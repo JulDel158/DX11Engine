@@ -5,10 +5,10 @@
 
 
 // main window class name
-static TCHAR szWindowClass[] = _T("Potato Engine");
+static TCHAR szWindowClass[] = L"Potato Engine";
 
 // title bar name
-static TCHAR szTitle[] = _T("First Game");
+static TCHAR szTitle[] = L"First Game";
 
 HINSTANCE hInst;
 
@@ -88,6 +88,7 @@ int CALLBACK WinMain(
 	ShowWindow(main_hwnd, nCmdShow);
 	UpdateWindow(main_hwnd);
 
+	// TODO: move this function to app implementation
 	MSG msg = begin_main_loop();
 
 	destroy_console(static_cast<int>(msg.wParam));
