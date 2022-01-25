@@ -148,10 +148,14 @@
     <ClCompile Include="src\cpp\app.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hpp\app.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
+    <ClInclude Include="src\hpp\pipeline.hpp" />
+    <ClInclude Include="src\hpp\pipeline_properties.hpp" />
+    <ClInclude Include="src\hpp\renderer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

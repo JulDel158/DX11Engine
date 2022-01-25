@@ -19,6 +19,7 @@ namespace dxe {
 
 	private:
 		dx_window dxWindow;
+
 	};
 
 } // namespace dxe
