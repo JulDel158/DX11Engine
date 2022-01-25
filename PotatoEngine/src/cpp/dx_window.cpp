@@ -12,7 +12,8 @@ namespace pe {
 		title{ L"First Game" }, 
 		msg{ ms },
 		hInstance{ hInst }, 
-		mainHWND{ NULL }
+		mainHWND{ NULL },
+		wcex{ 0 }
 		{
 		
         initWindowClass(hInst, winProc);
@@ -34,7 +35,7 @@ namespace pe {
     }
 
 	void dx_window::initWindowClass(HINSTANCE& hInst, WNDPROC winProc) {
-		ZeroMemory(&wcex, sizeof(WNDCLASSEX));
+		
 		wcex.cbSize = sizeof(WNDCLASSEX);
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = winProc;
