@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pe {
+namespace dxe {
 	dx_window::dx_window(HINSTANCE& hInst, WNDPROC winProc, int nCmdShow, MSG& ms) : 
 		windowClass{ L"Potato Engine" }, 
 		title{ L"First Game" }, 
@@ -99,4 +99,4 @@ namespace pe {
 	#endif
     }
 
-} // namespace pe
+} // namespace dxe

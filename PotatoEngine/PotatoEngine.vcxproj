@@ -145,10 +145,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\cpp\app.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\hpp\app.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

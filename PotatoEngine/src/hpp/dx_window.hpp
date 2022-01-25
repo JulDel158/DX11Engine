@@ -2,10 +2,9 @@
 #include <string>
 #include <windows.h>
 
+// dx_window handles window creation
 
-// BUG: only works in debug mode :/
-
-namespace pe {
+namespace dxe {
 
 	class dx_window
 	{
@@ -36,4 +35,4 @@ namespace pe {
 		HWND mainHWND{ 0 };
 	};
 
-} // namespace pe
+} // namespace dxe
