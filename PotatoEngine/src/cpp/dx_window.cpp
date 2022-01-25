@@ -4,11 +4,18 @@
 #include <cassert>
 #include <conio.h>
 #include <iostream>
+#include <stdexcept>
 
 namespace pe {
-	dx_window::dx_window(HINSTANCE& hInst, WNDPROC& winProc, int nCmdShow, MSG& ms) : windowClass{ L"Potato Engine" }, title{ L"First Game" }, hInstance{ hInst }, mainHWND{ NULL }, msg{ ms } {
+	dx_window::dx_window(HINSTANCE& hInst, WNDPROC winProc, int nCmdShow, MSG& ms) : 
+		windowClass{ L"Potato Engine" }, 
+		title{ L"First Game" }, 
+		msg{ ms },
+		hInstance{ hInst }, 
+		mainHWND{ NULL }
+		{
 		
-        initWindowClass(winProc);
+        initWindowClass(hInst, winProc);
 		createWindow();
 
 		createConsole();
@@ -17,8 +24,8 @@ namespace pe {
 		// hWnd: the value returned from CreateWindow
 		// nCmdShow: the fourth parameter from WinMain
 		if (mainHWND) {
-			ShowWindow(mainHWND, nCmdShow);
-			UpdateWindow(mainHWND);
+		ShowWindow(mainHWND, nCmdShow);
+		UpdateWindow(mainHWND);
 		}
     }
 
@@ -26,23 +33,26 @@ namespace pe {
 		destroyConsole(static_cast<int>(msg.wParam));
     }
 
-    void dx_window::initWindowClass(WNDPROC& winProc) {
+	void dx_window::initWindowClass(HINSTANCE& hInst, WNDPROC winProc) {
+		ZeroMemory(&wcex, sizeof(WNDCLASSEX));
 		wcex.cbSize = sizeof(WNDCLASSEX);
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = winProc;
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = 0;
-		wcex.hInstance = hInstance;
-		wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+		wcex.hInstance = hInst;
+		wcex.hIcon = LoadIcon(hInst, IDI_APPLICATION);
 		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground = NULL;
 		wcex.lpszMenuName = NULL;
 		wcex.lpszClassName = windowClass.c_str();
-		wcex.hIconSm = LoadIcon(hInstance, IDI_APPLICATION);
+		wcex.hIconSm = LoadIcon(hInst, IDI_APPLICATION);
 
 
-		assert(RegisterClassEx(&wcex) && "Call to RegisterClassEx failed!");
-    }
+		if (!RegisterClassEx(&wcex)) {
+			throw std::runtime_error("Call to RegisterClassEx in initWindowClass failed!");
+		}
+	}
 
 	void dx_window::createWindow() {
 
@@ -60,7 +70,9 @@ namespace pe {
 			NULL							// unused in this app
 		);
 
-		assert(mainHWND && "Call to CreateWindow failed!");
+		if (!mainHWND) {
+			throw std::runtime_error("Call to CreateWindow failed!");
+		}
 	}
 
     void dx_window::createConsole() {
@@ -85,4 +97,5 @@ namespace pe {
 		FreeConsole();
 	#endif
     }
+
 } // namespace pe

@@ -1,7 +1,16 @@
+// std
 #include <conio.h>
 #include <iostream>
 #include <tchar.h>
 #include <windows.h>
+#include <cassert>
+
+#include "../hpp/dx_window.hpp"
+
+//#ifndef NDEBUG
+//#define NDEBUG
+//#endif // !NDEBUG
+
 
 
 // main window class name
@@ -28,70 +37,76 @@ int CALLBACK WinMain(
 	_In_ LPSTR	   lpCmdLine,
 	_In_ int	   nCmdShow
 ) {
-	WNDCLASSEX wcex;
+	MSG msg;
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = NULL;
-	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = szWindowClass;
-	wcex.hIconSm = LoadIcon(hInstance, IDI_APPLICATION);
-
-	// TODO: Conside using throw
-	if (!RegisterClassEx(&wcex)) {
-		MessageBox(NULL,
-			_T("Call to RegisterClassEx failed!"),
-			_T("Potato Engine"),
-			NULL);
-
-		return 1;
-	}
+	pe::dx_window wnd(hInstance, WndProc, nCmdShow, msg);
 
 	// storing instance handle in our global variable
-	hInst = hInstance;
+	// hInst = hInstance;
 
-	main_hwnd = CreateWindow(
-		szWindowClass,	// name of application
-		szTitle,		// name displayed on title bar
-		WS_POPUPWINDOW | WS_CAPTION, // the type of window to create
-		CW_USEDEFAULT,	// initial postion (x)
-		CW_USEDEFAULT,	// initial position (y)
-		1280,			// initial window size
-		720,			// initial window size
-		NULL,			// parent of this window
-		NULL,			// menu bar
-		hInstance,		// first parameter from WinMain
-		NULL			// unused in this app
-	);
+	//WNDCLASSEX wcex{ 0 };
 
-	// TODO: Conside using throw
-	if (!main_hwnd) {
-		MessageBox(NULL,
-			_T("Call to CreateWindow failed!"),
-			_T("Potato Engine"),
-			NULL);
+	//wcex.cbSize = sizeof(WNDCLASSEX);
+	//wcex.style = CS_HREDRAW | CS_VREDRAW;
+	//wcex.lpfnWndProc = WndProc;
+	//wcex.cbClsExtra = 0;
+	//wcex.cbWndExtra = 0;
+	//wcex.hInstance = hInst;
+	//wcex.hIcon = LoadIcon(hInst, IDI_APPLICATION);
+	//wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	//wcex.hbrBackground = NULL;
+	//wcex.lpszMenuName = NULL;
+	//wcex.lpszClassName = szWindowClass;
+	//wcex.hIconSm = LoadIcon(hInst, IDI_APPLICATION);
 
-		return 1;
-	}
+	//// TODO: Conside using throw
+	//if (!RegisterClassEx(&wcex)) {
+	//	MessageBox(NULL,
+	//		_T("Call to RegisterClassEx failed!"),
+	//		_T("Potato Engine"),
+	//		NULL);
 
-	create_console();
+	//	return 1;
+	//}
+
+	//
+
+	//main_hwnd = CreateWindow(
+	//	szWindowClass,	// name of application
+	//	szTitle,		// name displayed on title bar
+	//	WS_POPUPWINDOW | WS_CAPTION, // the type of window to create
+	//	CW_USEDEFAULT,	// initial postion (x)
+	//	CW_USEDEFAULT,	// initial position (y)
+	//	1280,			// initial window size
+	//	720,			// initial window size
+	//	NULL,			// parent of this window
+	//	NULL,			// menu bar
+	//	hInst,		// first parameter from WinMain
+	//	NULL			// unused in this app
+	//);
+
+	//// TODO: Conside using throw
+	//if (!main_hwnd) {
+	//	MessageBox(NULL,
+	//		_T("Call to CreateWindow failed!"),
+	//		_T("Potato Engine"),
+	//		NULL);
+
+	//	return 1;
+	//}
+
+	//create_console();
 
 	// parameters to ShowWindow explained:
 	// hWnd: the value returned from CreateWindow
 	// nCmdShow: the fourth parameter from WinMain
-	ShowWindow(main_hwnd, nCmdShow);
-	UpdateWindow(main_hwnd);
+	/*ShowWindow(main_hwnd, nCmdShow);
+	UpdateWindow(main_hwnd);*/
 
 	// TODO: move this function to app implementation
-	MSG msg = begin_main_loop();
+	msg = begin_main_loop();
 
-	destroy_console(static_cast<int>(msg.wParam));
+	//destroy_console(static_cast<int>(msg.wParam));
 
 	return static_cast<int>(msg.wParam);
 }
