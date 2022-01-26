@@ -32,6 +32,7 @@ namespace dxe {
 
 		HINSTANCE hInstance{ 0 };
 
+	public:
 		// window handle
 		HWND mainHWND{ 0 };
 	};

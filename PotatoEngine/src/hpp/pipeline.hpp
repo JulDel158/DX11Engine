@@ -32,6 +32,7 @@ namespace dxe {
 
 	private:
 		HWND hwnd;
+		View_t tempView;
 
 		ID3D11Device*				device = nullptr;
 		ID3D11DeviceContext*		context = nullptr;
@@ -57,7 +58,7 @@ namespace dxe {
 
 		ID3D11Buffer*				constantBuffer[CONSTANT_BUFFER::COUNT]{};
 
-		D3D11_VIEWPORT				view_port[VIEWPORT::COUNT]{};
+		D3D11_VIEWPORT				viewPort[VIEWPORT::COUNT]{};
 
 		ID3D11ShaderResourceView*	sResourceView[SUBRESOURCE_VIEW::COUNT]{};  // may be moved out of here for textures
 
@@ -79,6 +80,10 @@ namespace dxe {
 		void createVertexBuffers();
 
 		void createConstantBuffers();
+
+	public:
+
+		void setRenderTargetView();
 
 	};
 

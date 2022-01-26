@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dx_window.hpp"
+#include "renderer.hpp"
 
 namespace dxe {
 
@@ -20,6 +21,7 @@ namespace dxe {
 	private:
 		dx_window dxWindow;
 
+		renderer dxRenderer;
 	};
 
 } // namespace dxe

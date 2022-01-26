@@ -3,7 +3,7 @@
 #include "../hpp/dx_window.hpp"
 
 namespace dxe {
-	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg) {
+	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND) {
 
 	}
 
@@ -28,6 +28,8 @@ namespace dxe {
 
 			}
 			else {
+				dxRenderer.update();
+				dxRenderer.draw();
 				// here you will do your update and render function for your engine
 			}
 		}

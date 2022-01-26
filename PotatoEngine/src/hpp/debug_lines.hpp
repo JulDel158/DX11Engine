@@ -17,11 +17,15 @@ namespace dxe {
 
 		static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 acolor, DirectX::XMFLOAT4 bcolor);
 
+		inline static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 color) { addLine(apos, bpos, color, color); }
+
 		static const ColoredVertex* getLineVerts();
 
 		static size_t getLineVertCount();
 
 		static size_t getLineVertCapacity();
+
+		static void addGrid();
 	};
 
 } // namespace dxe

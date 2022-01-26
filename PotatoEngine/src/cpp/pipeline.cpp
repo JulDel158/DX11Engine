@@ -5,9 +5,10 @@
 #include <vector>
 #include <DirectXMath.h>
 
+
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
-//#pragma comment(lib, "DXGI.lib")
+// #pragma comment(lib, "DXGI.lib")
 
 #include "../hpp/file_reader.hpp"
 
@@ -30,6 +31,18 @@ namespace dxe {
 		createVertexBuffers();
 
 		createConstantBuffers();
+
+		// we must create a view and projection matrix, at least temporarely here
+		// DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixIdentity());
+		DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixIdentity());
+
+		float aspect = viewPort[VIEWPORT::DEFAULT].Width / viewPort[VIEWPORT::DEFAULT].Height;
+		DirectX::XMVECTOR eyepos = DirectX::XMVectorSet(0.f, 5.f,10.f, 1.f);
+		DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.f, 0.f, 0.f, 1.f);
+		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+		DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH(eyepos, focus, up)));
+		DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixPerspectiveFovLH(3.1415926f / 4.0f, aspect, 0.01f, 100.f));
 	}
 
 	pipeline::~pipeline() {
@@ -94,7 +107,37 @@ namespace dxe {
 	}
 
 	void pipeline::drawDebugLines() {
+		UINT stride = sizeof(ColoredVertex);
+		UINT offset = 0;
 
+		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::COLORED_LINES], &stride, &offset);
+
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::COLORED_LINES], 0, nullptr, debug_lines::getLineVerts(), 0, 0);
+
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::DEFAULT]);
+
+		context->VSSetShader(vertexShader[VERTEX_SHADER::DEFAULT], nullptr, 0);
+
+		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+
+		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::DEFAULT], nullptr, 0);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		Object_cb cb1;
+		DirectX::XMStoreFloat4x4(&cb1.modeling, DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
+
+		Frame_cb cb2;
+		DirectX::XMStoreFloat4x4(&cb2.projection, DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&tempView.projection)));
+		DirectX::XMStoreFloat4x4(&cb2.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&tempView.view)))); // wtf directx
+
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb1, 0, 0);
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb2, 0, 0);
+
+		context->Draw(debug_lines::getLineVertCount(), 0);
+		debug_lines::clearLines();
 	}
 
 	void pipeline::createDeviceAndSwapChain() {
@@ -102,7 +145,7 @@ namespace dxe {
 		GetClientRect(hwnd, &crect); // Retrieves the coordinates of a window's client area. The client coordinates specify the upper-left and lower-right corners
 
 		// Set up viewport
-		D3D11_VIEWPORT& vp = view_port[VIEWPORT::DEFAULT];
+		D3D11_VIEWPORT& vp = viewPort[VIEWPORT::DEFAULT];
 		vp.Width = static_cast<float>(crect.right);
 		vp.Height = static_cast<float>(crect.bottom);
 		vp.MinDepth = 0.f;
@@ -178,8 +221,8 @@ namespace dxe {
 		D3D11_TEXTURE2D_DESC depthBufferDesc{ 0 };
 		ID3D11Texture2D* depthStencilBuffer;
 
-		depthBufferDesc.Width = static_cast<UINT>(view_port[VIEWPORT::DEFAULT].Width);
-		depthBufferDesc.Height = static_cast<UINT>(view_port[VIEWPORT::DEFAULT].Height);
+		depthBufferDesc.Width = static_cast<UINT>(viewPort[VIEWPORT::DEFAULT].Width);
+		depthBufferDesc.Height = static_cast<UINT>(viewPort[VIEWPORT::DEFAULT].Height);
 		depthBufferDesc.MipLevels = 1;
 		depthBufferDesc.ArraySize = 1;
 		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -266,8 +309,8 @@ namespace dxe {
 	}
 
 	void pipeline::createShaderAndInputLayout() {
-		std::vector<uint8_t> vs_blob = tools::file_reader::load_binary_blob("simple_vertex_shader.cso");
-		std::vector<uint8_t> ps_blob = tools::file_reader::load_binary_blob("simple_pixel_shader.cso");
+		std::vector<uint8_t> vs_blob = tools::file_reader::load_binary_blob("shaders/simple_vertex_shader.cso");
+		std::vector<uint8_t> ps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
 
 		HRESULT hr = device->CreateVertexShader(vs_blob.data(), vs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
 		assert(!FAILED(hr) && "failed to create vertex shader");
@@ -320,6 +363,19 @@ namespace dxe {
 
 		hr = device->CreateBuffer(&frm_cb, NULL, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
 		assert(!FAILED(hr) && "failed to create constant buffer: Frame_cb");
+	}
+
+	void pipeline::setRenderTargetView() {
+		const DirectX::XMFLOAT4 black{ 0.f, 0.f, 0.f, 1.f };
+
+		context->OMSetDepthStencilState(depthStencilState[DEPTH_STENCIL_STATE::DEFAULT], 1);
+		context->OMSetRenderTargets(1, &renderTarget[RENDER_TARGET_VIEW::DEFAULT], depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT]);
+
+		context->ClearRenderTargetView(renderTarget[RENDER_TARGET_VIEW::DEFAULT], &black.x);
+		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+		context->RSSetState(rasterState[RASTER_STATE::DEFAULT]);
+		context->RSSetViewports(1, &viewPort[VIEWPORT::DEFAULT]);
 	}
 
 } // namespace dxe

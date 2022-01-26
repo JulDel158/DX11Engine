@@ -27,4 +27,41 @@ namespace dxe {
 
 	size_t debug_lines::getLineVertCapacity() { return MAX_LINE_VERTS; }
 
+	void debug_lines::addGrid() {
+        const float size = 50;
+        const float spacing = 2;
+        const float lines = size / spacing;
+        float dxz = -size / 2;
+        //float z = dxz;
+        const float cz = dxz;
+        const float cx = dxz;
+        int i = 0;
+
+        for (int p = 0; p < lines; ++p)
+        {
+            //linex
+            addLine(
+                DirectX::XMFLOAT3(cx, 0.0f, dxz), // first point
+                DirectX::XMFLOAT3(cx + size, 0.0f, dxz),  // second point
+                DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+            //linez
+            addLine(
+                DirectX::XMFLOAT3(dxz, 0.0f, cz), // first point
+                DirectX::XMFLOAT3(dxz, 0.0f, cz + size),  // second point
+                DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+
+            dxz += spacing;
+        }
+        //drawing last line of the grid
+        addLine(
+            DirectX::XMFLOAT3(cx, 0.0f, dxz), // first point
+            DirectX::XMFLOAT3(cx + size, 0.0f, dxz),  // second point
+            DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+
+        addLine(
+            DirectX::XMFLOAT3(dxz, 0.0f, cz), // first point
+            DirectX::XMFLOAT3(dxz, 0.0f, cz + size),  // second point
+            DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+	}
+
 } // namespace dxe
