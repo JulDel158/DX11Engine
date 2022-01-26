@@ -286,7 +286,7 @@ namespace dxe {
 
 	void pipeline::createVertexBuffers() {
 		HRESULT hr;
-
+		
 		CD3D11_BUFFER_DESC desc = CD3D11_BUFFER_DESC(
 			sizeof(ColoredVertex) * debug_lines::getLineVertCapacity(),
 			D3D11_BIND_VERTEX_BUFFER);

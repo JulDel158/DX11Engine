@@ -8,29 +8,20 @@
 namespace dxe {
 
 	struct debug_lines {
-		debug_lines() = default;
-		~debug_lines() = default;
+		debug_lines() = delete;
+		~debug_lines() = delete;
+		debug_lines(const debug_lines&) = delete;
+		debug_lines& operator=(const debug_lines&) = delete;
 
-		static void clearLines() { lineVertCount = 0; }
+		static void clearLines();
 
-		static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 acolor, DirectX::XMFLOAT4 bcolor) {
-			lineVerts[lineVertCount].pos = apos;
-			lineVerts[lineVertCount++].color = acolor;
-			lineVerts[lineVertCount].pos = bpos;
-			lineVerts[lineVertCount++].color = bcolor;
-		}
+		static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 acolor, DirectX::XMFLOAT4 bcolor);
 
-		static const ColoredVertex* getLineVerts() { return lineVerts.data(); }
+		static const ColoredVertex* getLineVerts();
 
-		static size_t getLineVertCount() { return lineVertCount; }
+		static size_t getLineVertCount();
 
-		static size_t getLineVertCapacity() { return MAX_LINE_VERTS; }
-
-	private:
-		static constexpr size_t MAX_LINE_VERTS = 2000;
-
-		static size_t lineVertCount;
-		static std::array<ColoredVertex, MAX_LINE_VERTS> lineVerts;
+		static size_t getLineVertCapacity();
 	};
 
 } // namespace dxe
