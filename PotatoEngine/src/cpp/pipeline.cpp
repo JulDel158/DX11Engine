@@ -2,6 +2,18 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <vector>
+#include <DirectXMath.h>
+
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "d3d11.lib")
+//#pragma comment(lib, "DXGI.lib")
+
+#include "../hpp/file_reader.hpp"
+#include "../hpp/object_data.hpp"
+#include "../hpp/debug_lines.hpp"
+
+
 
 namespace dxe {
 
@@ -215,23 +227,98 @@ namespace dxe {
 	}
 
 	void pipeline::setUpRasterizer() {
+		D3D11_RASTERIZER_DESC rasterDesc;
+		ZeroMemory(&rasterDesc, sizeof(rasterDesc));
 
+		rasterDesc.AntialiasedLineEnable = true;
+		rasterDesc.CullMode = D3D11_CULL_BACK;
+		rasterDesc.DepthBias = 0;
+		rasterDesc.DepthBiasClamp = 0.0f;
+		rasterDesc.DepthClipEnable = false;
+		rasterDesc.FillMode = D3D11_FILL_SOLID;
+		rasterDesc.FrontCounterClockwise = false;
+		rasterDesc.MultisampleEnable = false;
+		rasterDesc.ScissorEnable = false;
+		rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+		HRESULT hr = device->CreateRasterizerState(&rasterDesc, &rasterState[RASTER_STATE::DEFAULT]);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("Create Rasterizer State failed!");
+		}
 	}
 
 	void pipeline::createSamplerState() {
+		D3D11_SAMPLER_DESC sd = {};
+		sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sd.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sd.MinLOD = 0;
+		sd.MaxLOD = D3D11_FLOAT32_MAX;
+		HRESULT hr = device->CreateSamplerState(&sd, &samplerState[SAMPLER_STATE::DEFAULT]);
 
+		if (FAILED(hr)) {
+			throw std::runtime_error("Create Sampler State failed!");
+		}
 	}
 
 	void pipeline::createShaderAndInputLayout() {
+		std::vector<uint8_t> vs_blob = tools::file_reader::load_binary_blob("simple_vertex_shader.cso");
+		std::vector<uint8_t> ps_blob = tools::file_reader::load_binary_blob("simple_pixel_shader.cso");
 
+		HRESULT hr = device->CreateVertexShader(vs_blob.data(), vs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create vertex shader");
+
+		hr = device->CreatePixelShader(ps_blob.data(), ps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create pixel shader");
+
+		D3D11_INPUT_ELEMENT_DESC idesc[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+
+		hr = device->CreateInputLayout(idesc, ARRAYSIZE(idesc), vs_blob.data(), vs_blob.size(), &inputLayout[INPUT_LAYOUT::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create input layout");
 	}
 
 	void pipeline::createVertexBuffers() {
+		HRESULT hr;
 
+		CD3D11_BUFFER_DESC desc = CD3D11_BUFFER_DESC(
+			sizeof(ColoredVertex) * debug_renderer::getLineVertCapacity(),
+			D3D11_BIND_VERTEX_BUFFER);
+
+		D3D11_SUBRESOURCE_DATA srd = { 0 };
+		srd.pSysMem = debug_renderer::getLineVerts();
+
+		hr = device->CreateBuffer(&desc, &srd, &vertexBuffer[VERTEX_BUFFER::COLORED_LINES]);
+		assert(!FAILED(hr) && "failed to create input layout");
 	}
 
 	void pipeline::createConstantBuffers() {
+		D3D11_BUFFER_DESC obj_cb;
+		ZeroMemory(&obj_cb, sizeof(obj_cb));
 
+		obj_cb.Usage = D3D11_USAGE_DEFAULT;
+		obj_cb.ByteWidth = sizeof(Object_cb);
+		obj_cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		obj_cb.CPUAccessFlags = 0;
+
+		HRESULT hr = device->CreateBuffer(&obj_cb, NULL, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+		assert(!FAILED(hr) && "failed to create constant buffer: Object_cb");
+
+		D3D11_BUFFER_DESC frm_cb;
+		ZeroMemory(&frm_cb, sizeof(frm_cb));
+
+		frm_cb.Usage = D3D11_USAGE_DEFAULT;
+		frm_cb.ByteWidth = sizeof(Frame_cb);
+		frm_cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		frm_cb.CPUAccessFlags = 0;
+
+		hr = device->CreateBuffer(&frm_cb, NULL, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
+		assert(!FAILED(hr) && "failed to create constant buffer: Frame_cb");
 	}
 
 } // namespace dxe

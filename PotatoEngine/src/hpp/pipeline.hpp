@@ -1,20 +1,14 @@
 #pragma once
-#include "pipeline_properties.hpp"
 
 // directx11
 #include <d3d11_2.h>
 
-// std
-#include <memory>
-
-//#pragma comment(lib, "d2d1.lib")
-//#pragma comment(lib, "d3d11.lib")
-//#pragma comment(lib, "DXGI.lib")
+#include "pipeline_properties.hpp"
 
 namespace {
 	template<typename T>
 	void safe_release(T* t) {
-		if (t) { t->release(); }
+		if (t) { t->Release(); }
 	}
 }
 
@@ -31,6 +25,8 @@ namespace dxe {
 		pipeline& operator=(const pipeline&&) = delete;
 
 		void present(unsigned int vsync);
+
+		void drawDebugLines();
 
 	private:
 		HWND hwnd;

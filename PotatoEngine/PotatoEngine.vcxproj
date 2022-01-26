@@ -147,15 +147,37 @@
   <ItemGroup>
     <ClCompile Include="src\cpp\app.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
+    <ClCompile Include="src\cpp\file_reader.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\pipeline.cpp" />
     <ClCompile Include="src\cpp\renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hpp\app.hpp" />
+    <ClInclude Include="src\hpp\debug_lines.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
+    <ClInclude Include="src\hpp\file_reader.hpp" />
+    <ClInclude Include="src\hpp\object_data.hpp" />
     <ClInclude Include="src\hpp\pipeline.hpp" />
     <ClInclude Include="src\hpp\pipeline_properties.hpp" />
     <ClInclude Include="src\hpp\renderer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\cb.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\simple_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\simple_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

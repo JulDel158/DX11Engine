@@ -19,7 +19,7 @@ namespace dxe {
 	};
 
 	struct VERTEX_BUFFER {
-		enum { DEFAULT = 0, COUNT };
+		enum { COLORED_LINES = 0, COUNT };
 	};
 
 	struct INDEX_BUFFER {
@@ -39,7 +39,7 @@ namespace dxe {
 	};
 
 	struct CONSTANT_BUFFER {
-		enum { DEFAULT = 0, COUNT };
+		enum { OBJECT_CB = 0, FRAME_CB, COUNT };
 	};
 
 	struct VIEWPORT {
