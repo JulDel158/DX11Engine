@@ -3,7 +3,9 @@
 // directx11
 #include <d3d11_2.h>
 
+#include "debug_lines.hpp"
 #include "pipeline_properties.hpp"
+#include "object_data.hpp"
 
 namespace {
 	template<typename T>

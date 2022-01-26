@@ -1,11 +1,15 @@
 #pragma once
-#include "object_data.hpp"
+
 #include <array>
 #include <DirectXMath.h>
 
+#include "object_data.hpp"
+
 namespace dxe {
 
-	struct debug_renderer {
+	struct debug_lines {
+		debug_lines() = default;
+		~debug_lines() = default;
 
 		static void clearLines() { lineVertCount = 0; }
 

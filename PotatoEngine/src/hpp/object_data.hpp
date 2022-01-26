@@ -3,18 +3,23 @@
 
 namespace dxe {
 
+	struct alignas(16)ColoredVertex {
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT4 color;
+	};
+
+	struct View_t {
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
+	};
+
 	struct Object_cb {
-		DirectX::XMMATRIX modeling;
+		DirectX::XMFLOAT4X4 modeling;
 	};
 
 	struct Frame_cb {
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	};
-
-	struct ColoredVertex {
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT4 color;
+		DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
 	};
 
 } // namespace dxe

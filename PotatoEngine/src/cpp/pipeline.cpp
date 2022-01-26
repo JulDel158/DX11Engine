@@ -10,9 +10,6 @@
 //#pragma comment(lib, "DXGI.lib")
 
 #include "../hpp/file_reader.hpp"
-#include "../hpp/object_data.hpp"
-#include "../hpp/debug_lines.hpp"
-
 
 
 namespace dxe {
@@ -94,6 +91,10 @@ namespace dxe {
 
 	void pipeline::present(unsigned int vsync) {
 		swapChain->Present(vsync, 0);
+	}
+
+	void pipeline::drawDebugLines() {
+
 	}
 
 	void pipeline::createDeviceAndSwapChain() {
@@ -287,11 +288,11 @@ namespace dxe {
 		HRESULT hr;
 
 		CD3D11_BUFFER_DESC desc = CD3D11_BUFFER_DESC(
-			sizeof(ColoredVertex) * debug_renderer::getLineVertCapacity(),
+			sizeof(ColoredVertex) * debug_lines::getLineVertCapacity(),
 			D3D11_BIND_VERTEX_BUFFER);
 
 		D3D11_SUBRESOURCE_DATA srd = { 0 };
-		srd.pSysMem = debug_renderer::getLineVerts();
+		srd.pSysMem = debug_lines::getLineVerts();
 
 		hr = device->CreateBuffer(&desc, &srd, &vertexBuffer[VERTEX_BUFFER::COLORED_LINES]);
 		assert(!FAILED(hr) && "failed to create input layout");

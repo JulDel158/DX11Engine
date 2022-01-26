@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cpp\app.cpp" />
+    <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\file_reader.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
