@@ -1,22 +1,21 @@
 #include "../hpp/pipeline.hpp"
 
-#include <cassert>
-#include <stdexcept>
-#include <vector>
-//#include <DirectXMath.h>
-
+// lib
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+// std
+#include <cassert>
+#include <stdexcept>
+#include <vector>
 
+// dep
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
 // #pragma comment(lib, "DXGI.lib")
 
 #include "../hpp/file_reader.hpp"
-
-//using namespace DirectX;
 
 namespace dxe {
 

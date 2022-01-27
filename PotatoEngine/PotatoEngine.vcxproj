@@ -153,6 +153,7 @@
     <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\file_reader.cpp" />
+    <ClCompile Include="src\cpp\input.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
     <ClCompile Include="src\cpp\object_data.cpp" />
     <ClCompile Include="src\cpp\pipeline.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="src\hpp\debug_lines.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
     <ClInclude Include="src\hpp\file_reader.hpp" />
+    <ClInclude Include="src\hpp\input.hpp" />
     <ClInclude Include="src\hpp\object_data.hpp" />
     <ClInclude Include="src\hpp\pipeline.hpp" />
     <ClInclude Include="src\hpp\pipeline_properties.hpp" />

@@ -2,6 +2,8 @@
 
 #include "../hpp/dx_window.hpp"
 
+#include <iostream>
+
 namespace dxe {
 	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND) { }
 
@@ -24,6 +26,12 @@ namespace dxe {
 
 			}
 			else {
+				input.Update();
+				// DEBUG STUFF
+				if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
+				if (input.KeyDown((int)'B')) { std::cout << "B key is down!\n"; }
+				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
+
 				dxRenderer.update();
 				dxRenderer.draw();
 				// here you will do your update and render function for your engine

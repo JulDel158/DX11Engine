@@ -2,6 +2,7 @@
 
 #include "dx_window.hpp"
 #include "renderer.hpp"
+#include "input.hpp"
 
 namespace dxe {
 
@@ -20,7 +21,9 @@ namespace dxe {
 
 	private:
 		dx_window dxWindow;
-		
+
+		input input;
+
 		renderer dxRenderer;
 	};
 

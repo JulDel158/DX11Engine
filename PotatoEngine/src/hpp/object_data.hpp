@@ -1,5 +1,6 @@
 #pragma once
-// #include <DirectXMath.h>
+
+// lib
 #include <glm/glm.hpp>
 
 namespace dxe {
@@ -24,8 +25,6 @@ namespace dxe {
 		void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 
 		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad);
-
-		
 	};
 
 	struct Object_cb {
