@@ -28,7 +28,7 @@ namespace dxe {
 
 		void present(unsigned int vsync);
 
-		void drawDebugLines();
+		void drawDebugLines(View_t &viewProj);
 
 	private:
 		HWND hwnd;

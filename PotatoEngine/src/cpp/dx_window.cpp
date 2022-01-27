@@ -7,13 +7,15 @@
 #include <stdexcept>
 
 namespace dxe {
-	dx_window::dx_window(HINSTANCE& hInst, WNDPROC winProc, int nCmdShow, MSG& ms) : 
+	dx_window::dx_window(HINSTANCE& hInst, WNDPROC winProc, int nCmdShow, MSG& ms, unsigned int w, unsigned int h) :
 		windowClass{ L"Potato Engine" }, 
 		title{ L"First Game" }, 
 		msg{ ms },
 		hInstance{ hInst }, 
 		mainHWND{ NULL },
-		wcex{ 0 }
+		wcex{ 0 },
+		Width{ w },
+		Height{ h }
 		{
 		
         initWindowClass(hInst, winProc);
@@ -63,8 +65,8 @@ namespace dxe {
 			WS_POPUPWINDOW | WS_CAPTION,	// the type of window to create
 			CW_USEDEFAULT,					// initial postion (x)
 			CW_USEDEFAULT,					// initial position (y)
-			1280,							// initial window size
-			720,							// initial window size
+			Width,							// initial window size
+			Height,							// initial window size
 			NULL,							// parent of this window
 			NULL,							// menu bar
 			hInstance,						// first parameter from WinMain

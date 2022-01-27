@@ -9,7 +9,7 @@ namespace dxe {
 	class dx_window
 	{
 	public:
-		dx_window(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg);
+		dx_window(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg, unsigned int w = 1280, unsigned int h = 720);
 		~dx_window();
 
 		dx_window(const dx_window&) = delete;
@@ -35,6 +35,8 @@ namespace dxe {
 	public:
 		// window handle
 		HWND mainHWND{ 0 };
+
+		unsigned int Width, Height;
 	};
 
 } // namespace dxe

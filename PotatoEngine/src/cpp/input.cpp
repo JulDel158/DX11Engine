@@ -2,7 +2,6 @@
 
 #include <Windows.h>
 
-
 namespace dxe {
 	input::input() {}
 	input::~input() {}

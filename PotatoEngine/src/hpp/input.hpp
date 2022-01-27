@@ -12,8 +12,13 @@ namespace dxe {
 
 		void Update();
 
+		// returns true when a key is pressed once
 		bool KeyPressed(int i);
+
+		// returns true while a key is being held down
 		bool KeyDown(int i);
+
+		// returns true once a pressed key is released
 		bool KeyUp(int i);
 
 	private:

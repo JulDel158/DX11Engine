@@ -3,6 +3,7 @@
 #include "dx_window.hpp"
 #include "renderer.hpp"
 #include "input.hpp"
+#include "object_data.hpp"
 
 namespace dxe {
 
@@ -25,6 +26,8 @@ namespace dxe {
 		input input;
 
 		renderer dxRenderer;
+
+		View_t camera;
 	};
 
 } // namespace dxe

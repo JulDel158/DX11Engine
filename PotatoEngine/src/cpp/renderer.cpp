@@ -4,7 +4,7 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle) : implementation(windowHandle) { }
+	renderer::renderer(HWND windowHandle, View_t& viewP) : implementation(windowHandle), viewProj{ viewP } { }
 
 	renderer::~renderer() { }
 
@@ -22,7 +22,7 @@ namespace dxe {
 	void renderer::draw() {
 		implementation.setRenderTargetView();
 
-		implementation.drawDebugLines();
+		implementation.drawDebugLines(viewProj);
 
 		implementation.present(1);
 	}

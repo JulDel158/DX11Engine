@@ -16,15 +16,19 @@ namespace dxe {
 
 		void setPerspectiveProjection(float fovy, float aspect, float n, float f);
 
+		// these functions won't work in this engine
 		void setViewDirection(glm::vec3 position, glm::vec3 direction,
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
-		void setViewTarget(glm::vec3 position, glm::vec3 target,
+		void LookAtTarget(glm::vec3 position, glm::vec3 target,
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
-		void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
+		// replaced by FPSViewRH
+		// void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 
 		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad);
+
+		void dPrintViewMat();
 	};
 
 	struct Object_cb {
