@@ -64,4 +64,43 @@ namespace dxe {
             glm::vec4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
 	}
 
+    void debug_lines::addDebugCube(glm::vec3 pos, float offset, glm::vec4 color) {
+
+        // bottom
+        glm::vec3 p1;
+        glm::vec3 p2;
+        glm::vec3 p3;
+        glm::vec3 p4;
+        // top
+        glm::vec3 p5;
+        glm::vec3 p6;
+        glm::vec3 p7;
+        glm::vec3 p8;
+
+        p1 = glm::vec3(pos.x - offset, pos.y - offset, pos.z - offset);
+        p2 = glm::vec3(pos.x - offset, pos.y - offset, pos.z + offset);
+        p3 = glm::vec3(pos.x + offset, pos.y - offset, pos.z - offset);
+        p4 = glm::vec3(pos.x + offset, pos.y - offset, pos.z + offset);
+
+        p5 = glm::vec3(pos.x - offset, pos.y + offset, pos.z - offset);
+        p6 = glm::vec3(pos.x - offset, pos.y + offset, pos.z + offset);
+        p7 = glm::vec3(pos.x + offset, pos.y + offset, pos.z - offset);
+        p8 = glm::vec3(pos.x + offset, pos.y + offset, pos.z + offset);
+
+        addLine(p1, p2, color);
+        addLine(p1, p3, color);
+        addLine(p2, p4, color);
+        addLine(p4, p3, color);
+                         
+        addLine(p1, p5, color);
+        addLine(p2, p6, color);
+        addLine(p3, p7, color);
+        addLine(p4, p8, color);
+                        
+        addLine(p5, p6, color);
+        addLine(p5, p7, color);
+        addLine(p6, p8, color);
+        addLine(p8, p7, color);
+    }
+
 } // namespace dxe

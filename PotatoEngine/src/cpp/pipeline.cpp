@@ -3,7 +3,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <vector>
-// #include <DirectXMath.h>
+//#include <DirectXMath.h>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -16,6 +16,7 @@
 
 #include "../hpp/file_reader.hpp"
 
+//using namespace DirectX;
 
 namespace dxe {
 
@@ -42,17 +43,22 @@ namespace dxe {
 		
 
 		float aspect = viewPort[VIEWPORT::DEFAULT].Width / viewPort[VIEWPORT::DEFAULT].Height;
-		glm::vec3 eyepos = glm::vec3(0.f, 5.f,10.f);
-		glm::vec3 focus = glm::vec3(0.f, 0.f, 0.f);
-		glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
+		/*XMVECTOR eyepos = XMVectorSet(0.f, 5.f, 10.f, 1.0f);
+		XMVECTOR focus = XMVectorSet(1.f, 2.f, 3.f, 1.0f);
+		XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.0f);*/
 
-		//tempView.setViewTarget({ 0.f, 5.f, -10.f }, { 0.f, 0.f, 0.f });
-		tempView.setViewYXZ(eyepos, { 0.0f, 0.f, 0.f });
-		tempView.view = glm::inverse(tempView.view);
+		//tempView.setViewTarget({ 0.f, 5.f, 10.f }, { 0.f, 0.f, 0.f });
+		//tempView.setViewYXZ(eyepos, { -0.5f, 0.f, 0.f });
+		
+		tempView.FPSViewRH({ 0.f, 5.f, -15.f }, glm::radians(15.f), 0.f);
+		tempView.view = tempView.view;
 		tempView.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
-
-		// DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH(eyepos, focus, up)));
-		//DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixPerspectiveFovLH(3.1415926f / 4.0f, aspect, 0.01f, 100.f));
+		
+		/*DirectX::XMFLOAT4X4 view;
+		DirectX::XMFLOAT4X4 projection;
+		DirectX::XMStoreFloat4x4(&view, DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH(eyepos, focus, up)));
+		DirectX::XMStoreFloat4x4(&projection, DirectX::XMMatrixPerspectiveFovLH(3.1415926f / 4.0f, aspect, 0.01f, 100.f));*/
+		int temp = 1;
 	}
 
 	pipeline::~pipeline() {

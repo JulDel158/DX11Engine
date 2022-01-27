@@ -27,14 +27,18 @@ namespace dxe {
 		view[2][0] = u.z;
 		view[0][1] = v.x;
 		view[0][0] = u.x;
-		view[1][1] = v.y;
+
+		view[1][1] = w.z; // swapped with 2 2
+
 		view[2][1] = v.z;
 		view[0][2] = w.x;
 		view[1][2] = w.y;
-		view[2][2] = w.z;
+
+		view[2][2] = v.y;
+
 		view[3][0] = -glm::dot(u, position);
 		view[3][1] = -glm::dot(v, position);
-		view[3][2] = -glm::dot(w, position);
+		view[3][2] = -glm::dot(w, position); // swaped from - to +
 	}
 
 	void View_t::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
@@ -61,9 +65,30 @@ namespace dxe {
 		view[0][2] = w.x;
 		view[1][2] = w.y;
 		view[2][2] = w.z;
-		view[3][0] = -glm::dot(u, position);
+		view[3][0] = glm::dot(u, position);
 		view[3][1] = -glm::dot(v, position);
-		view[3][2] = -glm::dot(w, position);
+		view[3][2] = glm::dot(w, position);
+	}
+
+	void View_t::FPSViewRH(glm::vec3 eye, float pitch, float yaw)
+	{
+		// I assume the values are already converted to radians.
+		float cosPitch = glm::cos(pitch);
+		float sinPitch = glm::sin(pitch);
+		float cosYaw = glm::cos(yaw);
+		float sinYaw = glm::sin(yaw);
+		glm::vec3 xaxis = { cosYaw, 0, -sinYaw };
+		glm::vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
+		glm::vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
+
+		// Create a 4x4 view matrix from the right, up, forward and eye position vectors
+
+		view = {
+			glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0),
+			glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
+			glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
+			glm::vec4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)
+		};
 	}
 
 }
