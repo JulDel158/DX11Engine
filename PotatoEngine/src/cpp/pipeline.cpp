@@ -3,7 +3,11 @@
 #include <cassert>
 #include <stdexcept>
 #include <vector>
-#include <DirectXMath.h>
+// #include <DirectXMath.h>
+
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 
 #pragma comment(lib, "d2d1.lib")
@@ -34,15 +38,21 @@ namespace dxe {
 
 		// we must create a view and projection matrix, at least temporarely here
 		// DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixIdentity());
-		DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixIdentity());
+		//DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixIdentity());
+		
 
 		float aspect = viewPort[VIEWPORT::DEFAULT].Width / viewPort[VIEWPORT::DEFAULT].Height;
-		DirectX::XMVECTOR eyepos = DirectX::XMVectorSet(0.f, 5.f,10.f, 1.f);
-		DirectX::XMVECTOR focus = DirectX::XMVectorSet(0.f, 0.f, 0.f, 1.f);
-		DirectX::XMVECTOR up = DirectX::XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		glm::vec3 eyepos = glm::vec3(0.f, 5.f,10.f);
+		glm::vec3 focus = glm::vec3(0.f, 0.f, 0.f);
+		glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 
-		DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH(eyepos, focus, up)));
-		DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixPerspectiveFovLH(3.1415926f / 4.0f, aspect, 0.01f, 100.f));
+		//tempView.setViewTarget({ 0.f, 5.f, -10.f }, { 0.f, 0.f, 0.f });
+		tempView.setViewYXZ(eyepos, { 0.0f, 0.f, 0.f });
+		tempView.view = glm::inverse(tempView.view);
+		tempView.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
+
+		// DirectX::XMStoreFloat4x4(&tempView.view, DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixLookAtLH(eyepos, focus, up)));
+		//DirectX::XMStoreFloat4x4(&tempView.projection, DirectX::XMMatrixPerspectiveFovLH(3.1415926f / 4.0f, aspect, 0.01f, 100.f));
 	}
 
 	pipeline::~pipeline() {
@@ -127,11 +137,14 @@ namespace dxe {
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		Object_cb cb1;
-		DirectX::XMStoreFloat4x4(&cb1.modeling, DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
+		//DirectX::XMStoreFloat4x4(&cb1.modeling, DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
+		cb1.modeling = glm::transpose(glm::mat4{ 1.f });
 
 		Frame_cb cb2;
-		DirectX::XMStoreFloat4x4(&cb2.projection, DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&tempView.projection)));
-		DirectX::XMStoreFloat4x4(&cb2.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&tempView.view)))); // wtf directx
+		//DirectX::XMStoreFloat4x4(&cb2.projection, DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&tempView.projection)));
+		//DirectX::XMStoreFloat4x4(&cb2.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&tempView.view)))); // wtf directx
+		cb2.view = glm::transpose(tempView.view);
+		cb2.projection = glm::transpose(tempView.projection);
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb1, 0, 0);
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb2, 0, 0);
@@ -366,7 +379,7 @@ namespace dxe {
 	}
 
 	void pipeline::setRenderTargetView() {
-		const DirectX::XMFLOAT4 black{ 0.f, 0.f, 0.f, 1.f };
+		const glm::vec4 black{ 0.f, 0.f, 0.f, 1.f };
 
 		context->OMSetDepthStencilState(depthStencilState[DEPTH_STENCIL_STATE::DEFAULT], 1);
 		context->OMSetRenderTargets(1, &renderTarget[RENDER_TARGET_VIEW::DEFAULT], depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT]);

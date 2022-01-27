@@ -3,13 +3,9 @@
 #include "../hpp/dx_window.hpp"
 
 namespace dxe {
-	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND) {
+	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND) { }
 
-	}
-
-	app::~app() {
-
-	}
+	app::~app() { }
 
 	MSG app::run() {
 		MSG msg;

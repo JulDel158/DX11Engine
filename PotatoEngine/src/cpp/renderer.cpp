@@ -4,13 +4,9 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle) : implementation(windowHandle) {
-		
-	}
+	renderer::renderer(HWND windowHandle) : implementation(windowHandle) { }
 
-	renderer::~renderer() {
-
-	}
+	renderer::~renderer() { }
 
 	void renderer::update() {
 		debug_lines::addGrid();

@@ -1,6 +1,7 @@
 #pragma once
 #include "pipeline.hpp"
 
+// Obect information should be passed into the renderer which we will then pass into our pipeline to draw
 namespace dxe {
 
 	class renderer {
@@ -13,7 +14,7 @@ namespace dxe {
 	
 	private:
 		pipeline implementation;
-
+		
 	};
 
 } // dxe

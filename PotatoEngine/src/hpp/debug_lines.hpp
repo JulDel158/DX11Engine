@@ -1,7 +1,8 @@
 #pragma once
 
 #include <array>
-#include <DirectXMath.h>
+// #include <DirectXMath.h>
+#include <glm/glm.hpp>
 
 #include "object_data.hpp"
 
@@ -15,9 +16,9 @@ namespace dxe {
 
 		static void clearLines();
 
-		static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 acolor, DirectX::XMFLOAT4 bcolor);
+		static void addLine(glm::vec3 apos, glm::vec3 bpos, glm::vec4 acolor, glm::vec4 bcolor);
 
-		inline static void addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 color) { addLine(apos, bpos, color, color); }
+		inline static void addLine(glm::vec3 apos, glm::vec3 bpos, glm::vec4 color) { addLine(apos, bpos, color, color); }
 
 		static const ColoredVertex* getLineVerts();
 

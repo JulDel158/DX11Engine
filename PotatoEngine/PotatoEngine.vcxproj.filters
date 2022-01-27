@@ -39,6 +39,9 @@
     <ClCompile Include="src\cpp\debug_lines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\object_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hpp\dx_window.hpp">

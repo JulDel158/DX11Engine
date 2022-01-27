@@ -1,25 +1,36 @@
 #pragma once
-#include <DirectXMath.h>
+// #include <DirectXMath.h>
+#include <glm/glm.hpp>
 
 namespace dxe {
 
 	struct alignas(16)ColoredVertex {
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT4 color;
+		glm::vec3 pos;
+		glm::vec4 color;
 	};
 
 	struct View_t {
-		DirectX::XMFLOAT4X4 view;
-		DirectX::XMFLOAT4X4 projection;
+		glm::mat4 view{ 1.f };
+		glm::mat4 projection{ 1.f };
+
+		void setPerspectiveProjection(float fovy, float aspect, float near, float far);
+
+		void setViewDirection(glm::vec3 position, glm::vec3 direction,
+			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
+
+		void setViewTarget(glm::vec3 position, glm::vec3 target,
+			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
+
+		void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 	};
 
 	struct Object_cb {
-		DirectX::XMFLOAT4X4 modeling;
+		glm::mat4 modeling{ 1.f };
 	};
 
 	struct Frame_cb {
-		DirectX::XMFLOAT4X4 view;
-		DirectX::XMFLOAT4X4 projection;
+		glm::mat4 view{ 1.f };
+		glm::mat4 projection{ 1.f };
 	};
 
 } // namespace dxe

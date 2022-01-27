@@ -20,7 +20,7 @@ namespace dxe {
 
 	private:
 		dx_window dxWindow;
-
+		
 		renderer dxRenderer;
 	};
 

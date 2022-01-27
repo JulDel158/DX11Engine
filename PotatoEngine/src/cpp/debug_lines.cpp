@@ -14,7 +14,7 @@ namespace dxe {
 
 	void debug_lines::clearLines() { lineVertCount = 0; }
 
-	void debug_lines::addLine(DirectX::XMFLOAT3 apos, DirectX::XMFLOAT3 bpos, DirectX::XMFLOAT4 acolor, DirectX::XMFLOAT4 bcolor) {
+	void debug_lines::addLine(glm::vec3 apos, glm::vec3 bpos, glm::vec4 acolor, glm::vec4 bcolor) {
 		lineVerts[lineVertCount].pos = apos;
 		lineVerts[lineVertCount++].color = acolor;
 		lineVerts[lineVertCount].pos = bpos;
@@ -41,27 +41,27 @@ namespace dxe {
         {
             //linex
             addLine(
-                DirectX::XMFLOAT3(cx, 0.0f, dxz), // first point
-                DirectX::XMFLOAT3(cx + size, 0.0f, dxz),  // second point
-                DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+                glm::vec3(cx, 0.0f, dxz), // first point
+                glm::vec3(cx + size, 0.0f, dxz),  // second point
+                glm::vec4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
             //linez
             addLine(
-                DirectX::XMFLOAT3(dxz, 0.0f, cz), // first point
-                DirectX::XMFLOAT3(dxz, 0.0f, cz + size),  // second point
-                DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+                glm::vec3(dxz, 0.0f, cz), // first point
+                glm::vec3(dxz, 0.0f, cz + size),  // second point
+                glm::vec4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
 
             dxz += spacing;
         }
         //drawing last line of the grid
         addLine(
-            DirectX::XMFLOAT3(cx, 0.0f, dxz), // first point
-            DirectX::XMFLOAT3(cx + size, 0.0f, dxz),  // second point
-            DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+            glm::vec3(cx, 0.0f, dxz), // first point
+            glm::vec3(cx + size, 0.0f, dxz),  // second point
+            glm::vec4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
 
         addLine(
-            DirectX::XMFLOAT3(dxz, 0.0f, cz), // first point
-            DirectX::XMFLOAT3(dxz, 0.0f, cz + size),  // second point
-            DirectX::XMFLOAT4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+            glm::vec3(dxz, 0.0f, cz), // first point
+            glm::vec3(dxz, 0.0f, cz + size),  // second point
+            glm::vec4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
 	}
 
 } // namespace dxe
