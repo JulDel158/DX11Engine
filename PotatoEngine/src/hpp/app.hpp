@@ -28,6 +28,10 @@ namespace dxe {
 		renderer dxRenderer;
 
 		View_t camera;
+
+		Frame_cb frameBuffer;
+
+		Window_cb windowBuffer;
 	};
 
 } // namespace dxe

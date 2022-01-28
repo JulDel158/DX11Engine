@@ -39,7 +39,7 @@ namespace dxe {
 	};
 
 	struct CONSTANT_BUFFER {
-		enum { OBJECT_CB = 0, FRAME_CB, COUNT };
+		enum { OBJECT_CB = 0, FRAME_CB, WINDOW_CB, COUNT };
 	};
 
 	struct VIEWPORT {

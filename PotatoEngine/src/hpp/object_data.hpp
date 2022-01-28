@@ -23,9 +23,6 @@ namespace dxe {
 		void LookAtTarget(glm::vec3 position, glm::vec3 target,
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
-		// replaced by FPSViewRH
-		// void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
-
 		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad);
 
 		void dPrintViewMat();
@@ -37,7 +34,12 @@ namespace dxe {
 
 	struct Frame_cb {
 		glm::mat4 view{ 1.f };
+	};
+
+	struct Window_cb {
 		glm::mat4 projection{ 1.f };
+
+		void setPerspectiveProjection(float fovy, float aspect, float n, float f);
 	};
 
 } // namespace dxe

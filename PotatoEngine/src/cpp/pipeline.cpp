@@ -36,17 +36,6 @@ namespace dxe {
 
 		createConstantBuffers();
 
-		float aspect = viewPort[VIEWPORT::DEFAULT].Width / viewPort[VIEWPORT::DEFAULT].Height;
-		
-		//tempView.FPSViewRH({ 0.f, 3.f, -15.f }, glm::radians(-30.f), glm::radians(0.f));
-		//// tempView.view = glm::inverse(tempView.view);
-		//// tempView.dPrintViewMat();
-		//tempView.view = glm::mat4{1.f};
-		//tempView.LookAtTarget({ 0.f, 5.f, -15.f }, { 0.f, 5.f, 0.f }, {0.f, 1.f, 0.f});
-		//tempView.view = glm::inverse(tempView.view);
-		//tempView.dPrintViewMat();
-
-		//tempView.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
 	}
 
 	pipeline::~pipeline() {
@@ -110,9 +99,19 @@ namespace dxe {
 		swapChain->Present(vsync, 0);
 	}
 
-	void pipeline::bindFrameBuffer(const View_t& viewProj) {
-		Frame_cb cb{ viewProj.view, viewProj.projection };
+	void pipeline::bindFrameBuffer(const Frame_cb& frameCbuffer) {
+		Frame_cb cb{ frameCbuffer };
+		cb.view = glm::inverse(cb.view);
+
+		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
+
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
+	}
+
+	void pipeline::bindWindowBuffer(const Window_cb& wcb) {
+		context->VSSetConstantBuffers(2, 1, &constantBuffer[CONSTANT_BUFFER::WINDOW_CB]);
+
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::WINDOW_CB], 0, NULL, &wcb, 0, 0);
 	}
 
 	void pipeline::drawDebugLines() {
@@ -127,20 +126,19 @@ namespace dxe {
 
 		context->VSSetShader(vertexShader[VERTEX_SHADER::DEFAULT], nullptr, 0);
 
-		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
-
-		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
-
 		context->PSSetShader(pixelShader[PIXEL_SHADER::DEFAULT], nullptr, 0);
-
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		Object_cb cb1;
 		cb1.modeling = glm::mat4{ 1.f };
 
+		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb1, 0, 0);
 
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
 		context->Draw(debug_lines::getLineVertCount(), 0);
+
 		debug_lines::clearLines();
 	}
 
@@ -346,8 +344,8 @@ namespace dxe {
 	}
 
 	void pipeline::createConstantBuffers() {
-		D3D11_BUFFER_DESC obj_cb;
-		ZeroMemory(&obj_cb, sizeof(obj_cb));
+		// Object buffer
+		D3D11_BUFFER_DESC obj_cb{ 0 };
 
 		obj_cb.Usage = D3D11_USAGE_DEFAULT;
 		obj_cb.ByteWidth = sizeof(Object_cb);
@@ -356,9 +354,9 @@ namespace dxe {
 
 		HRESULT hr = device->CreateBuffer(&obj_cb, NULL, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
 		assert(!FAILED(hr) && "failed to create constant buffer: Object_cb");
-
-		D3D11_BUFFER_DESC frm_cb;
-		ZeroMemory(&frm_cb, sizeof(frm_cb));
+		
+		// Frame buffer
+		D3D11_BUFFER_DESC frm_cb{ 0 };
 
 		frm_cb.Usage = D3D11_USAGE_DEFAULT;
 		frm_cb.ByteWidth = sizeof(Frame_cb);
@@ -367,6 +365,17 @@ namespace dxe {
 
 		hr = device->CreateBuffer(&frm_cb, NULL, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
 		assert(!FAILED(hr) && "failed to create constant buffer: Frame_cb");
+
+		// Window buffer
+		D3D11_BUFFER_DESC wnd_cb{ 0 };
+
+		wnd_cb.Usage = D3D11_USAGE_DEFAULT;
+		wnd_cb.ByteWidth = sizeof(Window_cb);
+		wnd_cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		wnd_cb.CPUAccessFlags = 0;
+
+		hr = device->CreateBuffer(&wnd_cb, NULL, &constantBuffer[CONSTANT_BUFFER::WINDOW_CB]);
+		assert(!FAILED(hr) && "failed to create constant buffer: Window_cb");
 	}
 
 	void pipeline::setRenderTargetView() {

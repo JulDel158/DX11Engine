@@ -9,7 +9,12 @@ cbuffer Object_cb : register(b0)
 cbuffer Frame_cb : register(b1)
 {
 	matrix view;
-	matrix projection;
+	// matrix projection;
+};
+
+cbuffer Window_cb : register(b2)
+{
+    matrix projection;
 };
 
 struct VS_IN

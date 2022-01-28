@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 namespace dxe {
-	input::input() {}
+	input::input() : keyboardState{ 0 }, prevKeyboardState{ 0 } {}
 	input::~input() {}
 
 	void input::Update() {

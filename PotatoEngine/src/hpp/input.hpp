@@ -10,6 +10,7 @@ namespace dxe {
 		input();
 		~input();
 
+		// updates the key map
 		void Update();
 
 		// returns true when a key is pressed once

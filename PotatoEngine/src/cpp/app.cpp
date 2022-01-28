@@ -8,20 +8,25 @@
 #include <iostream>
 
 namespace dxe {
-	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND, camera) { 
+	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND, frameBuffer, windowBuffer) { 
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
 		camera.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
 		camera.FPSViewRH({ 0.f, 3.f, -15.f }, glm::radians(0.f), glm::radians(0.f));
+
+		// updating constant buffers
+		windowBuffer.projection = camera.projection;
+		frameBuffer.view = camera.view;
+
+		dxRenderer.bindWindowBuffer();
+
 		// tempView.view = glm::inverse(tempView.view);
 		// tempView.dPrintViewMat();
 		/*camera.view = glm::mat4{ 1.f };
 		camera.LookAtTarget({ 0.f, 5.f, -15.f }, { 0.f, 5.f, 0.f }, { 0.f, 1.f, 0.f });
 		camera.view = glm::inverse(camera.view);
 		camera.dPrintViewMat();*/
-
-		
 	}
 
 	app::~app() {}
@@ -42,7 +47,7 @@ namespace dxe {
 				DispatchMessage(&msg);
 
 			}
-			else {
+			else { // do updates and render down here
 				input.Update();
 
 #ifndef NDEBUG
@@ -51,14 +56,14 @@ namespace dxe {
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
 #endif // !NDEBUG
 
-				camera.view = glm::inverse(camera.view);
 				if (input.KeyDown('W')) { camera.view[3][2] += 0.1f * 0.5f; } // FOWARD
 				if (input.KeyDown('A')) { camera.view[3][0] -= 0.1f * 0.5f; } // LEFT
 				if (input.KeyDown('S')) { camera.view[3][2] -= 0.1f * 0.5f; } // DOWN
 				if (input.KeyDown('D')) { camera.view[3][0] += 0.1f * 0.5f; } // RIGHT
 				if (input.KeyDown('Q')) { camera.view[3][1] += 0.1f * 0.5f; } // UP
 				if (input.KeyDown('E')) { camera.view[3][1] -= 0.1f * 0.5f; } // DOWN
-				camera.view = glm::inverse(camera.view);
+
+				frameBuffer.view = camera.view;
 
 				dxRenderer.update();
 				dxRenderer.draw();

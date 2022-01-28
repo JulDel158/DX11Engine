@@ -29,9 +29,13 @@ namespace dxe {
 
 		void present(unsigned int vsync);
 
-		void bindFrameBuffer(const View_t& viewProj);
+		void bindFrameBuffer(const Frame_cb& frameCbuffer);
+
+		void bindWindowBuffer(const Window_cb& windowData);
 
 		void drawDebugLines();
+
+		void setRenderTargetView();
 
 	private:
 		HWND hwnd;
@@ -82,10 +86,6 @@ namespace dxe {
 		void createVertexBuffers();
 
 		void createConstantBuffers();
-
-	public:
-
-		void setRenderTargetView();
 
 	};
 

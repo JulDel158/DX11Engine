@@ -4,7 +4,7 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle, View_t& viewP) : implementation(windowHandle), viewProj{ viewP } { }
+	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{wcb} {}
 
 	renderer::~renderer() { }
 
@@ -20,13 +20,17 @@ namespace dxe {
 	}
 
 	void renderer::draw() {
-		implementation.bindFrameBuffer(viewProj);
+		implementation.bindFrameBuffer(frameCbuffer);
 
 		implementation.setRenderTargetView();
 
 		implementation.drawDebugLines();
 
 		implementation.present(1);
+	}
+
+	void renderer::bindWindowBuffer() {
+		implementation.bindWindowBuffer(windowCbuffer);
 	}
 
 } // dxe

@@ -7,16 +7,20 @@ namespace dxe {
 
 	class renderer {
 	public:
-		renderer(HWND windowHandle, View_t &viewProj);
+		renderer(HWND windowHandle, Frame_cb &frame_cbuffer, Window_cb &window_cbuffer);
 		~renderer();
 
 		void update();
 		void draw();
+
+		void bindWindowBuffer();
 	
 	private:
 		pipeline implementation;
 		
-		View_t& viewProj;
+		Frame_cb& frameCbuffer;
+
+		Window_cb& windowCbuffer;
 	};
 
 } // dxe

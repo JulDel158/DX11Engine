@@ -1,14 +1,19 @@
 // #include "cb.hlsli"
 
-cbuffer Object_cb : register(b0)
+cbuffer Object_cb : register(b0) // binder per object per frame
 {
 	matrix modeling;
 };
 
-cbuffer Frame_cb : register(b1)
+cbuffer Frame_cb : register(b1) // binded once every frame
 {
 	matrix view;
-	matrix projection;
+	// matrix projection;
+};
+
+cbuffer Window_cb : register(b2) // binded whenever the window changes
+{
+    matrix projection;
 };
 
 	struct VS_OUT
