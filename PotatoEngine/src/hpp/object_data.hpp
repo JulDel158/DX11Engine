@@ -13,6 +13,7 @@ namespace dxe {
 	struct View_t {
 		glm::mat4 view{ 1.f };
 		glm::mat4 projection{ 1.f };
+		glm::vec3 rotation{ 0.f };
 
 		void setPerspectiveProjection(float fovy, float aspect, float n, float f);
 
@@ -24,6 +25,8 @@ namespace dxe {
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
 		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad);
+
+		void RotateView();
 
 		void dPrintViewMat();
 	};

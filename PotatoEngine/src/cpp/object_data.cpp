@@ -76,6 +76,10 @@ namespace dxe {
 		});
 	}
 
+	void View_t::RotateView() {
+
+	}
+
 	void View_t::dPrintViewMat() {
 	#ifndef NDEBUG
 		std::cout << "--------------VIEW MATRIX--------------\n";
