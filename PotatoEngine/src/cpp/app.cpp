@@ -51,6 +51,15 @@ namespace dxe {
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
 #endif // !NDEBUG
 
+				camera.view = glm::inverse(camera.view);
+				if (input.KeyDown('W')) { camera.view[3][2] += 0.1f * 0.5f; } // FOWARD
+				if (input.KeyDown('A')) { camera.view[3][0] -= 0.1f * 0.5f; } // LEFT
+				if (input.KeyDown('S')) { camera.view[3][2] -= 0.1f * 0.5f; } // DOWN
+				if (input.KeyDown('D')) { camera.view[3][0] += 0.1f * 0.5f; } // RIGHT
+				if (input.KeyDown('Q')) { camera.view[3][1] += 0.1f * 0.5f; } // UP
+				if (input.KeyDown('E')) { camera.view[3][1] -= 0.1f * 0.5f; } // DOWN
+				camera.view = glm::inverse(camera.view);
+
 				dxRenderer.update();
 				dxRenderer.draw();
 			}

@@ -110,7 +110,12 @@ namespace dxe {
 		swapChain->Present(vsync, 0);
 	}
 
-	void pipeline::drawDebugLines(View_t &viewProj) {
+	void pipeline::bindFrameBuffer(const View_t& viewProj) {
+		Frame_cb cb{ viewProj.view, viewProj.projection };
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
+	}
+
+	void pipeline::drawDebugLines() {
 		UINT stride = sizeof(ColoredVertex);
 		UINT offset = 0;
 
@@ -131,17 +136,9 @@ namespace dxe {
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		Object_cb cb1;
-		//DirectX::XMStoreFloat4x4(&cb1.modeling, DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
-		cb1.modeling = glm::transpose(glm::mat4{ 1.f });
-
-		Frame_cb cb2;
-		//DirectX::XMStoreFloat4x4(&cb2.projection, DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&tempView.projection)));
-		//DirectX::XMStoreFloat4x4(&cb2.view, DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&tempView.view)))); // wtf directx
-		cb2.view = glm::transpose(viewProj.view);
-		cb2.projection = glm::transpose(viewProj.projection);
+		cb1.modeling = glm::mat4{ 1.f };
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb1, 0, 0);
-		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb2, 0, 0);
 
 		context->Draw(debug_lines::getLineVertCount(), 0);
 		debug_lines::clearLines();

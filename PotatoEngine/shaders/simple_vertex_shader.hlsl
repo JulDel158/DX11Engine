@@ -1,4 +1,6 @@
 
+#pragma pack_matrix(row_major)
+
 cbuffer Object_cb : register(b0)
 {
 	matrix modeling;

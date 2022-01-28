@@ -20,9 +20,11 @@ namespace dxe {
 	}
 
 	void renderer::draw() {
+		implementation.bindFrameBuffer(viewProj);
+
 		implementation.setRenderTargetView();
 
-		implementation.drawDebugLines(viewProj);
+		implementation.drawDebugLines();
 
 		implementation.present(1);
 	}

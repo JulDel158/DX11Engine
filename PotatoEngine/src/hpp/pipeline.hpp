@@ -14,6 +14,7 @@ namespace {
 	}
 }
 
+// TODO: Move perspective matrix to its own buffer
 namespace dxe {
 
 	class pipeline {
@@ -28,11 +29,12 @@ namespace dxe {
 
 		void present(unsigned int vsync);
 
-		void drawDebugLines(View_t &viewProj);
+		void bindFrameBuffer(const View_t& viewProj);
+
+		void drawDebugLines();
 
 	private:
 		HWND hwnd;
-		View_t tempView;
 
 		ID3D11Device*				device = nullptr;
 		ID3D11DeviceContext*		context = nullptr;
