@@ -12,10 +12,14 @@ namespace dxe {
 
 	struct View_t {
 		glm::mat4 view{ 1.f };
-		glm::mat4 projection{ 1.f };
+		glm::mat4 rotationMat{ 1.f };
 		glm::vec3 rotation{ 0.f };
+		float rotationSpeed{ 25.0f };
+		glm::vec3 position{ 0.f };
+		float translationSpeed{ 25.5f };
+		bool invertView{ false };
 
-		void setPerspectiveProjection(float fovy, float aspect, float n, float f);
+		void getView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});
 
 		// these functions won't work in this engine
 		void setViewDirection(glm::vec3 position, glm::vec3 direction,
@@ -24,9 +28,9 @@ namespace dxe {
 		void LookAtTarget(glm::vec3 position, glm::vec3 target,
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
-		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad);
+		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad, bool invertView = 0);
 
-		void RotateView();
+		void UpdateView();
 
 		void dPrintViewMat();
 	};

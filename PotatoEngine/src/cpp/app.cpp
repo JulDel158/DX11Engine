@@ -12,11 +12,13 @@ namespace dxe {
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
-		camera.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
-		camera.FPSViewRH({ 0.f, 3.f, -15.f }, glm::radians(0.f), glm::radians(0.f));
+		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 1.f);
+		camera.position = glm::vec3(0.f, 3.f, -15.f);
+		camera.getView();
+		// camera.UpdateView();
+		// camera.FPSViewRH({ 0.f, 3.f, -15.f }, glm::radians(0.f), glm::radians(0.f));
 
 		// updating constant buffers
-		windowBuffer.projection = camera.projection;
 		frameBuffer.view = camera.view;
 
 		dxRenderer.bindWindowBuffer();
@@ -56,13 +58,22 @@ namespace dxe {
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
 #endif // !NDEBUG
 
-				if (input.KeyDown('W')) { camera.view[3][2] += 0.1f * 0.5f; } // FOWARD
-				if (input.KeyDown('A')) { camera.view[3][0] -= 0.1f * 0.5f; } // LEFT
-				if (input.KeyDown('S')) { camera.view[3][2] -= 0.1f * 0.5f; } // DOWN
-				if (input.KeyDown('D')) { camera.view[3][0] += 0.1f * 0.5f; } // RIGHT
-				if (input.KeyDown('Q')) { camera.view[3][1] += 0.1f * 0.5f; } // UP
-				if (input.KeyDown('E')) { camera.view[3][1] -= 0.1f * 0.5f; } // DOWN
+				const float tdt = 0.05f;
+				glm::vec4 translate{ 0.f };
 
+				if (input.KeyDown('W')) { translate.z += camera.translationSpeed * tdt; } // FOWARD
+				if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * tdt; } // BACKWARDS
+				if (input.KeyDown('D')) { translate.x += camera.translationSpeed * tdt; } // RIGHT
+				if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * tdt; } // LEFT
+				if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * tdt; } // UP
+				if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * tdt; } // DOWN
+
+				if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * tdt; } // look left
+				if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * tdt; } // look right
+				if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * tdt; } // look up
+				if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * tdt; } // look down
+
+				camera.getView(translate);
 				frameBuffer.view = camera.view;
 
 				dxRenderer.update();

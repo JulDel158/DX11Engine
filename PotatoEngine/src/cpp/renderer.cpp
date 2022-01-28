@@ -20,7 +20,7 @@ namespace dxe {
 	}
 
 	void renderer::draw() {
-		implementation.bindFrameBuffer(frameCbuffer);
+		implementation.bindFrameBuffer(frameCbuffer, true);
 
 		implementation.setRenderTargetView();
 

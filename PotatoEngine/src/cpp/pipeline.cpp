@@ -99,9 +99,11 @@ namespace dxe {
 		swapChain->Present(vsync, 0);
 	}
 
-	void pipeline::bindFrameBuffer(const Frame_cb& frameCbuffer) {
+	void pipeline::bindFrameBuffer(const Frame_cb& frameCbuffer, bool invertView) {
 		Frame_cb cb{ frameCbuffer };
-		cb.view = glm::inverse(cb.view);
+		if (invertView) {
+			cb.view = glm::inverse(cb.view);
+		}
 
 		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
 
