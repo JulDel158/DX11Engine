@@ -35,6 +35,8 @@ namespace dxe {
 
 		void drawDebugLines();
 
+		void drawGameObject(Objectdata& obj);
+
 		void setRenderTargetView();
 
 	private:

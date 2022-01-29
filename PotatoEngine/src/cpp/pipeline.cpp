@@ -144,6 +144,40 @@ namespace dxe {
 		debug_lines::clearLines();
 	}
 
+	void pipeline::drawGameObject(Objectdata& obj) {
+		UINT stride = sizeof(ObjVertex);
+		UINT offset = 0;
+
+		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
+
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, obj.vertices.data(), 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
+
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, obj.indices.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
+
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::OBJECT]);
+
+		context->VSSetShader(vertexShader[VERTEX_SHADER::OBJECT], nullptr, 0);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJECT], nullptr, 0);
+
+		Object_cb cb;
+		cb.modeling = glm::mat4{ 1.f };
+
+		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb, 0, 0);
+
+		//context->PSSetShaderResources(); // THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER
+
+		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->DrawIndexed(static_cast<UINT>(obj.indices.size()), 0, 0); /*TODO: ADD INDEX COUNT (SIZEOF INDICES)*/
+	}
+
 	void pipeline::createDeviceAndSwapChain() {
 		RECT crect;
 		GetClientRect(hwnd, &crect); // Retrieves the coordinates of a window's client area. The client coordinates specify the upper-left and lower-right corners
@@ -152,10 +186,10 @@ namespace dxe {
 		D3D11_VIEWPORT& vp = viewPort[VIEWPORT::DEFAULT];
 		vp.Width = static_cast<float>(crect.right);
 		vp.Height = static_cast<float>(crect.bottom);
-		vp.MinDepth = 0.f;
-		vp.MaxDepth = 1.f;
-		vp.TopLeftX = 0.f;
-		vp.TopLeftY = 0.f;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0.0f;
+		vp.TopLeftY = 0.0f;
 
 		// Setup Swap Chain
 		DXGI_SWAP_CHAIN_DESC sd{ 0 };
@@ -245,8 +279,8 @@ namespace dxe {
 		}
 
 		/* DEPTH_STENCIL */
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{ 0 };
+		
 
 		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -261,8 +295,8 @@ namespace dxe {
 		safe_release(depthStencilBuffer);
 
 		/* DEPTH_STENCIL_DESC */
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc{ 0 };
+		
 
 		depthStencilDesc.DepthEnable = true;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
@@ -280,7 +314,7 @@ namespace dxe {
 		ZeroMemory(&rasterDesc, sizeof(rasterDesc));
 
 		rasterDesc.AntialiasedLineEnable = true;
-		rasterDesc.CullMode = D3D11_CULL_BACK;
+		rasterDesc.CullMode = D3D11_CULL_NONE;
 		rasterDesc.DepthBias = 0;
 		rasterDesc.DepthBiasClamp = 0.0f;
 		rasterDesc.DepthClipEnable = false;
@@ -374,18 +408,18 @@ namespace dxe {
 
 		// object vertex buffer
 		CD3D11_BUFFER_DESC desc2 = CD3D11_BUFFER_DESC(
-			sizeof(ObjVertex) * 100,
+			sizeof(ObjVertex) * 40000,
 			D3D11_BIND_VERTEX_BUFFER);
 
-		hr = device->CreateBuffer(&desc, nullptr, &vertexBuffer[VERTEX_BUFFER::OBJ_100]);
-		assert(!FAILED(hr) && "failed to create obj 100 vertex buffer");
+		hr = device->CreateBuffer(&desc, NULL, &vertexBuffer[VERTEX_BUFFER::OBJ_40000]);
+		assert(!FAILED(hr) && "failed to create obj vertex buffer");
 
 		// index buffer
 		CD3D11_BUFFER_DESC idesc = CD3D11_BUFFER_DESC(
-			sizeof(uint32_t) * 255,
+			sizeof(uint32_t) * 40000,
 			D3D11_BIND_INDEX_BUFFER);
 
-		hr = device->CreateBuffer(&idesc, nullptr, &indexBuffer[INDEX_BUFFER::OBJ_255]);
+		hr = device->CreateBuffer(&idesc, NULL, &indexBuffer[INDEX_BUFFER::OBJ_40000]);
 		assert(!FAILED(hr) && "failed to create index buffer");
 	}
 

@@ -11,7 +11,7 @@ namespace dxe {
 		~renderer();
 
 		void update();
-		void draw();
+		void draw(Objectdata& obj);
 
 		void bindWindowBuffer();
 	
@@ -21,6 +21,8 @@ namespace dxe {
 		Frame_cb& frameCbuffer;
 
 		Window_cb& windowCbuffer;
+
+		Objectdata dCube;
 	};
 
 } // dxe

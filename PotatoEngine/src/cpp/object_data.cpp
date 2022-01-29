@@ -4,6 +4,7 @@
 #include <cassert>
 #include <limits>
 #include <iostream>
+#include <unordered_map>
 
 
 // libs
@@ -164,7 +165,7 @@ namespace dxe {
 				if (index.vertex_index >= 0) {
 					vertex.pos = {
 						attrib.vertices[3 * index.vertex_index + 0],
-						attrib.vertices[3 * index.vertex_index + 1],
+						-attrib.vertices[3 * index.vertex_index + 1],
 						attrib.vertices[3 * index.vertex_index + 2]
 					};
 
@@ -197,6 +198,62 @@ namespace dxe {
 				indices.push_back(uniqueVertices[vertex]);
 			}
 		} // end for loops
+	}
+
+	void Objectdata::dMakeCube(float offset) {
+		// bottom
+		ObjVertex p1;
+		ObjVertex p2;
+		ObjVertex p3;
+		ObjVertex p4;
+		// top
+		ObjVertex p5;
+		ObjVertex p6;
+		ObjVertex p7;
+		ObjVertex p8;
+
+		p1.pos = glm::vec3(-offset, -offset, -offset);
+		p2.pos = glm::vec3(-offset, -offset, +offset);
+		p3.pos = glm::vec3(+offset, -offset, -offset);
+		p4.pos = glm::vec3(+offset, -offset, +offset);
+
+		p5.pos = glm::vec3(-offset, +offset, -offset);
+		p6.pos = glm::vec3(-offset, +offset, +offset);
+		p7.pos = glm::vec3(+offset, +offset, -offset);
+		p8.pos = glm::vec3(+offset, +offset, +offset);
+
+		vertices.push_back(p1);
+		vertices.push_back(p2);
+		vertices.push_back(p3);
+		vertices.push_back(p4);
+		vertices.push_back(p5);
+		vertices.push_back(p6);
+		vertices.push_back(p7);
+		vertices.push_back(p8);
+
+		// bottom 0 1 2 3
+		indices.push_back(0); indices.push_back(1); indices.push_back(2);
+		indices.push_back(1); indices.push_back(3); indices.push_back(2);
+
+		// top 4 5 6 7
+		indices.push_back(4); indices.push_back(5); indices.push_back(6);
+		indices.push_back(5); indices.push_back(7); indices.push_back(6);
+
+		// front 0 2 4 6
+		indices.push_back(0); indices.push_back(4); indices.push_back(2);
+		indices.push_back(4); indices.push_back(6); indices.push_back(2);
+
+		// back 1 3 5 7
+		indices.push_back(1); indices.push_back(5); indices.push_back(3);
+		indices.push_back(5); indices.push_back(7); indices.push_back(3);
+
+		// left 0 1 4 5
+		indices.push_back(1); indices.push_back(4); indices.push_back(0);
+		indices.push_back(1); indices.push_back(5); indices.push_back(4);
+
+		// right 2 3 6 7
+		indices.push_back(2); indices.push_back(3); indices.push_back(6);
+		indices.push_back(3); indices.push_back(7); indices.push_back(6);
 	}
 
 } // namespace dxe

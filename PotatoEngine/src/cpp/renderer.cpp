@@ -4,7 +4,9 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{wcb} {}
+	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{ wcb } {
+		dCube.dMakeCube(1.f);
+	}
 
 	renderer::~renderer() { }
 
@@ -19,14 +21,16 @@ namespace dxe {
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });
 	}
 
-	void renderer::draw() {
+	void renderer::draw(Objectdata& obj) {
 		implementation.bindFrameBuffer(frameCbuffer, true);
 
 		implementation.setRenderTargetView();
-
+		
 		implementation.drawDebugLines();
+		// TODO: Drawing cube after sometimes crashes
+		implementation.drawGameObject(dCube);
 
-		implementation.present(1);
+		implementation.present(0);
 	}
 
 	void renderer::bindWindowBuffer() {

@@ -19,11 +19,11 @@ namespace dxe {
 	};
 
 	struct VERTEX_BUFFER {
-		enum { COLORED_LINES = 0, OBJ_100, COUNT };
+		enum { COLORED_LINES = 0, OBJ_40000, COUNT };
 	};
 
 	struct INDEX_BUFFER {
-		enum { DEFAULT = 0, OBJ_255, COUNT };
+		enum { DEFAULT = 0, OBJ_40000, COUNT };
 	};
 
 	struct INPUT_LAYOUT {

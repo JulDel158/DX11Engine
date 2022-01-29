@@ -40,10 +40,10 @@ VS_OUT main(VS_IN input)
     output.pos = mul(float4(input.pos, 1.0f), modeling);
     output.pos = mul(output.pos, mul(view, projection));
     
-    for (int i = 0; i < 3; ++i) {
-        output.camPos[i] = -dot(view[3].xyz, view[i].xyz);
-    }
-    output.camPos.w = 1.0f;
+    //for (int i = 0; i < 3; ++i) {
+    //    output.camPos[i] = -dot(view[3].xyz, view[i].xyz);
+    //}
+    //output.camPos.w = 1.0f;
     
     output.nrm = mul(float4(input.nrm, 0.0f), modeling);
     output.uv = input.uv;

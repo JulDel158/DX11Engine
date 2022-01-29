@@ -23,6 +23,7 @@ namespace dxe {
 
 		dxRenderer.bindWindowBuffer();
 
+		temporaryObject.loadObject("assets/models/flat_vase.obj");
 		// tempView.view = glm::inverse(tempView.view);
 		// tempView.dPrintViewMat();
 		/*camera.view = glm::mat4{ 1.f };
@@ -85,7 +86,7 @@ namespace dxe {
 				frameBuffer.view = camera.view;
 
 				dxRenderer.update();
-				dxRenderer.draw();
+				dxRenderer.draw(temporaryObject);
 			}
 		}
 

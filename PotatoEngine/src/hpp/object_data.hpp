@@ -16,7 +16,7 @@ namespace dxe {
 		glm::vec3 nrm;
 		glm::vec2 uv;
 
-		bool operator==(const ObjVertex& other) {
+		bool operator==(const ObjVertex& other) const {
 			return (pos == other.pos && uv == other.uv && nrm == other.nrm);
 		}
 	};
@@ -26,6 +26,8 @@ namespace dxe {
 		std::vector<uint32_t> indices;
 
 		void loadObject(const char* filepath);
+
+		void dMakeCube(float offset);
 	};
 
 	struct View_t {

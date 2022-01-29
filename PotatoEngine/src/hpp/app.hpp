@@ -35,6 +35,10 @@ namespace dxe {
 		Window_cb windowBuffer;
 
 		XTime timer;
+
+		// TEMPORARY TODO: REMOVE OUT OF HERE ONCE TESTING IS DONE
+		Objectdata temporaryObject;
+
 	};
 
 } // namespace dxe
