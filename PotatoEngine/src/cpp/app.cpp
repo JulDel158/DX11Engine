@@ -67,18 +67,19 @@ namespace dxe {
 #endif // !NDEBUG
 
 				glm::vec4 translate{ 0.f };
+				const float dt = static_cast<float>(timer.Delta());
 
-				if (input.KeyDown('W')) { translate.z += camera.translationSpeed * timer.Delta(); } // FOWARD
-				if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * timer.Delta(); } // BACKWARDS
-				if (input.KeyDown('D')) { translate.x += camera.translationSpeed * timer.Delta(); } // RIGHT
-				if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * timer.Delta(); } // LEFT
-				if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * timer.Delta(); } // UP
-				if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * timer.Delta(); } // DOWN
+				if (input.KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
+				if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
+				if (input.KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
+				if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
+				if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
+				if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
 
-				if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * timer.Delta(); } // look left
-				if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * timer.Delta(); } // look right
-				if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * timer.Delta(); } // look up
-				if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * timer.Delta(); } // look down
+				if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * dt; } // look left
+				if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
+				if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * dt; } // look up
+				if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * dt; } // look down
 
 				camera.getView(translate);
 				frameBuffer.view = camera.view;

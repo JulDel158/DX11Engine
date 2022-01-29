@@ -139,7 +139,7 @@ namespace dxe {
 
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-		context->Draw(debug_lines::getLineVertCount(), 0);
+		context->Draw(static_cast<UINT>(debug_lines::getLineVertCount()), 0);
 
 		debug_lines::clearLines();
 	}
@@ -171,6 +171,7 @@ namespace dxe {
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
+		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		
 		D3D_FEATURE_LEVEL featureLevelsSupported;
 
@@ -362,7 +363,7 @@ namespace dxe {
 		HRESULT hr;
 		// simple vertex buffer
 		CD3D11_BUFFER_DESC desc = CD3D11_BUFFER_DESC(
-			sizeof(ColoredVertex) * debug_lines::getLineVertCapacity(),
+			static_cast<UINT>(sizeof(ColoredVertex) * debug_lines::getLineVertCapacity()),
 			D3D11_BIND_VERTEX_BUFFER);
 
 		D3D11_SUBRESOURCE_DATA srd = { 0 };

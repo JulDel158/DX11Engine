@@ -24,6 +24,8 @@ namespace dxe {
 	struct Objectdata {
 		std::vector<ObjVertex> vertices;
 		std::vector<uint32_t> indices;
+
+		void loadObject(const char* filepath);
 	};
 
 	struct View_t {

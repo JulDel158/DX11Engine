@@ -5,7 +5,26 @@
 #include <limits>
 #include <iostream>
 
+
+// libs
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
+#include "../hpp/file_reader.hpp"
+
+namespace std {
+	template<>
+	struct hash<dxe::ObjVertex> {
+		size_t operator()(dxe::ObjVertex const& vertex) const {
+			size_t seed = 0;
+			tools::hashCombine(seed, vertex.pos, vertex.nrm, vertex.uv);
+			return seed;
+		}
+	};
+} // namespace std
 
 namespace dxe {
 	void View_t::getView(const glm::vec4& translation)
@@ -34,8 +53,6 @@ namespace dxe {
 		view[3][1] = position.y;
 		view[3][2] = position.z;
 	}
-
-
 
 	void View_t::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
 		glm::vec3 z = glm::normalize(direction);
@@ -125,4 +142,61 @@ namespace dxe {
 		projection[3][2] = -(far * near) / (far - near);
 	}
 
-}
+	void Objectdata::loadObject(const char* filepath) {
+		tinyobj::attrib_t attrib; // stores pos, color, normal, and uv coordinates data
+		std::vector<tinyobj::shape_t> shapes; // index values for each face element
+		std::vector<tinyobj::material_t> materials;
+		std::string warn, err;
+
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath)) {
+			throw std::runtime_error(warn + err);
+		}
+
+		vertices.clear();
+		indices.clear();
+
+		std::unordered_map<ObjVertex, uint32_t> uniqueVertices{};
+
+		for (const auto& shape : shapes) {
+			for (const auto& index : shape.mesh.indices) {
+				ObjVertex vertex{};
+
+				if (index.vertex_index >= 0) {
+					vertex.pos = {
+						attrib.vertices[3 * index.vertex_index + 0],
+						attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 2]
+					};
+
+					/*vertex.color = {
+						attrib.colors[3 * index.vertex_index + 0],
+						attrib.colors[3 * index.vertex_index + 1],
+						attrib.colors[3 * index.vertex_index + 2]
+					};*/
+				}
+
+				if (index.normal_index >= 0) {
+					vertex.nrm = {
+						attrib.normals[3 * index.normal_index + 0],
+						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 2]
+					};
+				}
+
+				if (index.texcoord_index >= 0) {
+					vertex.uv = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						attrib.texcoords[2 * index.texcoord_index + 1]
+					};
+				}
+
+				if (uniqueVertices.count(vertex) == 0) {
+					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+					vertices.push_back(vertex);
+				}
+				indices.push_back(uniqueVertices[vertex]);
+			}
+		} // end for loops
+	}
+
+} // namespace dxe
