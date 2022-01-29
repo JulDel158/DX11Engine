@@ -45,6 +45,9 @@
     <ClCompile Include="src\cpp\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\cpp\XTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hpp\dx_window.hpp">
@@ -74,6 +77,9 @@
     <ClInclude Include="src\hpp\input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\hpp\XTime.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\cb.hlsli">
@@ -85,6 +91,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="shaders\simple_pixel_shader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\obj_vertex_shader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\obj_pixel_shader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

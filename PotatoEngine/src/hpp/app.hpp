@@ -4,6 +4,7 @@
 #include "renderer.hpp"
 #include "input.hpp"
 #include "object_data.hpp"
+#include "XTime.hpp"
 
 namespace dxe {
 
@@ -32,6 +33,8 @@ namespace dxe {
 		Frame_cb frameBuffer;
 
 		Window_cb windowBuffer;
+
+		XTime timer;
 	};
 
 } // namespace dxe

@@ -313,27 +313,54 @@ namespace dxe {
 	}
 
 	void pipeline::createShaderAndInputLayout() {
-		std::vector<uint8_t> vs_blob = tools::file_reader::load_binary_blob("shaders/simple_vertex_shader.cso");
-		std::vector<uint8_t> ps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
+		// vertex shaders loading
+		std::vector<uint8_t> svs_blob = tools::file_reader::load_binary_blob("shaders/simple_vertex_shader.cso");
+		std::vector<uint8_t> ovs_blob = tools::file_reader::load_binary_blob("shaders/obj_vertex_shader.cso");
 
-		HRESULT hr = device->CreateVertexShader(vs_blob.data(), vs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
-		assert(!FAILED(hr) && "failed to create vertex shader");
+		// pixel shaders loading
+		std::vector<uint8_t> sps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
+		std::vector<uint8_t> ops_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader.cso");
 
-		hr = device->CreatePixelShader(ps_blob.data(), ps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
-		assert(!FAILED(hr) && "failed to create pixel shader");
+		// vertex shaders creation
+		HRESULT hr = device->CreateVertexShader(svs_blob.data(), svs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create simple vertex shader");
 
+		hr = device->CreateVertexShader(ovs_blob.data(), ovs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::OBJECT]);
+		assert(!FAILED(hr) && "failed to create object vertex shader");
+
+		// pixel shaders creation
+		hr = device->CreatePixelShader(sps_blob.data(), sps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create simple pixel shader");
+
+		hr = device->CreatePixelShader(ops_blob.data(), ops_blob.size(), NULL, &pixelShader[PIXEL_SHADER::OBJECT]);
+		assert(!FAILED(hr) && "failed to create object pixel shader");
+
+		// input layouts
+
+		// simple colored vertex
 		D3D11_INPUT_ELEMENT_DESC idesc[] = {
 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 		};
 
-		hr = device->CreateInputLayout(idesc, ARRAYSIZE(idesc), vs_blob.data(), vs_blob.size(), &inputLayout[INPUT_LAYOUT::DEFAULT]);
-		assert(!FAILED(hr) && "failed to create input layout");
+		hr = device->CreateInputLayout(idesc, ARRAYSIZE(idesc), svs_blob.data(), svs_blob.size(), &inputLayout[INPUT_LAYOUT::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create simple input layout");
+
+		// object vertex
+		D3D11_INPUT_ELEMENT_DESC oidesc[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+
+		hr = device->CreateInputLayout(oidesc, ARRAYSIZE(oidesc), ovs_blob.data(), ovs_blob.size(), &inputLayout[INPUT_LAYOUT::OBJECT]);
+		assert(!FAILED(hr) && "failed to create OBJECT input layout");
+
 	}
 
 	void pipeline::createVertexBuffers() {
 		HRESULT hr;
-		
+		// simple vertex buffer
 		CD3D11_BUFFER_DESC desc = CD3D11_BUFFER_DESC(
 			sizeof(ColoredVertex) * debug_lines::getLineVertCapacity(),
 			D3D11_BIND_VERTEX_BUFFER);
@@ -342,7 +369,23 @@ namespace dxe {
 		srd.pSysMem = debug_lines::getLineVerts();
 
 		hr = device->CreateBuffer(&desc, &srd, &vertexBuffer[VERTEX_BUFFER::COLORED_LINES]);
-		assert(!FAILED(hr) && "failed to create input layout");
+		assert(!FAILED(hr) && "failed to create simple vertex buffer");
+
+		// object vertex buffer
+		CD3D11_BUFFER_DESC desc2 = CD3D11_BUFFER_DESC(
+			sizeof(ObjVertex) * 100,
+			D3D11_BIND_VERTEX_BUFFER);
+
+		hr = device->CreateBuffer(&desc, nullptr, &vertexBuffer[VERTEX_BUFFER::OBJ_100]);
+		assert(!FAILED(hr) && "failed to create obj 100 vertex buffer");
+
+		// index buffer
+		CD3D11_BUFFER_DESC idesc = CD3D11_BUFFER_DESC(
+			sizeof(uint32_t) * 255,
+			D3D11_BIND_INDEX_BUFFER);
+
+		hr = device->CreateBuffer(&idesc, nullptr, &indexBuffer[INDEX_BUFFER::OBJ_255]);
+		assert(!FAILED(hr) && "failed to create index buffer");
 	}
 
 	void pipeline::createConstantBuffers() {

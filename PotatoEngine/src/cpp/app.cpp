@@ -50,28 +50,35 @@ namespace dxe {
 
 			}
 			else { // do updates and render down here
+				timer.Signal();
 				input.Update();
 
 #ifndef NDEBUG
 				if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
 				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
+				std::cout << "---------------------TIME DATA----------------------\n";
+				std::cout << "Timer total: " << timer.TotalTime() << "\n";
+				std::cout << "Timer total exact: " << timer.TotalTimeExact() << "\n";
+				std::cout << "Timer delta: " << timer.Delta() << "\n";
+				std::cout << "Timer smooth delta: " << timer.SmoothDelta() << "\n";
+				std::cout << "Timer FPS: " << timer.SamplesPerSecond() << "\n";
+				std::cout << "------------------------------------------------------------\n\n\n";
 #endif // !NDEBUG
 
-				const float tdt = 0.05f;
 				glm::vec4 translate{ 0.f };
 
-				if (input.KeyDown('W')) { translate.z += camera.translationSpeed * tdt; } // FOWARD
-				if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * tdt; } // BACKWARDS
-				if (input.KeyDown('D')) { translate.x += camera.translationSpeed * tdt; } // RIGHT
-				if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * tdt; } // LEFT
-				if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * tdt; } // UP
-				if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * tdt; } // DOWN
+				if (input.KeyDown('W')) { translate.z += camera.translationSpeed * timer.Delta(); } // FOWARD
+				if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * timer.Delta(); } // BACKWARDS
+				if (input.KeyDown('D')) { translate.x += camera.translationSpeed * timer.Delta(); } // RIGHT
+				if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * timer.Delta(); } // LEFT
+				if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * timer.Delta(); } // UP
+				if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * timer.Delta(); } // DOWN
 
-				if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * tdt; } // look left
-				if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * tdt; } // look right
-				if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * tdt; } // look up
-				if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * tdt; } // look down
+				if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * timer.Delta(); } // look left
+				if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * timer.Delta(); } // look right
+				if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * timer.Delta(); } // look up
+				if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * timer.Delta(); } // look down
 
 				camera.getView(translate);
 				frameBuffer.view = camera.view;

@@ -2,12 +2,28 @@
 
 // lib
 #include <glm/glm.hpp>
+#include <vector>
 
 namespace dxe {
 
 	struct alignas(16)ColoredVertex {
 		glm::vec3 pos;
 		glm::vec4 color;
+	};
+
+	struct alignas(16)ObjVertex {
+		glm::vec3 pos;
+		glm::vec3 nrm;
+		glm::vec2 uv;
+
+		bool operator==(const ObjVertex& other) {
+			return (pos == other.pos && uv == other.uv && nrm == other.nrm);
+		}
+	};
+
+	struct Objectdata {
+		std::vector<ObjVertex> vertices;
+		std::vector<uint32_t> indices;
 	};
 
 	struct View_t {
