@@ -13,7 +13,7 @@
 // dep
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
-// #pragma comment(lib, "DXGI.lib")
+#pragma comment(lib, "DXGI.lib")
 
 #include "../hpp/file_reader.hpp"
 
@@ -120,11 +120,11 @@ namespace dxe {
 		UINT stride = sizeof(ColoredVertex);
 		UINT offset = 0;
 
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::DEFAULT]);
+
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::COLORED_LINES], &stride, &offset);
 
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::COLORED_LINES], 0, nullptr, debug_lines::getLineVerts(), 0, 0);
-
-		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::DEFAULT]);
 
 		context->VSSetShader(vertexShader[VERTEX_SHADER::DEFAULT], nullptr, 0);
 
@@ -148,19 +148,18 @@ namespace dxe {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::OBJECT]);
+		
+		// SETTING BUFFERS
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
 
-		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, obj.vertices.data(), 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
+		vBuffer = obj.vertices; // we must first copy the data into the buffer
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
 
 		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
 
-		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, obj.indices.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
-
-		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::OBJECT]);
-
-		context->VSSetShader(vertexShader[VERTEX_SHADER::OBJECT], nullptr, 0);
-
-		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJECT], nullptr, 0);
+		iBuffer = obj.indices;
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
 
 		Object_cb cb;
 		cb.modeling = glm::mat4{ 1.f };
@@ -169,10 +168,17 @@ namespace dxe {
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &cb, 0, 0);
 
-		//context->PSSetShaderResources(); // THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER
+		// SETTING SHADERS 
+		context->VSSetShader(vertexShader[VERTEX_SHADER::OBJECT], NULL, 0);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJECT], NULL, 0);
+
+		// SETTING RESOURCES
+		//context->PSSetShaderResources(); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
+		// TIME TO DRAW
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->DrawIndexed(static_cast<UINT>(obj.indices.size()), 0, 0); /*TODO: ADD INDEX COUNT (SIZEOF INDICES)*/
@@ -279,7 +285,8 @@ namespace dxe {
 		}
 
 		/* DEPTH_STENCIL */
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{ 0 };
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+		ZeroMemory(&depthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
 		
 
 		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -408,10 +415,14 @@ namespace dxe {
 
 		// object vertex buffer
 		CD3D11_BUFFER_DESC desc2 = CD3D11_BUFFER_DESC(
-			sizeof(ObjVertex) * 40000,
+			static_cast<UINT>(sizeof(ObjVertex) * 40000),
 			D3D11_BIND_VERTEX_BUFFER);
 
-		hr = device->CreateBuffer(&desc, NULL, &vertexBuffer[VERTEX_BUFFER::OBJ_40000]);
+		vBuffer.reserve(40000); // allocating buffer memory
+		D3D11_SUBRESOURCE_DATA srd2 = { 0 };
+		srd2.pSysMem = vBuffer.data();
+
+		hr = device->CreateBuffer(&desc2, &srd2, &vertexBuffer[VERTEX_BUFFER::OBJ_40000]);
 		assert(!FAILED(hr) && "failed to create obj vertex buffer");
 
 		// index buffer
@@ -419,7 +430,12 @@ namespace dxe {
 			sizeof(uint32_t) * 40000,
 			D3D11_BIND_INDEX_BUFFER);
 
-		hr = device->CreateBuffer(&idesc, NULL, &indexBuffer[INDEX_BUFFER::OBJ_40000]);
+		iBuffer.reserve(40000); // allocating buffer memory
+		D3D11_SUBRESOURCE_DATA isrd = { 0 };
+		isrd.pSysMem = iBuffer.data();
+
+
+		hr = device->CreateBuffer(&idesc, &isrd, &indexBuffer[INDEX_BUFFER::OBJ_40000]);
 		assert(!FAILED(hr) && "failed to create index buffer");
 	}
 

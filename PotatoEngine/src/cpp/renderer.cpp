@@ -27,8 +27,8 @@ namespace dxe {
 		implementation.setRenderTargetView();
 		
 		implementation.drawDebugLines();
-		// TODO: Drawing cube after sometimes crashes
-		implementation.drawGameObject(dCube);
+
+		implementation.drawGameObject(obj);
 
 		implementation.present(0);
 	}

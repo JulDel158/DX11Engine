@@ -7,14 +7,14 @@
 namespace dxe {
 
 	struct alignas(16)ColoredVertex {
-		glm::vec3 pos;
-		glm::vec4 color;
+		glm::vec3 pos{ 0.f };
+		glm::vec4 color{ 0.f };
 	};
 
 	struct alignas(16)ObjVertex {
-		glm::vec3 pos;
-		glm::vec3 nrm;
-		glm::vec2 uv;
+		glm::vec3 pos{ 0.f };
+		glm::vec3 nrm{ 0.f };
+		glm::vec2 uv{ 0.f };
 
 		bool operator==(const ObjVertex& other) const {
 			return (pos == other.pos && uv == other.uv && nrm == other.nrm);

@@ -55,8 +55,10 @@ namespace dxe {
 		ID3D11RasterizerState*		rasterState[RASTER_STATE::COUNT]{};
 
 		ID3D11Buffer*				vertexBuffer[VERTEX_BUFFER::COUNT]{};
+		std::vector<ObjVertex>		vBuffer;
 
 		ID3D11Buffer*				indexBuffer[INDEX_BUFFER::COUNT]{};
+		std::vector<uint32_t>		iBuffer;
 
 		ID3D11InputLayout*			inputLayout[INPUT_LAYOUT::COUNT]{};
 		 
