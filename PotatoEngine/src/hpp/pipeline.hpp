@@ -91,6 +91,9 @@ namespace dxe {
 
 		void createConstantBuffers();
 
+		// remember to use the format L"filename" when calling this function
+		void createSResourceView(const wchar_t* filename);
+
 	};
 
 	/* IMPORTANT: 

@@ -143,7 +143,7 @@ namespace dxe {
 		projection[3][2] = -((far) / (far - near)) * near;
 	}
 
-	void Objectdata::loadObject(const char* filepath) {
+	void Objectdata::loadObject(const char* filepath, bool invertY) {
 		tinyobj::attrib_t attrib; // stores pos, color, normal, and uv coordinates data
 		std::vector<tinyobj::shape_t> shapes; // index values for each face element
 		std::vector<tinyobj::material_t> materials;
@@ -161,11 +161,11 @@ namespace dxe {
 		for (const auto& shape : shapes) {
 			for (const auto& index : shape.mesh.indices) {
 				ObjVertex vertex{};
-
+				const int sign = (invertY) ? -1 : 1;
 				if (index.vertex_index >= 0) {
 					vertex.pos = {
 						attrib.vertices[3 * index.vertex_index + 0],
-						-attrib.vertices[3 * index.vertex_index + 1],
+						attrib.vertices[3 * index.vertex_index + 1] * sign,
 						attrib.vertices[3 * index.vertex_index + 2]
 					};
 

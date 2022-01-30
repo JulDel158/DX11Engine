@@ -12,6 +12,8 @@ namespace dxe {
 
 	void renderer::update() {
 		debug_lines::addGrid();
+#ifdef _DEBUG
+
 		debug_lines::addDebugCube(glm::vec3{ 0.f }, 1.f, glm::vec4{1.f, 1.f, 1.f, 1.f});
 
 		debug_lines::addDebugCube(glm::vec3{ 5.f, 0.f, 0.f }, 0.5f, glm::vec4{1.f, 0.f, 0.f, 1.f });
@@ -19,6 +21,9 @@ namespace dxe {
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 5.f, 0.f }, 0.5f, glm::vec4{ 0.f, 1.f, 0.f, 1.f });
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });
+
+#endif // DEBUG
+
 	}
 
 	void renderer::draw(Objectdata& obj) {
@@ -26,7 +31,7 @@ namespace dxe {
 
 		implementation.bindFrameBuffer(frameCbuffer, true);
 		
-		implementation.drawGameObject(dCube);
+		implementation.drawGameObject(obj);
 
 		implementation.drawDebugLines();
 

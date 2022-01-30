@@ -25,16 +25,24 @@ namespace dxe {
 		std::vector<ObjVertex> vertices;
 		std::vector<uint32_t> indices;
 
-		void loadObject(const char* filepath);
+		void loadObject(const char* filepath, bool invertY = true);
 
 		void dMakeCube(float offset);
+	};
+
+	struct GameObject {
+		glm::mat4 transform;
+		Objectdata model;
+		uint32_t resourceId;
+		// TODO: IMPLEMENT TEXTURE REFERENCES ON OBJECTS, CONSIDER USING AN ID TO AN ARRAY OF ID3D11ShaderResourceView INSTEAD TO KEEP ABSTRACTION
+		// ID3D11ShaderResourceView* resourceView;
 	};
 
 	struct View_t {
 		glm::mat4 view{ 1.f };
 		glm::mat4 rotationMat{ 1.f };
 		glm::vec3 rotation{ 0.f };
-		float rotationSpeed{ 25.0f };
+		float rotationSpeed{ 100.0f };
 		glm::vec3 position{ 0.f };
 		float translationSpeed{ 25.5f };
 		bool invertView{ false };

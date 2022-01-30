@@ -12,7 +12,7 @@ namespace dxe {
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
-		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
+		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 1000.f);
 		camera.position = glm::vec3(0.f, 3.f, -15.f);
 		camera.getView();
 		// camera.UpdateView();
@@ -23,7 +23,7 @@ namespace dxe {
 
 		dxRenderer.bindWindowBuffer();
 
-		temporaryObject.loadObject("assets/models/flat_vase.obj");
+		temporaryObject.loadObject("assets/models/piramid.obj", false);
 		// tempView.view = glm::inverse(tempView.view);
 		// tempView.dPrintViewMat();
 		/*camera.view = glm::mat4{ 1.f };

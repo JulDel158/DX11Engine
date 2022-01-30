@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libraries\DDSTextureLoader;C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libraries\DDSTextureLoader;C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,7 +124,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libraries\DDSTextureLoader;C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +139,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)libraries\DDSTextureLoader;C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libraries\DDSTextureLoader\DDSTextureLoader.cpp" />
     <ClCompile Include="src\cpp\app.cpp" />
     <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />

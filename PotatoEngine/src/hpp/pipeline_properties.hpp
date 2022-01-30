@@ -35,7 +35,7 @@ namespace dxe {
 	};
 
 	struct PIXEL_SHADER {
-		enum { DEFAULT = 0, OBJECT, COUNT };
+		enum { DEFAULT = 0, OBJ_NRM, OBJ_TEXTURE, COUNT };
 	};
 
 	struct CONSTANT_BUFFER {

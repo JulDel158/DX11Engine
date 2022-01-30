@@ -1,6 +1,7 @@
 #include "../hpp/pipeline.hpp"
 
 // lib
+#include <DDSTextureLoader.h>
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -36,6 +37,8 @@ namespace dxe {
 
 		createConstantBuffers();
 
+		// temporary
+		createSResourceView(L"assets/images/obamium.dds");
 	}
 
 	pipeline::~pipeline() {
@@ -163,6 +166,9 @@ namespace dxe {
 
 		Object_cb cb;
 		cb.modeling = glm::mat4{ 1.f };
+		cb.modeling[0][0] = 10.f;
+		cb.modeling[1][1] = 10.f;
+		cb.modeling[2][2] = 10.f;
 
 		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
 
@@ -171,10 +177,10 @@ namespace dxe {
 		// SETTING SHADERS 
 		context->VSSetShader(vertexShader[VERTEX_SHADER::OBJECT], NULL, 0);
 
-		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJECT], NULL, 0);
+		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJ_TEXTURE], NULL, 0);
 
 		// SETTING RESOURCES
-		//context->PSSetShaderResources(); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
@@ -375,6 +381,7 @@ namespace dxe {
 
 		// pixel shaders loading
 		std::vector<uint8_t> sps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
+		std::vector<uint8_t> onps_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader_normals.cso");
 		std::vector<uint8_t> ops_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader.cso");
 
 		// vertex shaders creation
@@ -388,8 +395,11 @@ namespace dxe {
 		hr = device->CreatePixelShader(sps_blob.data(), sps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
 		assert(!FAILED(hr) && "failed to create simple pixel shader");
 
-		hr = device->CreatePixelShader(ops_blob.data(), ops_blob.size(), NULL, &pixelShader[PIXEL_SHADER::OBJECT]);
-		assert(!FAILED(hr) && "failed to create object pixel shader");
+		hr = device->CreatePixelShader(onps_blob.data(), onps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::OBJ_NRM]);
+		assert(!FAILED(hr) && "failed to create object normal pixel shader");
+
+		hr = device->CreatePixelShader(ops_blob.data(), ops_blob.size(), NULL, &pixelShader[PIXEL_SHADER::OBJ_TEXTURE]);
+		assert(!FAILED(hr) && "failed to create object texture pixel shader");
 
 		// input layouts
 
@@ -500,6 +510,14 @@ namespace dxe {
 		context->RSSetState(rasterState[RASTER_STATE::DEFAULT]);
 		context->RSSetViewports(1, &viewPort[VIEWPORT::DEFAULT]);
 		
+	}
+
+	void pipeline::createSResourceView(const wchar_t* filename) {
+		HRESULT hr = DirectX::CreateDDSTextureFromFile(device, filename, nullptr, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("could not load texture file!");
+		}
 	}
 
 } // namespace dxe
