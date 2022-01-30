@@ -66,7 +66,7 @@ namespace dxe {
 	struct Window_cb {
 		glm::mat4 projection{ 1.f };
 
-		void setPerspectiveProjection(float fovy, float aspect, float n, float f);
+		void setPerspectiveProjection(float fovy, float aspect, float nearz, float farz);
 	};
 
 } // namespace dxe

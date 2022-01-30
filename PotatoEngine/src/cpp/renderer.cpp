@@ -22,13 +22,13 @@ namespace dxe {
 	}
 
 	void renderer::draw(Objectdata& obj) {
-		implementation.bindFrameBuffer(frameCbuffer, true);
-
 		implementation.setRenderTargetView();
-		
-		implementation.drawDebugLines();
 
-		implementation.drawGameObject(obj);
+		implementation.bindFrameBuffer(frameCbuffer, true);
+		
+		implementation.drawGameObject(dCube);
+
+		implementation.drawDebugLines();
 
 		implementation.present(0);
 	}

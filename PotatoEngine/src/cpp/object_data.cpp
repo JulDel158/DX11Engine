@@ -140,7 +140,7 @@ namespace dxe {
 		projection[1][1] = 1.f / (tanHalfFovy);
 		projection[2][2] = far / (far - near);
 		projection[2][3] = 1.f;
-		projection[3][2] = -(far * near) / (far - near);
+		projection[3][2] = -((far) / (far - near)) * near;
 	}
 
 	void Objectdata::loadObject(const char* filepath) {

@@ -194,8 +194,8 @@ namespace dxe {
 		vp.Height = static_cast<float>(crect.bottom);
 		vp.MinDepth = 0.0f;
 		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0.0f;
-		vp.TopLeftY = 0.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
 
 		// Setup Swap Chain
 		DXGI_SWAP_CHAIN_DESC sd{ 0 };
@@ -211,7 +211,7 @@ namespace dxe {
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
-		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		//sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		
 		D3D_FEATURE_LEVEL featureLevelsSupported;
 
@@ -223,9 +223,9 @@ namespace dxe {
 
 		UINT createDeviceFlags = 0;
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif // _DEBUG
+	#endif // _DEBUG
 
 		// creating device, swapchain and context
 		HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
@@ -263,7 +263,7 @@ namespace dxe {
 
 	void pipeline::setUpDepthStencil() {
 		// DEPTH BUFFER
-		D3D11_TEXTURE2D_DESC depthBufferDesc{ 0 };
+		D3D11_TEXTURE2D_DESC depthBufferDesc = { 0 };
 		ID3D11Texture2D* depthStencilBuffer;
 
 		depthBufferDesc.Width = static_cast<UINT>(viewPort[VIEWPORT::DEFAULT].Width);
@@ -285,7 +285,7 @@ namespace dxe {
 		}
 
 		/* DEPTH_STENCIL */
-		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;;
 		ZeroMemory(&depthStencilViewDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
 		
 
@@ -303,11 +303,25 @@ namespace dxe {
 
 		/* DEPTH_STENCIL_DESC */
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc{ 0 };
-		
 
 		depthStencilDesc.DepthEnable = true;
 		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+		depthStencilDesc.StencilEnable = true;
+		depthStencilDesc.StencilReadMask = 0xFF;
+		depthStencilDesc.StencilWriteMask = 0xFF;
+
+		depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		
 
 		hr = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState[DEPTH_STENCIL_STATE::DEFAULT]);
 
@@ -475,16 +489,17 @@ namespace dxe {
 	}
 
 	void pipeline::setRenderTargetView() {
-		const glm::vec4 black{ 0.f, 0.f, 0.f, 1.f };
+		static const float black[] = { 0.1f, 0.1f, 0.2f, 1.f };
 
 		context->OMSetDepthStencilState(depthStencilState[DEPTH_STENCIL_STATE::DEFAULT], 1);
 		context->OMSetRenderTargets(1, &renderTarget[RENDER_TARGET_VIEW::DEFAULT], depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT]);
-
-		context->ClearRenderTargetView(renderTarget[RENDER_TARGET_VIEW::DEFAULT], &black.x);
+		
+		context->ClearRenderTargetView(renderTarget[RENDER_TARGET_VIEW::DEFAULT], black);
 		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		context->RSSetState(rasterState[RASTER_STATE::DEFAULT]);
 		context->RSSetViewports(1, &viewPort[VIEWPORT::DEFAULT]);
+		
 	}
 
 } // namespace dxe

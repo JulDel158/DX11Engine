@@ -12,7 +12,7 @@ namespace dxe {
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
-		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 1.f);
+		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 100.f);
 		camera.position = glm::vec3(0.f, 3.f, -15.f);
 		camera.getView();
 		// camera.UpdateView();
