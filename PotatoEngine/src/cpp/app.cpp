@@ -1,9 +1,10 @@
 #include "../hpp/app.hpp"
 
 #include "../hpp/dx_window.hpp"
+#include "../hpp/debug_lines.hpp"
 
 #define GLM_FORCE_RADIANS
-#include "glm/gtc/constants.hpp"
+#include <glm/gtc/constants.hpp>
 
 #include <iostream>
 
@@ -85,7 +86,13 @@ namespace dxe {
 				camera.getView(translate);
 				frameBuffer.view = camera.view;
 
+				
+
 				dxRenderer.update();
+
+				// RAINBOW DEBUG LINES!!!!!!
+				debug_lines::rainbowUpdate(dt);
+
 				dxRenderer.draw(temporaryObject);
 			}
 		}

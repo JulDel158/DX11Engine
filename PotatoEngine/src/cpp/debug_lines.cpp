@@ -1,13 +1,29 @@
 #include "../hpp/debug_lines.hpp"
 
 #include<array>
-
+#include <glm/gtx/compatibility.hpp>
 
 namespace {
 	constexpr size_t MAX_LINE_VERTS = 2000;
 
 	size_t lineVertCount = 0;
 	std::array<dxe::ColoredVertex, MAX_LINE_VERTS> lineVerts;
+    
+    uint8_t colorIndex = 0;
+   
+    glm::vec4 colors[6] = {
+        {1.f, 0.f, 0.f, 1.f}, // red
+        {1.f, 1.f, 0.f, 1.f},
+        {0.f, 1.f, 0.f, 1.f}, // green
+        {0.f, 1.f, 1.f, 1.f},
+        {0.f, 0.f, 1.f, 1.f}, // blue
+        {1.f, 0.f, 1.f, 1.f}
+    };
+
+    glm::vec4 currentColor = { 1.f, 0.f, 0.f, 1.f };
+
+    constexpr float totalTime = 3.f;
+    float currTime = 0.f;
 }
 
 namespace dxe {
@@ -101,6 +117,25 @@ namespace dxe {
         addLine(p5, p7, color);
         addLine(p6, p8, color);
         addLine(p8, p7, color);
+    }
+
+    void debug_lines::rainbowUpdate(const float dt) {
+        currTime = (currTime + dt > 2.f) ? 2.f : currTime + dt;
+        const float a = currTime / totalTime;
+
+        if (colorIndex > 5) { colorIndex = 0; }
+        const uint8_t nextInx = (colorIndex == 5) ? 0 : colorIndex + 1;
+
+        currentColor = glm::lerp(currentColor, colors[nextInx], a);
+
+        for (size_t i = 0; i < lineVertCount; ++i) {
+            lineVerts[i].color = currentColor;
+        }
+
+        if (colors[nextInx] == currentColor){ 
+            ++colorIndex;
+            currTime = 0;
+        }
     }
 
 } // namespace dxe
