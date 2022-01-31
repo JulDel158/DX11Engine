@@ -39,6 +39,8 @@ namespace dxe {
 
 		// temporary
 		createSResourceView(L"assets/images/obamium.dds");
+
+		createDebugTexture();
 	}
 
 	pipeline::~pipeline() {
@@ -180,7 +182,7 @@ namespace dxe {
 		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJ_TEXTURE], NULL, 0);
 
 		// SETTING RESOURCES
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEBUG]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
@@ -518,6 +520,39 @@ namespace dxe {
 		if (FAILED(hr)) {
 			throw std::runtime_error("could not load texture file!");
 		}
+	}
+
+	void pipeline::createDebugTexture() {
+		const uint32_t pixel = 0xffff7798; // a b g r
+
+		D3D11_SUBRESOURCE_DATA initData = { &pixel, sizeof(uint32_t), 0 };
+
+		D3D11_TEXTURE2D_DESC desc = {};
+		desc.Width = desc.Height = desc.MipLevels = desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+		ID3D11Texture2D* texture; // don't forget to release
+		HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("could not make debug texture!");
+		}
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		hr = device->CreateShaderResourceView(texture, &srvDesc, &sResourceView[SUBRESOURCE_VIEW::DEBUG]);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("Create Shader resource view for debug texture failed!");
+		}
+
+		safe_release(texture);
 	}
 
 } // namespace dxe

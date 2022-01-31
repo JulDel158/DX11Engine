@@ -94,6 +94,8 @@ namespace dxe {
 		// remember to use the format L"filename" when calling this function
 		void createSResourceView(const wchar_t* filename);
 
+		void createDebugTexture();
+
 	};
 
 	/* IMPORTANT: 
