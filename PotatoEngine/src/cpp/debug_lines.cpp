@@ -22,7 +22,7 @@ namespace {
 
     glm::vec4 currentColor = { 1.f, 0.f, 0.f, 1.f };
 
-    constexpr float totalTime = 10.f;
+    constexpr float totalTime = 2.f;
     float currTime = 0.f;
 }
 

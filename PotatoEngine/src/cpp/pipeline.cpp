@@ -149,7 +149,7 @@ namespace dxe {
 		debug_lines::clearLines();
 	}
 
-	void pipeline::drawGameObject(Objectdata& obj) {
+	void pipeline::drawObject(Objectdata& obj) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
@@ -182,7 +182,7 @@ namespace dxe {
 		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJ_TEXTURE], NULL, 0);
 
 		// SETTING RESOURCES
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEBUG]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
@@ -190,6 +190,47 @@ namespace dxe {
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->DrawIndexed(static_cast<UINT>(obj.indices.size()), 0, 0); /*TODO: ADD INDEX COUNT (SIZEOF INDICES)*/
+	}
+
+	void pipeline::drawGameObjects(GameObject* gameObjects, uint32_t size) {
+		UINT stride = sizeof(ObjVertex);
+		UINT offset = 0;
+
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::OBJECT]);
+
+		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
+
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+
+		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+
+		// SETTING SHADERS 
+		context->VSSetShader(vertexShader[VERTEX_SHADER::OBJECT], NULL, 0);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJ_TEXTURE], NULL, 0);
+
+		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		static Object_cb ocb;
+		ocb.modeling = glm::mat4{ 1.f };
+
+		for (size_t i = 0; i < size; ++i) {
+			vBuffer = gameObjects[i].model.vertices;
+			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
+
+			iBuffer = gameObjects[i].model.indices;
+			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0);
+
+			ocb.modeling = gameObjects[i].transform;
+			context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &ocb, 0, 0);
+
+			const uint32_t inx = (gameObjects[i].resourceId < SUBRESOURCE_VIEW::COUNT) ? gameObjects[i].resourceId : SUBRESOURCE_VIEW::DEBUG;
+			context->PSSetShaderResources(0, 1, &sResourceView[inx]);
+
+			context->DrawIndexed(static_cast<UINT>(gameObjects[i].model.indices.size()), 0, 0);
+		}
 	}
 
 	void pipeline::createDeviceAndSwapChain() {

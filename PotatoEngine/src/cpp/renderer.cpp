@@ -31,7 +31,7 @@ namespace dxe {
 
 		implementation.bindFrameBuffer(frameCbuffer, true);
 		
-		implementation.drawGameObject(obj);
+		implementation.drawObject(obj);
 
 		implementation.drawDebugLines();
 
