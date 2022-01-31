@@ -22,7 +22,7 @@ namespace {
 
     glm::vec4 currentColor = { 1.f, 0.f, 0.f, 1.f };
 
-    constexpr float totalTime = 3.f;
+    constexpr float totalTime = 10.f;
     float currTime = 0.f;
 }
 
@@ -120,19 +120,19 @@ namespace dxe {
     }
 
     void debug_lines::rainbowUpdate(const float dt) {
-        currTime = (currTime + dt > 2.f) ? 2.f : currTime + dt;
-        const float a = currTime / totalTime;
+        currTime = (currTime + dt > totalTime) ? totalTime : currTime + dt;
+        const float a = glm::clamp(currTime / totalTime, 0.f, 1.f);
 
         if (colorIndex > 5) { colorIndex = 0; }
         const uint8_t nextInx = (colorIndex == 5) ? 0 : colorIndex + 1;
 
-        currentColor = glm::lerp(currentColor, colors[nextInx], a);
+        currentColor = glm::lerp(colors[colorIndex], colors[nextInx], a);
 
         for (size_t i = 0; i < lineVertCount; ++i) {
             lineVerts[i].color = currentColor;
         }
 
-        if (colors[nextInx] == currentColor){ 
+        if (currTime == totalTime){ 
             ++colorIndex;
             currTime = 0;
         }
