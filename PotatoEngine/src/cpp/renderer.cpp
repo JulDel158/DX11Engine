@@ -40,7 +40,9 @@ namespace dxe {
 
 		implementation.bindFrameBuffer(frameCbuffer, true);
 		
-		implementation.drawSkybox(skyBoxes);
+		if (skyBoxes) {
+			implementation.drawSkybox(skyBoxes);
+		}
 
 		implementation.drawGameObjects(objects, size);
 

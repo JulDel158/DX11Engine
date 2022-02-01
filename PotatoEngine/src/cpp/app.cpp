@@ -32,7 +32,7 @@ namespace dxe {
 
 		tempGameObj.model.loadObject("assets/models/piramid.obj", false);
 		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
-		tempGameObj.resourceId = 1;
+		tempGameObj.resourceId = 0;
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;

@@ -588,6 +588,8 @@ namespace dxe {
 
 		hr = device->CreateBuffer(&wnd_cb, NULL, &constantBuffer[CONSTANT_BUFFER::WINDOW_CB]);
 		assert(!FAILED(hr) && "failed to create constant buffer: Window_cb");
+
+		// Scene buffer
 	}
 
 	void pipeline::setRenderTargetView() {

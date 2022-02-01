@@ -77,4 +77,29 @@ namespace dxe {
 		void setPerspectiveProjection(float fovy, float aspect, float nearz, float farz);
 	};
 
+	struct alignas(16)DirLight {
+		glm::vec4 color{ 0.f };
+		glm::vec3 direction{ 0.f };
+	};
+
+	struct alignas(16)PointLight {
+		glm::vec4 color{ 0.f };
+		glm::vec3 pos{ 0.f };
+		float radius{ 0.f };
+	};
+
+	struct alignas(16)ConeLight {
+		glm::vec4 color{ 0.f };
+		glm::vec3 pos{ 0.f };
+		float ratio{ 0.f };
+		glm::vec3 direction{ 0.f };
+	};
+
+	struct Scene_cb{
+		PointLight pointLight;
+		DirLight dirLight;
+		ConeLight coneLight;
+		glm::vec4 ambient{ 0.f };
+	};
+
 } // namespace dxe
