@@ -2,7 +2,8 @@
 #include "pipeline.hpp"
 #include "object_data.hpp"
 
-// Obect information should be passed into the renderer which we will then pass into our pipeline to draw
+// Object information should be passed into the renderer which we will then pass into our pipeline to draw
+// this class is also intended to handle pipeline settings and determine which data to send in which order (transparent objects get drawn last for example)
 namespace dxe {
 
 	class renderer {
@@ -11,7 +12,7 @@ namespace dxe {
 		~renderer();
 
 		void update();
-		void draw(Objectdata& obj);
+		void draw(GameObject* objects, GameObject* skyBoxes, const uint32_t size);
 
 		void bindWindowBuffer();
 	
@@ -23,6 +24,9 @@ namespace dxe {
 		Window_cb& windowCbuffer;
 
 		Objectdata dCube;
+
+		PIPELINE_PROPERTY_DESC objDesc;
+		PIPELINE_PROPERTY_DESC skyboxDesc;
 	};
 
 } // dxe

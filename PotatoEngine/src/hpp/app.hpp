@@ -6,6 +6,9 @@
 #include "object_data.hpp"
 #include "XTime.hpp"
 
+// std
+#include <vector>
+
 namespace dxe {
 
 	class app {
@@ -36,9 +39,9 @@ namespace dxe {
 
 		XTime timer;
 
-		// TEMPORARY TODO: REMOVE OUT OF HERE ONCE TESTING IS DONE
-		Objectdata temporaryObject;
+		std::vector<GameObject> gameObjects;
 
+		std::vector<GameObject> skyBoxes;
 	};
 
 } // namespace dxe

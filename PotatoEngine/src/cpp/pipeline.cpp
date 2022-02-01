@@ -14,7 +14,7 @@
 // dep
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "DXGI.lib")
+// #pragma comment(lib, "DXGI.lib")
 
 #include "../hpp/file_reader.hpp"
 
@@ -38,7 +38,9 @@ namespace dxe {
 		createConstantBuffers();
 
 		// temporary
-		createSResourceView(L"assets/images/obamium.dds");
+		createSResourceView(L"assets/images/obamium.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::DEFAULT));
+
+		createSResourceView(L"assets/images/SkyboxOcean.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SKYBOX));
 
 		createDebugTexture();
 	}
@@ -168,9 +170,6 @@ namespace dxe {
 
 		Object_cb cb;
 		cb.modeling = glm::mat4{ 1.f };
-		cb.modeling[0][0] = 10.f;
-		cb.modeling[1][1] = 10.f;
-		cb.modeling[2][2] = 10.f;
 
 		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
 
@@ -182,7 +181,7 @@ namespace dxe {
 		context->PSSetShader(pixelShader[PIXEL_SHADER::OBJ_TEXTURE], NULL, 0);
 
 		// SETTING RESOURCES
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEBUG]); // TODO: THIS FUNCTION CALL IS TO BIND TEXTURES TO THE PIXEL SHADER, TO BE USED LATER
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
@@ -190,6 +189,48 @@ namespace dxe {
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->DrawIndexed(static_cast<UINT>(obj.indices.size()), 0, 0); /*TODO: ADD INDEX COUNT (SIZEOF INDICES)*/
+	}
+
+	void pipeline::drawSkybox(GameObject* skybox) {
+		UINT stride = sizeof(ObjVertex);
+		UINT offset = 0;
+
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::OBJECT]);
+
+		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
+
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+
+		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
+
+		// SETTING SHADERS 
+		context->VSSetShader(vertexShader[VERTEX_SHADER::SKYBOX], NULL, 0);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::SKYBOX], NULL, 0);
+
+		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		Object_cb scb;
+		scb.modeling = glm::mat4{ 1.f };
+
+		vBuffer = skybox->model.vertices;
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
+
+		iBuffer = skybox->model.indices;
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0);
+
+		scb.modeling = skybox->transform;
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &scb, 0, 0);
+
+		const uint32_t inx = (skybox->resourceId < SUBRESOURCE_VIEW::COUNT) ? skybox->resourceId : SUBRESOURCE_VIEW::DEBUG;
+		context->PSSetShaderResources(0, 1, &sResourceView[inx]);
+
+		context->DrawIndexed(static_cast<UINT>(skybox->model.indices.size()), 0, 0); 
+
+		// must clear the depth stencil so we can draw objects "inside" the skybox BEWARE of when this function is call
+		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
 	void pipeline::drawGameObjects(GameObject* gameObjects, uint32_t size) {
@@ -421,11 +462,13 @@ namespace dxe {
 		// vertex shaders loading
 		std::vector<uint8_t> svs_blob = tools::file_reader::load_binary_blob("shaders/simple_vertex_shader.cso");
 		std::vector<uint8_t> ovs_blob = tools::file_reader::load_binary_blob("shaders/obj_vertex_shader.cso");
+		std::vector<uint8_t> vss_blob = tools::file_reader::load_binary_blob("shaders/vs_skybox.cso");
 
 		// pixel shaders loading
 		std::vector<uint8_t> sps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
 		std::vector<uint8_t> onps_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader_normals.cso");
 		std::vector<uint8_t> ops_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader.cso");
+		std::vector<uint8_t> pss_blob = tools::file_reader::load_binary_blob("shaders/ps_skybox.cso");
 
 		// vertex shaders creation
 		HRESULT hr = device->CreateVertexShader(svs_blob.data(), svs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
@@ -433,6 +476,9 @@ namespace dxe {
 
 		hr = device->CreateVertexShader(ovs_blob.data(), ovs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::OBJECT]);
 		assert(!FAILED(hr) && "failed to create object vertex shader");
+
+		hr = device->CreateVertexShader(vss_blob.data(), vss_blob.size(), NULL, &vertexShader[VERTEX_SHADER::SKYBOX]);
+		assert(!FAILED(hr) && "failed to create skybox vertex shader");
 
 		// pixel shaders creation
 		hr = device->CreatePixelShader(sps_blob.data(), sps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
@@ -443,6 +489,9 @@ namespace dxe {
 
 		hr = device->CreatePixelShader(ops_blob.data(), ops_blob.size(), NULL, &pixelShader[PIXEL_SHADER::OBJ_TEXTURE]);
 		assert(!FAILED(hr) && "failed to create object texture pixel shader");
+
+		hr = device->CreatePixelShader(pss_blob.data(), pss_blob.size(), NULL, &pixelShader[PIXEL_SHADER::SKYBOX]);
+		assert(!FAILED(hr) && "failed to create skybox texture pixel shader");
 
 		// input layouts
 
@@ -555,11 +604,11 @@ namespace dxe {
 		
 	}
 
-	void pipeline::createSResourceView(const wchar_t* filename) {
-		HRESULT hr = DirectX::CreateDDSTextureFromFile(device, filename, nullptr, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]);
+	void pipeline::createSResourceView(const wchar_t* filename, const uint32_t index) {
+		HRESULT hr = DirectX::CreateDDSTextureFromFile(device, filename, nullptr, &sResourceView[index]);
 
 		if (FAILED(hr)) {
-			throw std::runtime_error("could not load texture file!");
+			throw std::runtime_error("could not load texture file! at: " + index);
 		}
 	}
 

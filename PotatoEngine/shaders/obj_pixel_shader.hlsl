@@ -1,4 +1,4 @@
-Texture2D diffuse : register(t0); // TODO: UNCOMMENT AND ADD DEBUG TEXTURE
+Texture2D diffuse : register(t0);
 SamplerState samLinear : register(s0);
 
 cbuffer Object_cb : register(b0) // binder per object per frame
@@ -32,6 +32,4 @@ float4 main(VS_OUT input) : SV_Target
     finalColor = diffuse.Sample(samLinear, input.uv);
     
     return finalColor;
-    // return float4(input.nrm.xyz, 1.f);
-
 }

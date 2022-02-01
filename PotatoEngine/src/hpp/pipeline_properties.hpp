@@ -31,11 +31,11 @@ namespace dxe {
 	};
 
 	struct VERTEX_SHADER {
-		enum { DEFAULT = 0, OBJECT, COUNT };
+		enum { DEFAULT = 0, OBJECT, SKYBOX, COUNT };
 	};
 
 	struct PIXEL_SHADER {
-		enum { DEFAULT = 0, OBJ_NRM, OBJ_TEXTURE, COUNT };
+		enum { DEFAULT = 0, OBJ_NRM, OBJ_TEXTURE, SKYBOX, COUNT };
 	};
 
 	struct CONSTANT_BUFFER {
@@ -47,11 +47,27 @@ namespace dxe {
 	};
 
 	struct SUBRESOURCE_VIEW {
-		enum { DEBUG = 0, DEFAULT, COUNT };
+		enum { DEBUG = 0, DEFAULT, SKYBOX, COUNT };
 	};
 
 	struct SAMPLER_STATE {
 		enum { DEFAULT = 0, COUNT };
+	};
+
+	struct PIPELINE_PROPERTY_DESC {
+		uint8_t renderTarget_V;
+		uint8_t depthStencil_V;
+		uint8_t depthStencil_S;
+		uint8_t rasterState;
+		uint8_t vertexBuffer;
+		uint8_t indexBuffer;
+		uint8_t inputLayout;
+		uint8_t vertexShader;
+		uint8_t pixelShader;
+		uint8_t constantBuffer;
+		uint8_t viewport;
+		uint8_t sResourceView;
+		uint8_t samplerState;
 	};
 
 } // namespace dxe

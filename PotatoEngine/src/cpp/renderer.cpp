@@ -4,8 +4,17 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{ wcb } {
+	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{ wcb }, objDesc{ 0 }, skyboxDesc{ 0 } {
 		dCube.dMakeCube(1.f);
+
+		objDesc.inputLayout = INPUT_LAYOUT::OBJECT;
+		objDesc.vertexBuffer = VERTEX_BUFFER::OBJ_40000;
+		objDesc.indexBuffer = INDEX_BUFFER::OBJ_40000;
+		objDesc.constantBuffer = CONSTANT_BUFFER::OBJECT_CB;
+		objDesc.vertexShader = VERTEX_SHADER::OBJECT;
+		objDesc.pixelShader = PIXEL_SHADER::OBJ_TEXTURE;
+		objDesc.samplerState = SAMPLER_STATE::DEFAULT;
+
 	}
 
 	renderer::~renderer() { }
@@ -26,14 +35,20 @@ namespace dxe {
 
 	}
 
-	void renderer::draw(Objectdata& obj) {
+	void renderer::draw(GameObject* objects, GameObject* skyBoxes, const uint32_t size) {
 		implementation.setRenderTargetView();
 
 		implementation.bindFrameBuffer(frameCbuffer, true);
 		
-		implementation.drawObject(obj);
+		implementation.drawSkybox(skyBoxes);
+
+		implementation.drawGameObjects(objects, size);
 
 		implementation.drawDebugLines();
+
+#ifdef _DEBUG
+		implementation.drawObject(dCube);
+#endif
 
 		implementation.present(0);
 	}

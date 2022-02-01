@@ -37,6 +37,8 @@ namespace dxe {
 
 		void drawObject(Objectdata& obj);
 
+		void drawSkybox(GameObject* skybox);
+
 		void drawGameObjects(GameObject* gameObjects, uint32_t size);
 
 		void setRenderTargetView();
@@ -94,7 +96,7 @@ namespace dxe {
 		void createConstantBuffers();
 
 		// remember to use the format L"filename" when calling this function
-		void createSResourceView(const wchar_t* filename);
+		void createSResourceView(const wchar_t* filename, const uint32_t index);
 
 		void createDebugTexture();
 

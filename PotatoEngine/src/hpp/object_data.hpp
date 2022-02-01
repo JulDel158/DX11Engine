@@ -31,9 +31,9 @@ namespace dxe {
 	};
 
 	struct GameObject {
-		glm::mat4 transform;
+		glm::mat4 transform{ 1.f };
 		Objectdata model;
-		uint32_t resourceId;
+		uint32_t resourceId{ 0 };
 		// TODO: IMPLEMENT TEXTURE REFERENCES ON OBJECTS, CONSIDER USING AN ID TO AN ARRAY OF ID3D11ShaderResourceView INSTEAD TO KEEP ABSTRACTION
 		// ID3D11ShaderResourceView* resourceView;
 	};

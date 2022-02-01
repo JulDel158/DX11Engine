@@ -6,7 +6,11 @@
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
 
+// std
+#ifdef _DEBUG
 #include <iostream>
+#endif
+#include <utility>
 
 namespace dxe {
 	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND, frameBuffer, windowBuffer) { 
@@ -16,21 +20,26 @@ namespace dxe {
 		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 1000.f);
 		camera.position = glm::vec3(0.f, 3.f, -15.f);
 		camera.getView();
-		// camera.UpdateView();
-		// camera.FPSViewRH({ 0.f, 3.f, -15.f }, glm::radians(0.f), glm::radians(0.f));
 
 		// updating constant buffers
 		frameBuffer.view = camera.view;
 
 		dxRenderer.bindWindowBuffer();
 
-		temporaryObject.loadObject("assets/models/piramid.obj", false);
-		// tempView.view = glm::inverse(tempView.view);
-		// tempView.dPrintViewMat();
-		/*camera.view = glm::mat4{ 1.f };
-		camera.LookAtTarget({ 0.f, 5.f, -15.f }, { 0.f, 5.f, 0.f }, { 0.f, 1.f, 0.f });
-		camera.view = glm::inverse(camera.view);
-		camera.dPrintViewMat();*/
+		GameObject tempGameObj;
+
+		GameObject skyBox;
+
+		tempGameObj.model.loadObject("assets/models/piramid.obj", false);
+		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
+		tempGameObj.resourceId = 1;
+
+		skyBox.model.loadObject("assets/models/CUBE.obj");
+		skyBox.resourceId = 2;
+
+		gameObjects.push_back(std::move(tempGameObj));
+
+		skyBoxes.push_back(std::move(skyBox));
 	}
 
 	app::~app() {}
@@ -55,7 +64,7 @@ namespace dxe {
 				timer.Signal();
 				input.Update();
 
-#ifndef NDEBUG
+#ifdef _DEBUG
 				if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
 				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
@@ -66,7 +75,7 @@ namespace dxe {
 				std::cout << "Timer smooth delta: " << timer.SmoothDelta() << "\n";
 				std::cout << "Timer FPS: " << timer.SamplesPerSecond() << "\n";
 				std::cout << "------------------------------------------------------------\n\n\n";
-#endif // !NDEBUG
+#endif // _DEBUG
 
 				glm::vec4 translate{ 0.f };
 				const float dt = static_cast<float>(timer.Delta());
@@ -85,15 +94,16 @@ namespace dxe {
 
 				camera.getView(translate);
 				frameBuffer.view = camera.view;
-
-				
+				skyBoxes[0].transform[3][0] = camera.view[3][0];
+				skyBoxes[0].transform[3][1] = camera.view[3][1];
+				skyBoxes[0].transform[3][2] = camera.view[3][2];
 
 				dxRenderer.update();
 
 				// RAINBOW DEBUG LINES!!!!!!
 				debug_lines::rainbowUpdate(dt);
 
-				dxRenderer.draw(temporaryObject);
+				dxRenderer.draw(gameObjects.data(), &skyBoxes[0], static_cast<uint32_t>(gameObjects.size()));
 			}
 		}
 
