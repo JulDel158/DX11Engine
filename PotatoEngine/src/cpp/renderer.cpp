@@ -20,8 +20,8 @@ namespace dxe {
 	renderer::~renderer() { }
 
 	void renderer::update() {
-		debug_lines::addGrid();
 #ifdef _DEBUG
+		debug_lines::addGrid();
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f }, 1.f, glm::vec4{1.f, 1.f, 1.f, 1.f});
 

@@ -27,17 +27,24 @@ namespace dxe {
 		dxRenderer.bindWindowBuffer();
 
 		GameObject tempGameObj;
+		GameObject plane;
 
 		GameObject skyBox;
 
-		tempGameObj.model.loadObject("assets/models/piramid.obj", false);
-		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
+		tempGameObj.model.loadObject("assets/models/flat_vase.obj", true);
+		// tempGameObj.model.dMakePlane();
+		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 20.f;
 		tempGameObj.resourceId = 0;
+
+		plane.model.dMakePlane();
+		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
+		plane.resourceId = 0;
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;
 
 		gameObjects.push_back(std::move(tempGameObj));
+		gameObjects.push_back(std::move(plane));
 
 		skyBoxes.push_back(std::move(skyBox));
 	}
@@ -103,7 +110,7 @@ namespace dxe {
 				// RAINBOW DEBUG LINES!!!!!!
 				debug_lines::rainbowUpdate(dt);
 
-				dxRenderer.draw(gameObjects.data(), &skyBoxes[0], static_cast<uint32_t>(gameObjects.size()));
+				dxRenderer.draw(gameObjects.data(), /*&skyBoxes[0]*/ nullptr, static_cast<uint32_t>(gameObjects.size()));
 			}
 		}
 

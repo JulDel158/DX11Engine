@@ -179,7 +179,7 @@ namespace dxe {
 				if (index.normal_index >= 0) {
 					vertex.nrm = {
 						attrib.normals[3 * index.normal_index + 0],
-						attrib.normals[3 * index.normal_index + 1],
+						attrib.normals[3 * index.normal_index + 1] * sign,
 						attrib.normals[3 * index.normal_index + 2]
 					};
 				}
@@ -254,6 +254,39 @@ namespace dxe {
 		// right 2 3 6 7
 		indices.push_back(2); indices.push_back(3); indices.push_back(6);
 		indices.push_back(3); indices.push_back(7); indices.push_back(6);
+	}
+
+	void Objectdata::dMakePlane() {
+		ObjVertex p1;
+		ObjVertex p2;
+		ObjVertex p3;
+		ObjVertex p4;
+
+		p1.pos = { -0.5f , 0.f, -0.5f };
+		p2.pos = { -0.5f, 0.f, 0.5f };
+		p3.pos = { 0.5f, 0.f, -0.5f };
+		p4.pos = { 0.5f, 0.f, 0.5f };
+
+		p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
+
+		p1.uv = { 0.f, 1.f };
+		p2.uv = { 1.f, 1.f };
+		p3.uv = {0.f, 0.f};
+		p4.uv = {1.f, 0.f};
+
+		vertices.push_back(p1);
+		vertices.push_back(p2);
+		vertices.push_back(p3);
+		vertices.push_back(p4);
+
+		// the 2 triangles that form the plane
+		indices.push_back(0);
+		indices.push_back(2);
+		indices.push_back(1);
+
+		indices.push_back(2);
+		indices.push_back(3);
+		indices.push_back(1);
 	}
 
 } // namespace dxe

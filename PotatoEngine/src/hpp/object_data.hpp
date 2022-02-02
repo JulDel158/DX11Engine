@@ -28,6 +28,8 @@ namespace dxe {
 		void loadObject(const char* filepath, bool invertY = true);
 
 		void dMakeCube(float offset);
+
+		void dMakePlane();
 	};
 
 	struct GameObject {
@@ -95,11 +97,12 @@ namespace dxe {
 		glm::vec3 direction{ 0.f };
 	};
 
-	struct Scene_cb{
-		PointLight pointLight;
-		DirLight dirLight;
-		ConeLight coneLight;
+	struct alignas(16)Scene_cb{
+	//	PointLight pointLight;
+		glm::vec4 color{ 0.f };
 		glm::vec4 ambient{ 0.f };
+		glm::vec3 direction{ 0.f };
+	//	ConeLight coneLight;
 	};
 
 } // namespace dxe

@@ -115,6 +115,16 @@ namespace dxe {
 		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
+
+		// BINDING TEMPORARY SCENE BUFFER HERE, TO BE REMOVED
+		Scene_cb scb;
+		scb.color = {0.f, 0.0f, 0.f, 0.f};
+		scb.direction = {1.f, -1.f, 1.f};
+		scb.ambient = { 1.f, 1.f, 1.f, 1.f };
+
+		context->PSSetConstantBuffers(3, 1, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
+
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::SCENE_CB], 0, NULL, &scb, 0, 0);
 	}
 
 	void pipeline::bindWindowBuffer(const Window_cb& wcb) {
@@ -590,10 +600,19 @@ namespace dxe {
 		assert(!FAILED(hr) && "failed to create constant buffer: Window_cb");
 
 		// Scene buffer
+		D3D11_BUFFER_DESC snd_cb{ 0 };
+
+		snd_cb.Usage = D3D11_USAGE_DEFAULT;
+		snd_cb.ByteWidth = sizeof(Scene_cb);
+		snd_cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		snd_cb.CPUAccessFlags = 0;
+
+		hr = device->CreateBuffer(&snd_cb, NULL, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
+		assert(!FAILED(hr) && "failed to create constant buffer: Scene_cb");
 	}
 
 	void pipeline::setRenderTargetView() {
-		static const float black[] = { 0.1f, 0.1f, 0.2f, 1.f };
+		static const float black[] = { 0.25f, 0.25f, 0.25f, 1.f };
 
 		context->OMSetDepthStencilState(depthStencilState[DEPTH_STENCIL_STATE::DEFAULT], 1);
 		context->OMSetRenderTargets(1, &renderTarget[RENDER_TARGET_VIEW::DEFAULT], depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT]);
@@ -615,7 +634,7 @@ namespace dxe {
 	}
 
 	void pipeline::createDebugTexture() {
-		const uint32_t pixel = 0xffff7798; // a b g r
+		const uint32_t pixel = 0xffDBD9CB;//0xffff7798; // a b g r 
 
 		D3D11_SUBRESOURCE_DATA initData = { &pixel, sizeof(uint32_t), 0 };
 
