@@ -98,11 +98,10 @@ namespace dxe {
 	};
 
 	struct alignas(16)Scene_cb{
-	//	PointLight pointLight;
-		glm::vec4 color{ 0.f };
-		glm::vec4 ambient{ 0.f };
-		glm::vec3 direction{ 0.f };
+		PointLight pointLight;
+		DirLight dirLight;
 	//	ConeLight coneLight;
+		glm::vec4 ambient{ 0.f };
 	};
 
 } // namespace dxe

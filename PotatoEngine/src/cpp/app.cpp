@@ -31,10 +31,10 @@ namespace dxe {
 
 		GameObject skyBox;
 
-		tempGameObj.model.loadObject("assets/models/flat_vase.obj", true);
+		tempGameObj.model.loadObject("assets/models/piramid.obj", false);
 		// tempGameObj.model.dMakePlane();
-		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 20.f;
-		tempGameObj.resourceId = 0;
+		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
+		tempGameObj.resourceId = 1;
 
 		plane.model.dMakePlane();
 		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;

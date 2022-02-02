@@ -118,9 +118,13 @@ namespace dxe {
 
 		// BINDING TEMPORARY SCENE BUFFER HERE, TO BE REMOVED
 		Scene_cb scb;
-		scb.color = {0.f, 0.0f, 0.f, 0.f};
-		scb.direction = {1.f, -1.f, 1.f};
-		scb.ambient = { 1.f, 1.f, 1.f, 1.f };
+		scb.dirLight.color = {0.4f, 0.4f, 0.4f, 1.0f};
+		scb.dirLight.direction = {0.f, -1.f, 0.f};
+		scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
+
+		scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
+		scb.pointLight.pos = { 4.f, 3.f, 8.f };
+		scb.pointLight.radius = 40.f;
 
 		context->PSSetConstantBuffers(3, 1, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
 

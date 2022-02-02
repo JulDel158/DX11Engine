@@ -16,40 +16,34 @@ cbuffer Window_cb : register(b2) // binded whenever the window changes
     matrix projection;
 };
 
-//struct DirLight {
-//    float4 color;
-//    float3 direction;
-//};
-
-//struct PointLight {
+// THIS DATA IS BEING BINDED TO THE PIXEL SHADER, NOT THE VERTEX SHADER
+//struct PointLight
+//{
 //    float4 color;
 //    float3 pos;
 //    float radius;
 //};
 
-//struct ConeLight {
+//struct DirectionalLight
+//{
 //    float4 color;
-//    float3 pos;
-//    float ratio;
 //    float3 direction;
 //};
 
-cbuffer Scene_cb : register(b3) {
-     // point light
-    //float4 p_color;
-    //float3 p_pos;
-    //float p_radius;
-    // directional light
-    float4 d_color;
-    float3 d_direction;
-    // cone light
-    //float4 c_color;
-    //float3 c_pos;
-    //float c_ratio;
-    //float3 c_direction;
-    // ambient light
-    float4 ambientTerm;
-};
+//cbuffer Scene_cb : register(b3)
+//{
+//    // point light
+//    PointLight plight;
+//    // directional light
+//    DirectionalLight dlight;
+//    // cone light
+//    //float4 c_color;
+//    //float3 c_pos;
+//    //float c_ratio;
+//    //float3 c_direction;
+//    // ambient light
+//    float4 ambientLightColor;
+//};
 
 struct VS_IN
 {
@@ -62,7 +56,7 @@ struct VS_OUT
 {
     float4 pos : SV_Position;
     float3 nrm : NORMAL;
-    float4 worldPos : POSITION;
+    float3 worldPos : POSITION;
     float4 camPos : CAMPOS;
     float2 uv : TEXCOORD;
 };
@@ -73,13 +67,13 @@ VS_OUT main(VS_IN input)
     VS_OUT output = (VS_OUT) 0;
 	
     output.pos = mul(float4(input.pos, 1.0f), modeling);
+    output.worldPos = output.pos.xyz;
     output.pos = mul(output.pos, mul(view, projection));
     
     //for (int i = 0; i < 3; ++i) {
     //    output.camPos[i] = -dot(view[3].xyz, view[i].xyz);
     //}
     //output.camPos.w = 1.0f;
-    
     output.nrm = mul(input.nrm, (float3x3)modeling);
     output.uv = input.uv;
 	
