@@ -93,12 +93,12 @@ namespace dxe {
 	struct alignas(16)SpotLight {
 		glm::vec4 color{ 0.f };  // 16 BYTES
 		glm::vec3 pos{ 0.f };
-		float att2{ 0.f }; // +16 BYTES
+		float innerRatio{ 0.f }; // +16 BYTES
 		glm::vec3 direction{ 0.f };
-		float att1{ 0.f }; // +16 BYTES
+		float outerRatio{ 0.f }; // +16 BYTES
 		float range{ 0.f }; 
-		float cone{ 0.f };
-		float att3{ 0.f };
+		float focus{ 0.f };
+		float falloff{ 0.f };
 		//  +16 TOTAL: 64 BYTES
 	};
 

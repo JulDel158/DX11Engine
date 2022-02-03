@@ -34,12 +34,12 @@ struct SpotLight
 {
     float4 color;
     float3 pos;
-    float att2;
+    float innerRatio;
     float3 direction;
-    float att1;
+    float outerRatio;
     float range;
-    float cone;
-    float att3;
+    float focus;
+    float falloff;
 };
 
 cbuffer Scene_cb : register(b3)
@@ -84,7 +84,7 @@ float4 CreatePointLight(float4 color, float3 lightpos, float radius, float3 surf
     return light;
 }
 
-float4 CreateSpotLight(float4 color, float3 lightpos, float att1, float att2, float att3, float3 coneDirection, float range, float cone, float3 surfacePos, float3 surfaceNormal)
+float4 CreateSpotLight(float4 color, float3 lightpos, float outerRatio, float innerRatio, float falloff, float3 coneDirection, float range, float focus, float3 surfacePos, float3 surfaceNormal)
 {
     float4 light = (float4)0;
     coneDirection = normalize(coneDirection);
@@ -106,9 +106,9 @@ float4 CreateSpotLight(float4 color, float3 lightpos, float att1, float att2, fl
         float hmlight = dot(pixelToLight, surfaceNormal);
         if (hmlight > 0.0f)
         {
-            light += color;
-            light /= (att1 + (att2 * d)) + (att3 * (d * d));
-            light *= pow(max(dot(-pixelToLight, coneDirection), 0.0f), cone);
+            light = color;
+            light /= (outerRatio + (innerRatio * d)) + (falloff * (d * d));
+            light *= pow(max(dot(-pixelToLight, coneDirection), 0.0f), focus);
         }
 
     }
@@ -121,9 +121,9 @@ float4 main(VS_OUT input) : SV_Target
     float4 finalColor = (float4)0;
     finalColor += CreateDirectionalLight(dlight.color, dlight.direction, input.nrm) +
     CreatePointLight(plight.color, plight.pos, plight.radius, input.worldPos, input.nrm) +
-    CreateSpotLight(slight.color, slight.pos, slight.att1, slight.att2, slight.att3, slight.direction, slight.range, slight.cone,
-    input.worldPos, input.nrm)
-    +
+    CreateSpotLight(slight.color, slight.pos, slight.outerRatio, slight.innerRatio, 
+                    slight.falloff, slight.direction, slight.range, slight.focus,
+                    input.worldPos, input.nrm) +
     float4(ambientLightColor.xyz * ambientLightColor.a, 1);
     // CreatePointLight(p_color, p_pos, p_radius, input.worldPos.xyz, input.nrm.xyz) +
     // CreateConeLight(c_color, c_pos, c_ratio, c_direction, input.worldPos.xyz, input.nrm.xyz);

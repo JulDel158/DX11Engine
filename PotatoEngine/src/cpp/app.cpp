@@ -61,12 +61,12 @@ namespace dxe {
 
 		scb.spotLight.color = { 0.f, 1.f, 0.f, 1.f };
 
-		scb.spotLight.att1 = 0.1f;
-		scb.spotLight.att2 = 0.2f;
-		scb.spotLight.att3 = 0.f;
+		scb.spotLight.outerRatio = 1.f;
+		scb.spotLight.innerRatio = 1.f;
+		scb.spotLight.falloff = 0.f;
 
 		scb.spotLight.range = 1000.f;
-		scb.spotLight.cone = 10.f;
+		scb.spotLight.focus = 10.f;
 	}
 
 	app::~app() {}
@@ -128,18 +128,18 @@ namespace dxe {
 				{ // temp light stuff
 					glm::vec3 campos = camera.view[3];
 					glm::vec3 camforw = camera.view[2];
-					// att1
-					if (input.KeyDown('Z')) { scb.spotLight.att1 += 0.05f * dt; }
-					if (input.KeyDown('X')) { scb.spotLight.att1 -= 0.05f * dt; scb.spotLight.att1 = glm::clamp(scb.spotLight.att1, 0.f, 1000.f); }
-					// att2
-					if (input.KeyDown('V')) { scb.spotLight.att2 += 0.05f * dt; }
-					if (input.KeyDown('B')) { scb.spotLight.att2 -= 0.05f * dt; scb.spotLight.att2 = glm::clamp(scb.spotLight.att2, 0.f, 1000.f); }
-					// att3
-					if (input.KeyDown('K')) { scb.spotLight.att3 += 0.05f * dt; }
-					if (input.KeyDown('L')) { scb.spotLight.att3 -= 0.05f * dt; scb.spotLight.att3 = glm::clamp(scb.spotLight.att3, 0.f, 1000.f); }
-					// cone
-					if (input.KeyDown('O')) { scb.spotLight.cone+= 20.0f * dt; }
-					if (input.KeyDown('P')) { scb.spotLight.cone-= 20.0f * dt; scb.spotLight.cone = glm::clamp(scb.spotLight.cone, 0.f, 1000.f); }
+					// att1 outer cone
+					if (input.KeyDown('Z')) { scb.spotLight.outerRatio += 0.05f * dt; }
+					if (input.KeyDown('X')) { scb.spotLight.outerRatio -= 0.05f * dt; scb.spotLight.outerRatio = glm::clamp(scb.spotLight.outerRatio, 0.f, 1000.f); }
+					// att2 inner cone
+					if (input.KeyDown('V')) { scb.spotLight.innerRatio += 0.05f * dt; }
+					if (input.KeyDown('B')) { scb.spotLight.innerRatio -= 0.05f * dt; scb.spotLight.innerRatio = glm::clamp(scb.spotLight.innerRatio, 0.f, 1000.f); }
+					// att3 falloff
+					if (input.KeyDown('K')) { scb.spotLight.falloff += 0.05f * dt; }
+					if (input.KeyDown('L')) { scb.spotLight.falloff -= 0.05f * dt; scb.spotLight.falloff = glm::clamp(scb.spotLight.falloff, 0.f, 1000.f); }
+					// focus
+					if (input.KeyDown('O')) { scb.spotLight.focus+= 20.0f * dt; }
+					if (input.KeyDown('P')) { scb.spotLight.focus-= 20.0f * dt; scb.spotLight.focus = glm::clamp(scb.spotLight.focus, 0.f, 1000.f); }
 
 					scb.spotLight.direction = camforw;
 					scb.spotLight.pos = campos;
