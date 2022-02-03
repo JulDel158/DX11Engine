@@ -13,7 +13,9 @@
 #include <utility>
 
 namespace dxe {
-	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : dxWindow(hInstance, winProc, nCmdShow, msg), dxRenderer(dxWindow.mainHWND, frameBuffer, windowBuffer) { 
+	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : 
+		dxWindow(hInstance, winProc, nCmdShow, msg), 
+		dxRenderer(dxWindow.mainHWND, frameBuffer, windowBuffer, scb) { 
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
@@ -47,6 +49,24 @@ namespace dxe {
 		gameObjects.push_back(std::move(plane));
 
 		skyBoxes.push_back(std::move(skyBox));
+
+
+		scb.dirLight.color = { 0.4f, 0.4f, 0.4f, 1.0f };
+		scb.dirLight.direction = { 0.f, -1.f, 0.f };
+		scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
+
+		/*scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
+		scb.pointLight.pos = { 5.f, 3.f, 8.f };
+		scb.pointLight.radius = 10.f;*/
+
+		scb.spotLight.color = { 0.f, 1.f, 0.f, 1.f };
+
+		scb.spotLight.att1 = 0.1f;
+		scb.spotLight.att2 = 0.2f;
+		scb.spotLight.att3 = 0.f;
+
+		scb.spotLight.range = 1000.f;
+		scb.spotLight.cone = 10.f;
 	}
 
 	app::~app() {}
@@ -101,9 +121,29 @@ namespace dxe {
 
 				camera.getView(translate);
 				frameBuffer.view = camera.view;
-				skyBoxes[0].transform[3][0] = camera.view[3][0];
-				skyBoxes[0].transform[3][1] = camera.view[3][1];
-				skyBoxes[0].transform[3][2] = camera.view[3][2];
+				skyBoxes[0].transform[3] = camera.view[3];
+				/*skyBoxes[0].transform[3][1] = camera.view[3][1];
+				skyBoxes[0].transform[3][2] = camera.view[3][2];*/
+
+				{ // temp light stuff
+					glm::vec3 campos = camera.view[3];
+					glm::vec3 camforw = camera.view[2];
+					// att1
+					if (input.KeyDown('Z')) { scb.spotLight.att1 += 0.05f * dt; }
+					if (input.KeyDown('X')) { scb.spotLight.att1 -= 0.05f * dt; scb.spotLight.att1 = glm::clamp(scb.spotLight.att1, 0.f, 1000.f); }
+					// att2
+					if (input.KeyDown('V')) { scb.spotLight.att2 += 0.05f * dt; }
+					if (input.KeyDown('B')) { scb.spotLight.att2 -= 0.05f * dt; scb.spotLight.att2 = glm::clamp(scb.spotLight.att2, 0.f, 1000.f); }
+					// att3
+					if (input.KeyDown('K')) { scb.spotLight.att3 += 0.05f * dt; }
+					if (input.KeyDown('L')) { scb.spotLight.att3 -= 0.05f * dt; scb.spotLight.att3 = glm::clamp(scb.spotLight.att3, 0.f, 1000.f); }
+					// cone
+					if (input.KeyDown('O')) { scb.spotLight.cone+= 20.0f * dt; }
+					if (input.KeyDown('P')) { scb.spotLight.cone-= 20.0f * dt; scb.spotLight.cone = glm::clamp(scb.spotLight.cone, 0.f, 1000.f); }
+
+					scb.spotLight.direction = camforw;
+					scb.spotLight.pos = campos;
+				}
 
 				dxRenderer.update();
 

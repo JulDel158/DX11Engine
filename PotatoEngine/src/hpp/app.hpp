@@ -37,6 +37,8 @@ namespace dxe {
 
 		Window_cb windowBuffer;
 
+		Scene_cb scb;
+
 		XTime timer;
 
 		std::vector<GameObject> gameObjects;

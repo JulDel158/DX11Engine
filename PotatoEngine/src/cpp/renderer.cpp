@@ -4,7 +4,13 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb) : implementation(windowHandle), frameCbuffer{ fcb }, windowCbuffer{ wcb }, objDesc{ 0 }, skyboxDesc{ 0 } {
+	renderer::renderer(HWND windowHandle, Frame_cb& fcb, Window_cb& wcb, Scene_cb& scb) : 
+		implementation(windowHandle), 
+		frameCbuffer{ fcb }, 
+		windowCbuffer{ wcb }, 
+		objDesc{ 0 }, 
+		skyboxDesc{ 0 },
+		sceneCbuffer{ scb } {
 		dCube.dMakeCube(1.f);
 
 		objDesc.inputLayout = INPUT_LAYOUT::OBJECT;
@@ -38,7 +44,7 @@ namespace dxe {
 	void renderer::draw(GameObject* objects, GameObject* skyBoxes, const uint32_t size) {
 		implementation.setRenderTargetView();
 
-		implementation.bindFrameBuffer(frameCbuffer, true);
+		implementation.bindFrameBuffer(frameCbuffer, sceneCbuffer, true);
 		
 		if (skyBoxes) {
 			implementation.drawSkybox(skyBoxes);

@@ -8,7 +8,7 @@ namespace dxe {
 
 	class renderer {
 	public:
-		renderer(HWND windowHandle, Frame_cb &frame_cbuffer, Window_cb &window_cbuffer);
+		renderer(HWND windowHandle, Frame_cb &frame_cbuffer, Window_cb &window_cbuffer, Scene_cb& scene_buffer);
 		~renderer();
 
 		void update();
@@ -22,6 +22,8 @@ namespace dxe {
 		Frame_cb& frameCbuffer;
 
 		Window_cb& windowCbuffer;
+
+		Scene_cb& sceneCbuffer;
 
 		Objectdata dCube;
 

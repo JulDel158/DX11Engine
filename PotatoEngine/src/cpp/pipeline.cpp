@@ -106,7 +106,7 @@ namespace dxe {
 		swapChain->Present(vsync, 0);
 	}
 
-	void pipeline::bindFrameBuffer(const Frame_cb& frameCbuffer, bool invertView) {
+	void pipeline::bindFrameBuffer(const Frame_cb& frameCbuffer, const Scene_cb& sceneCbuffer, bool invertView) {
 		Frame_cb cb{ frameCbuffer };
 		if (invertView) {
 			cb.view = glm::inverse(cb.view);
@@ -117,18 +117,32 @@ namespace dxe {
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
 
 		// BINDING TEMPORARY SCENE BUFFER HERE, TO BE REMOVED
-		Scene_cb scb;
-		scb.dirLight.color = {0.4f, 0.4f, 0.4f, 1.0f};
-		scb.dirLight.direction = {0.f, -1.f, 0.f};
-		scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
+		//Scene_cb scb;
+		//scb.dirLight.color = {0.4f, 0.4f, 0.4f, 1.0f};
+		//scb.dirLight.direction = {0.f, -1.f, 0.f};
+		//scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
 
-		scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
-		scb.pointLight.pos = { 4.f, 3.f, 8.f };
-		scb.pointLight.radius = 40.f;
+		///*scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
+		//scb.pointLight.pos = { 5.f, 3.f, 8.f };
+		//scb.pointLight.radius = 10.f;*/
+		//glm::vec3 campos = frameCbuffer.view[3];
+		//glm::vec3 camforw = frameCbuffer.view[2];
+
+
+		//scb.spotLight.color = {0.f, 1.f, 0.f, 1.f};
+		//scb.spotLight.direction = camforw;
+		//scb.spotLight.pos = campos;
+
+		//scb.spotLight.att1 = 0.1f;
+		//scb.spotLight.att2 = 0.2f;
+		//scb.spotLight.att3 = 0.f;
+
+		//scb.spotLight.range = 100.f;
+		//scb.spotLight.cone = 10.f;
 
 		context->PSSetConstantBuffers(3, 1, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
 
-		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::SCENE_CB], 0, NULL, &scb, 0, 0);
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::SCENE_CB], 0, NULL, &sceneCbuffer, 0, 0);
 	}
 
 	void pipeline::bindWindowBuffer(const Window_cb& wcb) {

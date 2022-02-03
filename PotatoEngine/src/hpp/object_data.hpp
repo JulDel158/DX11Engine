@@ -80,28 +80,33 @@ namespace dxe {
 	};
 
 	struct alignas(16)DirLight {
-		glm::vec4 color{ 0.f };
-		glm::vec3 direction{ 0.f };
+		glm::vec4 color{ 0.f }; // 16 BYTES
+		glm::vec3 direction{ 0.f };	// 16 BYTES TOTAL: 32 BYTES
 	};
 
 	struct alignas(16)PointLight {
-		glm::vec4 color{ 0.f };
-		glm::vec3 pos{ 0.f };
-		float radius{ 0.f };
+		glm::vec4 color{ 0.f }; // 16 BYTES
+		glm::vec3 pos{ 0.f }; 
+		float radius{ 0.f }; // 16 BYTES TOTAL: 32 BYTES
 	};
 
-	struct alignas(16)ConeLight {
-		glm::vec4 color{ 0.f };
+	struct alignas(16)SpotLight {
+		glm::vec4 color{ 0.f };  // 16 BYTES
 		glm::vec3 pos{ 0.f };
-		float ratio{ 0.f };
+		float att2{ 0.f }; // +16 BYTES
 		glm::vec3 direction{ 0.f };
+		float att1{ 0.f }; // +16 BYTES
+		float range{ 0.f }; 
+		float cone{ 0.f };
+		float att3{ 0.f };
+		//  +16 TOTAL: 64 BYTES
 	};
 
 	struct alignas(16)Scene_cb{
-		PointLight pointLight;
-		DirLight dirLight;
-	//	ConeLight coneLight;
-		glm::vec4 ambient{ 0.f };
+		PointLight pointLight; // 32 BYTES
+		DirLight dirLight; // 32 BYTES
+		SpotLight spotLight; // 64 BYTES
+		glm::vec4 ambient{ 0.f }; // 16 BYTES TOTAL: 144 BYTES X-X
 	};
 
 } // namespace dxe

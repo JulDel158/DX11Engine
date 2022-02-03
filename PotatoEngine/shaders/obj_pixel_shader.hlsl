@@ -30,18 +30,23 @@ struct DirectionalLight
     float3 direction;
 };
 
+struct SpotLight
+{
+    float4 color;
+    float3 pos;
+    float att2;
+    float3 direction;
+    float att1;
+    float range;
+    float cone;
+    float att3;
+};
+
 cbuffer Scene_cb : register(b3)
 {
-    // point light
     PointLight plight;
-    // directional light
     DirectionalLight dlight;
-    // cone light
-    //float4 c_color;
-    //float3 c_pos;
-    //float c_ratio;
-    //float3 c_direction;
-    // ambient light
+    SpotLight slight;
     float4 ambientLightColor;
 };
 
@@ -79,16 +84,34 @@ float4 CreatePointLight(float4 color, float3 lightpos, float radius, float3 surf
     return light;
 }
 
-float4 CreateConeLight(float4 color, float3 lightpos, float coneRatio, float3 coneDirection, float3 surfacePos, float3 surfaceNormal)
+float4 CreateSpotLight(float4 color, float3 lightpos, float att1, float att2, float att3, float3 coneDirection, float range, float cone, float3 surfacePos, float3 surfaceNormal)
 {
     float4 light = (float4)0;
     coneDirection = normalize(coneDirection);
-    float3 lightdirection = normalize(lightpos - surfacePos);
-    float surfaceRatio = saturate(dot(-lightdirection, coneDirection));
-    float spotFactor = (surfaceRatio > coneRatio) ? 1.0f : 0.0f;
-    float lightRatio = saturate(dot(lightdirection, surfaceNormal));
     
-    light = spotFactor * lightRatio * color;
+    // not working...
+    //float3 lightdirection = normalize(lightpos - surfacePos);
+    //float surfaceRatio = saturate(dot(-lightdirection, coneDirection));
+    //float spotFactor = (surfaceRatio > innerRatio) ? 1.0f : 0.0f;
+    ////float attenuation = 1.0 - saturate((innerRatio - surfaceRatio) / (innerRatio - outerRatio));
+    ////attenuation *= attenuation;
+    //float lightRatio = normalize(dot(lightdirection, surfaceNormal));
+    //light = spotFactor * lightRatio * color;
+    
+    float3 pixelToLight = (lightpos - surfacePos);
+    float d = length(pixelToLight);
+    if (d <= range)
+    {
+        pixelToLight = normalize(pixelToLight);
+        float hmlight = dot(pixelToLight, surfaceNormal);
+        if (hmlight > 0.0f)
+        {
+            light += color;
+            light /= (att1 + (att2 * d)) + (att3 * (d * d));
+            light *= pow(max(dot(-pixelToLight, coneDirection), 0.0f), cone);
+        }
+
+    }
     
     return light;
 }
@@ -96,11 +119,15 @@ float4 CreateConeLight(float4 color, float3 lightpos, float coneRatio, float3 co
 float4 main(VS_OUT input) : SV_Target
 {
     float4 finalColor = (float4)0;
-    finalColor += CreateDirectionalLight(dlight.color, dlight.direction, input.nrm) + 
+    finalColor += CreateDirectionalLight(dlight.color, dlight.direction, input.nrm) +
     CreatePointLight(plight.color, plight.pos, plight.radius, input.worldPos, input.nrm) +
-    float4(ambientLightColor.xyz * ambientLightColor.w, 1);
+    CreateSpotLight(slight.color, slight.pos, slight.att1, slight.att2, slight.att3, slight.direction, slight.range, slight.cone,
+    input.worldPos, input.nrm)
+    +
+    float4(ambientLightColor.xyz * ambientLightColor.a, 1);
     // CreatePointLight(p_color, p_pos, p_radius, input.worldPos.xyz, input.nrm.xyz) +
     // CreateConeLight(c_color, c_pos, c_ratio, c_direction, input.worldPos.xyz, input.nrm.xyz);
     finalColor *= diffuse.Sample(samLinear, input.uv);
-    return finalColor;
+    
+    return saturate(finalColor);
 }
