@@ -15,6 +15,9 @@ namespace dxe {
 	struct enemy {
 		sphere collider;
 		GameObject* object{ nullptr };
+
+		enemy() = default;
+		~enemy() { object = nullptr; }
 	};
 
 	class GameScene {

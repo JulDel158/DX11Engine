@@ -1,5 +1,5 @@
 #include "../hpp/input.hpp"
-
+#define NOMINMAX
 #include <Windows.h>
 
 namespace dxe {

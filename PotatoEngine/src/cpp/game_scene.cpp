@@ -1,9 +1,12 @@
 #include "../hpp/game_scene.hpp"
 
 // std
-#include <algorithm>
+#define NOMINMAX
 #include <Windows.h>
 #include <iostream>
+
+// lib
+#include <glm/gtc/random.hpp>
 
 namespace dxe {
 
@@ -24,21 +27,25 @@ namespace dxe {
 		//tempGameObj.resourceId = 1;
 		// gameObjects.push_back(std::move(tempGameObj));
 		
-
-		for (int i = 0; i < gameObjects.size(); ++i) {
+		// IMPORTANT, SINCE WE ARE ALLOCATING THE ENEMY UNITS FIRST THIS IS FINE, IF WE INSERT OTHER GAME OBJECTS PRIOR, YOU WILL HAVE TO PROPERLY MATCH THE GAME OBJECT FROM THE ENEMY ARRAY
+		for (int i = 0; i < MAX_ENEMIES; ++i) {
 			enemies[i].object = &gameObjects[i];
 
 			enemies[i].object->model.dMakeCube(1.f);
 			enemies[i].object->resourceId = 3;
-			enemies[0].collider.radius = 1.2f;
+			enemies[i].collider.radius = 1.2f;
+			glm::vec4 randompos = glm::linearRand(glm::vec4{ -10.f, 5.f, -10.f, 1.f }, glm::vec4{ 10.f, 5.f, 10.f, 1.f });
+			enemies[i].object->transform[3] = randompos;
+			enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
+			enemies[i].object->isActive = true;
 		}
 
 		// gameObjects.resize(gameObjects.size() + 1);
 		// enemies[0].object = &gameObjects.back();
-		enemies[0].object->isActive = true;
-		glm::vec4 temppos = glm::vec4(0.f, 1.f, 10.f, 1.f);
+		
+		/*glm::vec4 temppos = glm::vec4(0.f, 1.f, 10.f, 1.f);
 		enemies[0].object->transform[3] = temppos;
-		enemies[0].collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);
+		enemies[0].collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);*/
 
 		
 		plane.model.dMakePlane();
