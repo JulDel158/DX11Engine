@@ -17,7 +17,7 @@ namespace dxe {
 	};
 
 	struct enemy {
-		GameObject& object;
+		GameObject object;
 		sphere collider;
 		bool enabled{ false };
 	};
@@ -45,6 +45,8 @@ namespace dxe {
 		View_t camera;
 
 		std::vector<GameObject> gameObjects;
+
+		enemy testSubject;
 
 		GameObject skyBox;
 

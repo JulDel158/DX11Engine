@@ -47,7 +47,7 @@ namespace dxe {
 	};
 
 	struct SUBRESOURCE_VIEW {
-		enum { DEBUG = 0, DEFAULT, SKYBOX, COUNT };
+		enum { DEBUG = 0, DEFAULT, SKYBOX, DEBUG_RED, DEBUG_GREEN, COUNT };
 	};
 
 	struct SAMPLER_STATE {

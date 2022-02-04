@@ -58,7 +58,7 @@ namespace dxe {
 	}
 
 	glm::vec3 View_t::getFoward() const {
-		return glm::normalize(glm::vec3{view[3].x, view[3].y, view[3].z});
+		return glm::normalize(glm::vec3{view[2].x, view[2].y, view[2].z});
 	}
 
 	void View_t::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
@@ -213,6 +213,9 @@ namespace dxe {
 		ObjVertex p6;
 		ObjVertex p7;
 		ObjVertex p8;
+
+		// not correct but will allow me to see the actual color of the obj for now
+		p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, 1.f, 1.f };
 
 		p1.pos = glm::vec3(-offset, -offset, -offset);
 		p2.pos = glm::vec3(-offset, -offset, +offset);

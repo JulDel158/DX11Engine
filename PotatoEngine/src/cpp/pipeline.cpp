@@ -634,6 +634,14 @@ namespace dxe {
 
 		D3D11_SUBRESOURCE_DATA initData = { &pixel, sizeof(uint32_t), 0 };
 
+		const uint32_t pixel2 = 0xff0000ff; // red
+
+		D3D11_SUBRESOURCE_DATA initData2 = { &pixel2, sizeof(uint32_t), 0 };
+
+		const uint32_t pixel3 = 0xff00ff00; // green
+
+		D3D11_SUBRESOURCE_DATA initData3 = { &pixel3, sizeof(uint32_t), 0 };
+
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.Width = desc.Height = desc.MipLevels = desc.ArraySize = 1;
 		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -642,8 +650,20 @@ namespace dxe {
 		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
 		ID3D11Texture2D* texture; // don't forget to release
-		HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
+		ID3D11Texture2D* texture2;
+		ID3D11Texture2D* texture3;
 
+		HRESULT hr = device->CreateTexture2D(&desc, &initData, &texture);
+		if (FAILED(hr)) {
+			throw std::runtime_error("could not make debug texture!");
+		}
+
+		hr = device->CreateTexture2D(&desc, &initData2, &texture2);
+		if (FAILED(hr)) {
+			throw std::runtime_error("could not make debug texture!");
+		}
+
+		hr = device->CreateTexture2D(&desc, &initData3, &texture3);
 		if (FAILED(hr)) {
 			throw std::runtime_error("could not make debug texture!");
 		}
@@ -659,7 +679,22 @@ namespace dxe {
 			throw std::runtime_error("Create Shader resource view for debug texture failed!");
 		}
 
+		hr = device->CreateShaderResourceView(texture2, &srvDesc, &sResourceView[SUBRESOURCE_VIEW::DEBUG_RED]);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("Create Shader resource view for debug texture failed!");
+		}
+
+		hr = device->CreateShaderResourceView(texture3, &srvDesc, &sResourceView[SUBRESOURCE_VIEW::DEBUG_GREEN]);
+
+		if (FAILED(hr)) {
+			throw std::runtime_error("Create Shader resource view for debug texture failed!");
+		}
+
+
 		safe_release(texture);
+		safe_release(texture2);
+		safe_release(texture3);
 	}
 
 } // namespace dxe

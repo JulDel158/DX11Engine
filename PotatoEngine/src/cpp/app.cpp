@@ -50,13 +50,14 @@ namespace dxe {
 				/*if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
 				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
 				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }*/
-				std::cout << "---------------------TIME DATA----------------------\n";
+
+				/*std::cout << "---------------------TIME DATA----------------------\n";
 				std::cout << "Timer total: " << timer.TotalTime() << "\n";
 				std::cout << "Timer total exact: " << timer.TotalTimeExact() << "\n";
 				std::cout << "Timer delta: " << timer.Delta() << "\n";
 				std::cout << "Timer smooth delta: " << timer.SmoothDelta() << "\n";
 				std::cout << "Timer FPS: " << timer.SamplesPerSecond() << "\n";
-				std::cout << "------------------------------------------------------------\n\n\n";
+				std::cout << "------------------------------------------------------------\n\n\n";*/
 
 				// RAINBOW DEBUG LINES!!!!!!
 				debug_lines::rainbowUpdate(dt);

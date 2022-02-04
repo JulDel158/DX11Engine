@@ -1,6 +1,7 @@
 #include "../hpp/game_scene.hpp"
 
 #include <Windows.h>
+#include <iostream>
 
 namespace dxe {
 	GameScene::GameScene() {
@@ -22,8 +23,19 @@ namespace dxe {
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
 		plane.resourceId = 0;
 
+		testSubject.enabled = true;
+		testSubject.collider.radius = 1.f;
+		testSubject.object.model.dMakeCube(1.f);
+		testSubject.object.resourceId = 3;
+		glm::vec4 temppos = glm::vec4(0.f, 1.f, 5.f, 1.f);
+		testSubject.object.transform[3] = temppos;
+		testSubject.collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);
+
+		
+
 		// gameObjects.push_back(std::move(tempGameObj));
 		gameObjects.push_back(std::move(plane));
+		gameObjects.push_back(testSubject.object);
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;
@@ -111,12 +123,39 @@ namespace dxe {
 		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
 
 		camera.updateView(translate);
+
+		if (input.KeyDown(VK_SPACE)) {
+			// here we should check collision with all enemies
+			if (RayToSphereCollision(camera.position, camera.getFoward(), testSubject.collider)) {
+				testSubject.object.resourceId = 4;
+				std::cout << "collision detected\n";
+			} else {
+				testSubject.object.resourceId = 3;
+			}
+
+			// std::cout << "pressing space bar\n";
+		} 
+		gameObjects.back() = testSubject.object;
 	}
 
 	const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target) {
 
+		glm::vec3 targetTopos = pos - target.pos;
+		direction = glm::normalize(direction);
 
+		const float b = glm::dot(targetTopos, direction);
+		// squared distance from start of ray to sphere surface
+		const float c = glm::dot(targetTopos, targetTopos) - target.radius * target.radius; 
 
+		// ray starts outside of sphere and points away
+		if (c > 0.f && b > 0.f) { return false; }
+
+		const float discriminant = b*b - c;
+
+		// the ray missed
+		if (discriminant < 0.f) { return false; }
+
+		// in all other cases the ray is a hit
 		return true;
 	}
 
