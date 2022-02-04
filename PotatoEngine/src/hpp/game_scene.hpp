@@ -2,6 +2,7 @@
 
 #include "object_data.hpp"
 #include "input.hpp"
+#include "collision.hpp"
 
 // lib
 #include <glm/glm.hpp>
@@ -11,18 +12,12 @@
 
 namespace dxe {
 
-	struct sphere {
-		glm::vec3 pos{ 0.f };
-		float radius{ 0.f };
-	};
-
 	struct enemy {
-		GameObject object;
+		int objectIndex{ -1 };
 		sphere collider;
 		bool enabled{ false };
+		GameObject object;
 	};
-
-	const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target);
 
 	class GameScene {
 
@@ -46,7 +41,7 @@ namespace dxe {
 
 		std::vector<GameObject> gameObjects;
 
-		enemy testSubject;
+		GameObject plane;
 
 		GameObject skyBox;
 
@@ -55,6 +50,8 @@ namespace dxe {
 		Scene_cb scb;
 
 		static constexpr uint8_t MAX_ENEMIES = 10;
+
+		enemy enemies[10];
 	};
 
 

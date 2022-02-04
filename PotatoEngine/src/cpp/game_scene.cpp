@@ -1,5 +1,7 @@
 #include "../hpp/game_scene.hpp"
 
+// std
+#include <algorithm>
 #include <Windows.h>
 #include <iostream>
 
@@ -8,34 +10,38 @@ namespace dxe {
 		camera.position = glm::vec3(0.f, 1.f, 0.f);
 		camera.updateView();
 
-		GameObject tempGameObj;
-		GameObject plane;
+		gameObjects.reserve(MAX_ENEMIES + 2);
+
+		//GameObject tempGameObj;
+		
 
 		// GameObject skyBox;
 
-		tempGameObj.model.loadObject("assets/models/piramid.obj", false);
-		// tempGameObj.model.dMakePlane();
-		tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
-		tempGameObj.resourceId = 1;
+		//tempGameObj.model.loadObject("assets/models/piramid.obj", false);
+		//// tempGameObj.model.dMakePlane();
+		//tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
+		//tempGameObj.resourceId = 1;
 
 		plane.model.dMakePlane();
 		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
 		plane.resourceId = 0;
 
-		testSubject.enabled = true;
-		testSubject.collider.radius = 1.f;
-		testSubject.object.model.dMakeCube(1.f);
-		testSubject.object.resourceId = 3;
-		glm::vec4 temppos = glm::vec4(0.f, 1.f, 5.f, 1.f);
-		testSubject.object.transform[3] = temppos;
-		testSubject.collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);
+		enemies[0].enabled = true;
+		enemies[0].collider.radius = 1.2f;
+		enemies[0].object.model.dMakeCube(1.f);
+		enemies[0].object.resourceId = 3;
+		glm::vec4 temppos = glm::vec4(0.f, 1.f, 10.f, 1.f);
+		enemies[0].object.transform[3] = temppos;
+		enemies[0].collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);
 
 		
 
 		// gameObjects.push_back(std::move(tempGameObj));
-		gameObjects.push_back(std::move(plane));
-		gameObjects.push_back(testSubject.object);
+		gameObjects.push_back(plane);
+		// need to keep track of the index
+		gameObjects.push_back(enemies[0].object);
+		enemies[0].objectIndex = gameObjects.size();
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;
@@ -65,6 +71,21 @@ namespace dxe {
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
 
+		// updating enemies
+		for (int i = 0; i < MAX_ENEMIES; ++i) {
+
+			// auto it = std::find(gameObjects.begin(), gameObjects.end(), enemies[i].object);
+
+			if (enemies[i].enabled && enemies[i].objectIndex == -1) { // the enemy is active but game object is not in draw list
+				gameObjects.push_back(enemies[i].object);
+				enemies[i].objectIndex = gameObjects.size();
+
+			} else if (!enemies[i].enabled && enemies[i].objectIndex >= 0) { // the enemy is dissabled and game object is in draw list
+				gameObjects.erase(gameObjects.begin() + (enemies[i].objectIndex - 1));
+				enemies[i].objectIndex = -1;
+			}
+		}
+
 		// copying the position of the camera into the skybox
 		skyBox.transform[3] = camera.view[3];
 
@@ -89,16 +110,6 @@ namespace dxe {
 			//scb.spotLight.pos = campos;
 		}
 	}
-
-	const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
-
-	const GameObject* GameScene::GetSkyBox() const { return &skyBox; }
-
-	const uint32_t GameScene::GetObjectTotal() const { return static_cast<uint32_t>(gameObjects.size()); }
-
-	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
-
-	const View_t& GameScene::GetView() const { return camera; }
 
 	void GameScene::inputUpdate(const float dt) {
 		input.Update();
@@ -126,37 +137,24 @@ namespace dxe {
 
 		if (input.KeyDown(VK_SPACE)) {
 			// here we should check collision with all enemies
-			if (RayToSphereCollision(camera.position, camera.getFoward(), testSubject.collider)) {
-				testSubject.object.resourceId = 4;
-				std::cout << "collision detected\n";
-			} else {
-				testSubject.object.resourceId = 3;
+			for (int i = 0; i < MAX_ENEMIES; ++i) {
+				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider)) {
+					enemies[i].enabled = false;
+				} else {
+					enemies[i].enabled = true;
+				}
 			}
-
-			// std::cout << "pressing space bar\n";
 		} 
-		gameObjects.back() = testSubject.object;
 	}
 
-	const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target) {
+	const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
 
-		glm::vec3 targetTopos = pos - target.pos;
-		direction = glm::normalize(direction);
+	const GameObject* GameScene::GetSkyBox() const { return &skyBox; }
 
-		const float b = glm::dot(targetTopos, direction);
-		// squared distance from start of ray to sphere surface
-		const float c = glm::dot(targetTopos, targetTopos) - target.radius * target.radius; 
+	const uint32_t GameScene::GetObjectTotal() const { return static_cast<uint32_t>(gameObjects.size()); }
 
-		// ray starts outside of sphere and points away
-		if (c > 0.f && b > 0.f) { return false; }
+	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
 
-		const float discriminant = b*b - c;
-
-		// the ray missed
-		if (discriminant < 0.f) { return false; }
-
-		// in all other cases the ray is a hit
-		return true;
-	}
+	const View_t& GameScene::GetView() const { return camera; }
 
 } // namespace dxe
