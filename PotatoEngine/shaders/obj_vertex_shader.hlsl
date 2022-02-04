@@ -55,10 +55,11 @@ struct VS_IN
 struct VS_OUT
 {
     float4 pos : SV_Position;
-    float3 nrm : NORMAL;
-    float3 worldPos : POSITION;
     float4 camPos : CAMPOS;
-    float2 uv : TEXCOORD;
+    float3 nrm : NORMAL;
+    float u : TEXCOORD0;
+    float3 worldPos : POSITION;
+    float v : TEXCOORD1;
 };
 
 VS_OUT main(VS_IN input)
@@ -75,7 +76,8 @@ VS_OUT main(VS_IN input)
     //}
     //output.camPos.w = 1.0f;
     output.nrm = mul(input.nrm, (float3x3)modeling);
-    output.uv = input.uv;
+    output.u = input.uv.x;
+    output.v = input.uv.y;
 	
     return output;
 }

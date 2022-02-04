@@ -53,10 +53,11 @@ cbuffer Scene_cb : register(b3)
 struct VS_OUT
 {
     float4 pos : SV_Position;
-    float3 nrm : NORMAL;
-    float3 worldPos : POSITION;
     float4 camPos : CAMPOS;
-    float2 uv : TEXCOORD;
+    float3 nrm : NORMAL;
+    float u : TEXCOORD0;
+    float3 worldPos : POSITION;
+    float v : TEXCOORD1;
 };
 
 float4 CreateDirectionalLight(float4 color, float3 direction, float3 surfaceNormal)
@@ -72,15 +73,15 @@ float4 CreateDirectionalLight(float4 color, float3 direction, float3 surfaceNorm
 float4 CreatePointLight(float4 color, float3 lightpos, float radius, float3 surfacePos, float3 surfaceNormal)
 {
     float4 light = (float4)0;
-    
     float attenuation = 1.0f - saturate(length(lightpos - surfacePos) / radius);
-    attenuation *= attenuation;
+    if (attenuation > 0.0f)
+    {
+        attenuation *= attenuation;
+        float3 direction = normalize(lightpos - surfacePos);
+        float ratio = saturate(dot(direction, surfaceNormal));
     
-    float3 direction = normalize(lightpos - surfacePos);
-    float ratio = saturate(dot(direction, surfaceNormal));
-    
-    light = color * ratio * attenuation;
-    
+        light = color * ratio * attenuation;
+    }
     return light;
 }
 
@@ -127,7 +128,7 @@ float4 main(VS_OUT input) : SV_Target
     float4(ambientLightColor.xyz * ambientLightColor.a, 1);
     // CreatePointLight(p_color, p_pos, p_radius, input.worldPos.xyz, input.nrm.xyz) +
     // CreateConeLight(c_color, c_pos, c_ratio, c_direction, input.worldPos.xyz, input.nrm.xyz);
-    finalColor *= diffuse.Sample(samLinear, input.uv);
+    finalColor *= diffuse.Sample(samLinear, float2(input.u, input.v));
     
     return saturate(finalColor);
 }

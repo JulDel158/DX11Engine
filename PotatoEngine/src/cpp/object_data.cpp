@@ -262,10 +262,10 @@ namespace dxe {
 		ObjVertex p3;
 		ObjVertex p4;
 
-		p1.pos = { -0.5f , 0.f, -0.5f };
-		p2.pos = { -0.5f, 0.f, 0.5f };
-		p3.pos = { 0.5f, 0.f, -0.5f };
-		p4.pos = { 0.5f, 0.f, 0.5f };
+		p1.pos = { 0.f , 0.f, 0.f };
+		p2.pos = { 0.f, 0.f, 1.f };
+		p3.pos = { 1.f, 0.f, 0.f };
+		p4.pos = { 1.f, 0.f, 1.f };
 
 		p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
 

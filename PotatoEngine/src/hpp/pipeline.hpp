@@ -37,9 +37,9 @@ namespace dxe {
 
 		void drawObject(Objectdata& obj);
 
-		void drawSkybox(GameObject* skybox);
+		void drawSkybox(const GameObject* skybox);
 
-		void drawGameObjects(GameObject* gameObjects, uint32_t size);
+		void drawGameObjects(const GameObject* gameObjects, uint32_t size);
 
 		void setRenderTargetView();
 

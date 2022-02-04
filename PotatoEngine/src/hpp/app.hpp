@@ -1,9 +1,10 @@
 #pragma once
 
 #include "dx_window.hpp"
-#include "renderer.hpp"
+#include "game_scene.hpp"
 #include "input.hpp"
 #include "object_data.hpp"
+#include "renderer.hpp"
 #include "XTime.hpp"
 
 // std
@@ -31,9 +32,9 @@ namespace dxe {
 
 		renderer dxRenderer;
 
-		View_t camera;
+		// View_t camera;
 
-		Frame_cb frameBuffer;
+		// Frame_cb frameBuffer;
 
 		Window_cb windowBuffer;
 
@@ -41,9 +42,11 @@ namespace dxe {
 
 		XTime timer;
 
-		std::vector<GameObject> gameObjects;
+		// std::vector<GameObject> gameObjects;
 
-		std::vector<GameObject> skyBoxes;
+		// std::vector<GameObject> skyBoxes;
+
+		GameScene scene1;
 	};
 
 } // namespace dxe

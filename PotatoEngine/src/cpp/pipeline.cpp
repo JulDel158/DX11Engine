@@ -117,28 +117,6 @@ namespace dxe {
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
 
 		// BINDING TEMPORARY SCENE BUFFER HERE, TO BE REMOVED
-		//Scene_cb scb;
-		//scb.dirLight.color = {0.4f, 0.4f, 0.4f, 1.0f};
-		//scb.dirLight.direction = {0.f, -1.f, 0.f};
-		//scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
-
-		///*scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
-		//scb.pointLight.pos = { 5.f, 3.f, 8.f };
-		//scb.pointLight.radius = 10.f;*/
-		//glm::vec3 campos = frameCbuffer.view[3];
-		//glm::vec3 camforw = frameCbuffer.view[2];
-
-
-		//scb.spotLight.color = {0.f, 1.f, 0.f, 1.f};
-		//scb.spotLight.direction = camforw;
-		//scb.spotLight.pos = campos;
-
-		//scb.spotLight.att1 = 0.1f;
-		//scb.spotLight.att2 = 0.2f;
-		//scb.spotLight.att3 = 0.f;
-
-		//scb.spotLight.range = 100.f;
-		//scb.spotLight.cone = 10.f;
 
 		context->PSSetConstantBuffers(3, 1, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
 
@@ -219,7 +197,7 @@ namespace dxe {
 		context->DrawIndexed(static_cast<UINT>(obj.indices.size()), 0, 0); /*TODO: ADD INDEX COUNT (SIZEOF INDICES)*/
 	}
 
-	void pipeline::drawSkybox(GameObject* skybox) {
+	void pipeline::drawSkybox(const GameObject* skybox) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
@@ -261,7 +239,7 @@ namespace dxe {
 		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
-	void pipeline::drawGameObjects(GameObject* gameObjects, uint32_t size) {
+	void pipeline::drawGameObjects(const GameObject* gameObjects, uint32_t size) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 

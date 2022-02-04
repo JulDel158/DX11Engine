@@ -45,7 +45,7 @@ namespace dxe {
 
 	void debug_lines::addGrid() {
         const float size = 50;
-        const float spacing = 2;
+        const float spacing = 1;
         const float lines = size / spacing;
         float dxz = -size / 2;
         //float z = dxz;
