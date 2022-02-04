@@ -4,10 +4,9 @@
 
 namespace dxe {
 
-	renderer::renderer(HWND windowHandle, Window_cb& wcb, Scene_cb& scb) : 
+	renderer::renderer(HWND windowHandle, Window_cb& wcb) : 
 		implementation(windowHandle), 
-		windowCbuffer{ wcb }, 
-		sceneCbuffer{ scb } {
+		windowCbuffer{ wcb } {
 		dCube.dMakeCube(1.f);
 
 		/*objDesc.inputLayout = INPUT_LAYOUT::OBJECT;
@@ -43,7 +42,7 @@ namespace dxe {
 
 		implementation.setRenderTargetView();
 
-		implementation.bindFrameBuffer(frameCbuffer, sceneCbuffer, true);
+		implementation.bindFrameBuffer(frameCbuffer, scene.GetSceneBuffer(), scene.GetView().invertView);
 		
 		if (scene.GetSkyBox()) {
 			implementation.drawSkybox(scene.GetSkyBox());

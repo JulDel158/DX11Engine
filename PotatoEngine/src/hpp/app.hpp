@@ -28,7 +28,7 @@ namespace dxe {
 	private:
 		dx_window dxWindow;
 
-		input input;
+		// input input;
 
 		renderer dxRenderer;
 
@@ -38,7 +38,7 @@ namespace dxe {
 
 		Window_cb windowBuffer;
 
-		Scene_cb scb;
+		// Scene_cb scb;
 
 		XTime timer;
 

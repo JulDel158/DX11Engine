@@ -29,7 +29,7 @@ namespace dxe {
 
 		void present(unsigned int vsync);
 
-		void bindFrameBuffer(const Frame_cb& frameCbuffer,const Scene_cb& sceneCbuffer, bool invertView = 0);
+		void bindFrameBuffer(const Frame_cb& frameCbuffer,const Scene_cb& sceneCbuffer, const bool invertView = 0);
 
 		void bindWindowBuffer(const Window_cb& windowData);
 

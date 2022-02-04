@@ -20,6 +20,7 @@ namespace dxe {
 		const GameObject* GetSkyBox() const;
 		const uint32_t GetObjectTotal() const;
 		const View_t& GetView() const;
+		const Scene_cb& GetSceneBuffer() const;
 
 	private:
 
@@ -31,6 +32,7 @@ namespace dxe {
 
 		input input;
 
+		Scene_cb scb;
 	};
 
 

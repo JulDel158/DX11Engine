@@ -53,6 +53,8 @@ namespace dxe {
 		view[3][0] = position.x;
 		view[3][1] = position.y;
 		view[3][2] = position.z;
+
+		invertView = true;
 	}
 
 	void View_t::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {

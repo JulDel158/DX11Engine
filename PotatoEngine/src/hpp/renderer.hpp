@@ -9,7 +9,7 @@ namespace dxe {
 
 	class renderer {
 	public:
-		renderer(HWND windowHandle, Window_cb &window_cbuffer, Scene_cb& scene_buffer);
+		renderer(HWND windowHandle, Window_cb &window_cbuffer);
 		~renderer();
 
 		void draw(GameScene const& scene);
@@ -25,8 +25,6 @@ namespace dxe {
 		Frame_cb frameCbuffer;
 
 		Window_cb& windowCbuffer;
-
-		Scene_cb& sceneCbuffer;
 
 		Objectdata dCube;
 

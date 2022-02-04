@@ -27,6 +27,25 @@ namespace dxe {
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;
+
+		// lights
+		scb.dirLight.color = { 0.4f, 0.4f, 0.4f, 1.0f };
+		scb.dirLight.direction = { 0.f, -1.f, 0.f };
+		scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
+
+		scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
+		scb.pointLight.pos = { 4.f, 3.f, 0.f };
+		scb.pointLight.radius = 10.f;
+
+		scb.spotLight.color = { 0.f, 0.f, 0.f, 1.f };
+
+		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
+		scb.spotLight.outerRatio = 1.f;
+		scb.spotLight.innerRatio = 1.f;
+		scb.spotLight.falloff    = 1.f;
+
+		scb.spotLight.range = 0.1f;
+		scb.spotLight.focus = 10.f;
 	}
 
 	GameScene::~GameScene() {}
@@ -34,6 +53,7 @@ namespace dxe {
 	void GameScene::update(const float dt) {
 		input.Update();
 
+		// TODO ENCAPSULATE INPUT INTO FUNCTION, IDEA: MAKE A VIRTUAL CLASS FOR GAME SCENES THAT HAS A FEW FUNCTIONS SUCH AS INPUT UPDATE WHICH ARE CALLED BY DEFAULT AT THE START OF UPDATE
 		glm::vec4 translate{ 0.f };
 		if (input.KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
 		if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
@@ -58,6 +78,8 @@ namespace dxe {
 	const GameObject* GameScene::GetSkyBox() const { return &skyBox; }
 
 	const uint32_t GameScene::GetObjectTotal() const { return static_cast<uint32_t>(gameObjects.size()); }
+
+	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
 
 	const View_t& GameScene::GetView() const { return camera; }
 

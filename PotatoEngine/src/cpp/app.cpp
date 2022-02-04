@@ -15,7 +15,7 @@
 namespace dxe {
 	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : 
 		dxWindow(hInstance, winProc, nCmdShow, msg), 
-		dxRenderer(dxWindow.mainHWND, windowBuffer, scb) { 
+		dxRenderer(dxWindow.mainHWND, windowBuffer) { 
 		float aspect = static_cast<float>(dxWindow.Width) / static_cast<float>(dxWindow.Height);
 
 		// creating camera
@@ -28,10 +28,7 @@ namespace dxe {
 		// updating constant buffers
 		// frameBuffer.view = camera.view;
 
-		
-
-
-		scb.dirLight.color = { 0.4f, 0.4f, 0.4f, 1.0f };
+		/*scb.dirLight.color = { 0.4f, 0.4f, 0.4f, 1.0f };
 		scb.dirLight.direction = { 0.f, -1.f, 0.f };
 		scb.ambient = { 1.f, 1.f, 1.f, 0.02f };
 
@@ -46,7 +43,7 @@ namespace dxe {
 		scb.spotLight.falloff = 1.f;
 
 		scb.spotLight.range = 0.1f;
-		scb.spotLight.focus = 10.f;
+		scb.spotLight.focus = 10.f;*/
 	}
 
 	app::~app() {}
@@ -73,9 +70,9 @@ namespace dxe {
 				scene1.update(dt);
 
 #ifdef _DEBUG
-				if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
+				/*if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
 				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
-				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }
+				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }*/
 				std::cout << "---------------------TIME DATA----------------------\n";
 				std::cout << "Timer total: " << timer.TotalTime() << "\n";
 				std::cout << "Timer total exact: " << timer.TotalTimeExact() << "\n";
@@ -83,6 +80,9 @@ namespace dxe {
 				std::cout << "Timer smooth delta: " << timer.SmoothDelta() << "\n";
 				std::cout << "Timer FPS: " << timer.SamplesPerSecond() << "\n";
 				std::cout << "------------------------------------------------------------\n\n\n";
+
+				// RAINBOW DEBUG LINES!!!!!!
+				debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
 				//glm::vec4 translate{ 0.f };
@@ -124,11 +124,6 @@ namespace dxe {
 					//scb.spotLight.direction = camforw;
 					//scb.spotLight.pos = campos;
 				}
-
-				//dxRenderer.update();
-
-				// RAINBOW DEBUG LINES!!!!!!
-				debug_lines::rainbowUpdate(dt);
 
 				dxRenderer.draw(scene1);
 			}
