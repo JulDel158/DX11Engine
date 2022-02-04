@@ -4,8 +4,8 @@
 
 namespace dxe {
 	GameScene::GameScene() {
-		camera.position = glm::vec3(0.f, 3.f, -15.f);
-		camera.getView();
+		camera.position = glm::vec3(0.f, 1.f, 0.f);
+		camera.updateView();
 
 		GameObject tempGameObj;
 		GameObject plane;
@@ -22,7 +22,7 @@ namespace dxe {
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
 		plane.resourceId = 0;
 
-		gameObjects.push_back(std::move(tempGameObj));
+		// gameObjects.push_back(std::move(tempGameObj));
 		gameObjects.push_back(std::move(plane));
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
@@ -51,26 +51,31 @@ namespace dxe {
 	GameScene::~GameScene() {}
 
 	void GameScene::update(const float dt) {
-		input.Update();
-
-		// TODO ENCAPSULATE INPUT INTO FUNCTION, IDEA: MAKE A VIRTUAL CLASS FOR GAME SCENES THAT HAS A FEW FUNCTIONS SUCH AS INPUT UPDATE WHICH ARE CALLED BY DEFAULT AT THE START OF UPDATE
-		glm::vec4 translate{ 0.f };
-		if (input.KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
-		if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
-		if (input.KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
-		if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
-		if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
-		if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
-
-		if (input.KeyDown(VK_LEFT)) {  camera.rotation.y -= camera.rotationSpeed * dt; } // look left
-		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
-		if (input.KeyDown(VK_UP)) {    camera.rotation.x -= camera.rotationSpeed * dt; } // look up
-		if (input.KeyDown(VK_DOWN)) {  camera.rotation.x += camera.rotationSpeed * dt; } // look down
-
-		camera.getView(translate);
+		inputUpdate(dt);
 
 		// copying the position of the camera into the skybox
 		skyBox.transform[3] = camera.view[3];
+
+		// temp light debug stuff for spot light
+		{
+			//glm::vec3 campos = camera.view[3];
+			//glm::vec3 camforw = camera.view[2];
+			//// att1 outer cone
+			//if (input.KeyDown('Z')) { scb.spotLight.outerRatio += 0.05f * dt; }
+			//if (input.KeyDown('X')) { scb.spotLight.outerRatio -= 0.05f * dt; scb.spotLight.outerRatio = glm::clamp(scb.spotLight.outerRatio, 0.f, 1000.f); }
+			//// att2 inner cone
+			//if (input.KeyDown('V')) { scb.spotLight.innerRatio += 0.05f * dt; }
+			//if (input.KeyDown('B')) { scb.spotLight.innerRatio -= 0.05f * dt; scb.spotLight.innerRatio = glm::clamp(scb.spotLight.innerRatio, 0.f, 1000.f); }
+			//// att3 falloff
+			//if (input.KeyDown('K')) { scb.spotLight.falloff += 0.05f * dt; }
+			//if (input.KeyDown('L')) { scb.spotLight.falloff -= 0.05f * dt; scb.spotLight.falloff = glm::clamp(scb.spotLight.falloff, 0.f, 1000.f); }
+			//// focus
+			//if (input.KeyDown('O')) { scb.spotLight.focus+= 20.0f * dt; }
+			//if (input.KeyDown('P')) { scb.spotLight.focus-= 20.0f * dt; scb.spotLight.focus = glm::clamp(scb.spotLight.focus, 0.f, 1000.f); }
+
+			//scb.spotLight.direction = camforw;
+			//scb.spotLight.pos = campos;
+		}
 	}
 
 	const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
@@ -82,5 +87,37 @@ namespace dxe {
 	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
 
 	const View_t& GameScene::GetView() const { return camera; }
+
+	void GameScene::inputUpdate(const float dt) {
+		input.Update();
+		// in our demo the player will be unable to move and will be fixated at one point on the screen
+		// he will however be able to rotate the camera
+		
+		glm::vec4 translate{ 0.f };
+#ifdef _DEBUG
+		if (input.KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
+		if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
+		if (input.KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
+		if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
+		if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
+		if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
+#endif // _DEBUG
+
+
+		if (input.KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
+		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
+		if (input.KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
+		if (input.KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
+		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+
+		camera.updateView(translate);
+	}
+
+	const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target) {
+
+
+
+		return true;
+	}
 
 } // namespace dxe

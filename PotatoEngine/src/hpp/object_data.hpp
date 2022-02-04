@@ -49,7 +49,9 @@ namespace dxe {
 		float translationSpeed{ 25.5f };
 		bool invertView{ false };
 
-		void getView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});
+		void updateView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});
+
+		glm::vec3 getFoward()const;
 
 		// these functions won't work in this engine
 		void setViewDirection(glm::vec3 position, glm::vec3 direction,
@@ -59,8 +61,6 @@ namespace dxe {
 			glm::vec3 up = glm::vec3{ 0.f, 1.f, 0.f });
 
 		void FPSViewRH(glm::vec3 eye, float pitchrad, float yawrad, bool invertView = 0);
-
-		void UpdateView();
 
 		void dPrintViewMat();
 	};

@@ -28,7 +28,7 @@ namespace std {
 } // namespace std
 
 namespace dxe {
-	void View_t::getView(const glm::vec4& translation)
+	void View_t::updateView(const glm::vec4& translation)
 	{
 		glm::mat4 rotZ{ 1.f }, rotY{ 1.f };
 		rotationMat = glm::mat4{ 1.f };
@@ -55,6 +55,10 @@ namespace dxe {
 		view[3][2] = position.z;
 
 		invertView = true;
+	}
+
+	glm::vec3 View_t::getFoward() const {
+		return glm::normalize(glm::vec3{view[3].x, view[3].y, view[3].z});
 	}
 
 	void View_t::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
@@ -114,10 +118,6 @@ namespace dxe {
 		};
 
 		if (inverView) { view = glm::inverse(view); }
-	}
-
-	void View_t::UpdateView() {
-		FPSViewRH(position, -rotation.x, rotation.y, invertView);
 	}
 
 	void View_t::dPrintViewMat() {

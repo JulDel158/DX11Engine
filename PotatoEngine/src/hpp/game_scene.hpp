@@ -3,10 +3,26 @@
 #include "object_data.hpp"
 #include "input.hpp"
 
+// lib
+#include <glm/glm.hpp>
+
 // std
 #include <vector>
 
 namespace dxe {
+
+	struct sphere {
+		glm::vec3 pos{ 0.f };
+		float radius{ 0.f };
+	};
+
+	struct enemy {
+		GameObject& object;
+		sphere collider;
+		bool enabled{ false };
+	};
+
+	const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target);
 
 	class GameScene {
 
@@ -24,6 +40,8 @@ namespace dxe {
 
 	private:
 
+		void inputUpdate(const float dt);
+
 		View_t camera;
 
 		std::vector<GameObject> gameObjects;
@@ -33,6 +51,8 @@ namespace dxe {
 		input input;
 
 		Scene_cb scb;
+
+		static constexpr uint8_t MAX_ENEMIES = 10;
 	};
 
 
