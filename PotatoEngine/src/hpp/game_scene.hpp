@@ -13,10 +13,8 @@
 namespace dxe {
 
 	struct enemy {
-		int objectIndex{ -1 };
 		sphere collider;
-		bool enabled{ false };
-		GameObject object;
+		GameObject* object{ nullptr };
 	};
 
 	class GameScene {
@@ -51,7 +49,7 @@ namespace dxe {
 
 		static constexpr uint8_t MAX_ENEMIES = 10;
 
-		enemy enemies[10];
+		enemy enemies[MAX_ENEMIES];
 	};
 
 

@@ -264,6 +264,8 @@ namespace dxe {
 		ocb.modeling = glm::mat4{ 1.f };
 
 		for (size_t i = 0; i < size; ++i) {
+			if (!gameObjects[i].isActive) { continue; }
+
 			vBuffer = gameObjects[i].model.vertices;
 			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
 
