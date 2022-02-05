@@ -1,4 +1,6 @@
 
+#pragma comment(lib, "DirectXTK.lib")
+
 #include "../hpp/app.hpp"
 
 // std

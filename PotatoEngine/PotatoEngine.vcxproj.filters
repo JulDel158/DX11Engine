@@ -48,9 +48,6 @@
     <ClCompile Include="src\cpp\XTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libraries\DDSTextureLoader\DDSTextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\cpp\game_scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
