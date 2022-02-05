@@ -4,6 +4,7 @@
 #define NOMINMAX
 #include <Windows.h>
 #include <iostream>
+#include <time.h>
 
 // lib
 #include <glm/gtc/random.hpp>
@@ -11,52 +12,36 @@
 namespace dxe {
 
 	GameScene::GameScene() {
+		std::srand(std::time(0));
 		camera.position = glm::vec3(0.f, 1.f, 0.f);
 		camera.updateView();
 
 		gameObjects.clear();
 		gameObjects.resize(MAX_ENEMIES + 1);
-
-		//GameObject tempGameObj;
-
-		// GameObject skyBox;
-
-		//tempGameObj.model.loadObject("assets/models/piramid.obj", false);
-		//// tempGameObj.model.dMakePlane();
-		//tempGameObj.transform[0][0] = tempGameObj.transform[1][1] = tempGameObj.transform[2][2] = 10.f;
-		//tempGameObj.resourceId = 1;
-		// gameObjects.push_back(std::move(tempGameObj));
 		
 		// IMPORTANT, SINCE WE ARE ALLOCATING THE ENEMY UNITS FIRST THIS IS FINE, IF WE INSERT OTHER GAME OBJECTS PRIOR, YOU WILL HAVE TO PROPERLY MATCH THE GAME OBJECT FROM THE ENEMY ARRAY
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
 			enemies[i].object = &gameObjects[i];
 
-			enemies[i].object->model.dMakeCube(1.f);
-			enemies[i].object->resourceId = 3;
-			enemies[i].collider.radius = 1.2f;
-			glm::vec4 randompos = glm::linearRand(glm::vec4{ -10.f, 5.f, -10.f, 1.f }, glm::vec4{ 10.f, 5.f, 10.f, 1.f });
+			enemies[i].object->model.loadObject("assets/models/piramid.obj", false);//.dMakeCube(1.f);
+			enemies[i].object->resourceId = 1;
+
+			const float scale = glm::linearRand(1.0f, 10.f);
+			enemies[i].collider.radius =  enemies[i].object->transform[0][0] = enemies[i].object->transform[1][1] = enemies[i].object->transform[2][2] = scale;
+			enemies[i].collider.radius += 0.2f;
+			glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 30.f, -80.f, 1.f }, glm::vec4{ 80.f, 80.f, 80.f, 1.f });
 			enemies[i].object->transform[3] = randompos;
 			enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
 			enemies[i].object->isActive = true;
+			enemies[i].velocity = -glm::normalize(randompos);
+			enemies[i].speed = glm::linearRand(3.0f, 10.f);
 		}
-
-		// gameObjects.resize(gameObjects.size() + 1);
-		// enemies[0].object = &gameObjects.back();
-		
-		/*glm::vec4 temppos = glm::vec4(0.f, 1.f, 10.f, 1.f);
-		enemies[0].object->transform[3] = temppos;
-		enemies[0].collider.pos = glm::vec3(temppos.x, temppos.y, temppos.z);*/
-
 		
 		plane.model.dMakePlane();
 		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
 		plane.resourceId = 0;
 		gameObjects.back() = plane;
-		
-		// need to keep track of the index
-		// gameObjects.push_back(enemies[0].object);
-		//enemies[0].objectIndex = gameObjects.size();
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 2;
@@ -89,19 +74,15 @@ namespace dxe {
 		// updating enemies
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
 
-			if (!enemies[i].object) { continue; }
-			// this should be done after any translations
-			glm::vec4 pos = enemies[i].object->transform[3];
-			enemies[i].collider.pos = glm::vec3{ pos.x, pos.y, pos.z };
+			if (!enemies[i].object || !enemies[i].object->isActive) { continue; }
 			
-			//if (enemies[i].enabled && enemies[i].objectIndex == -1) { // the enemy is active but game object is not in draw list
-			//	gameObjects.push_back(enemies[i].object);
-			//	enemies[i].objectIndex = gameObjects.size();
+			glm::vec4 pos = enemies[i].object->transform[3];
 
-			//} else if (!enemies[i].enabled && enemies[i].objectIndex >= 0) { // the enemy is dissabled and game object is in draw list
-			//	gameObjects.erase(gameObjects.begin() + (enemies[i].objectIndex - 1));
-			//	enemies[i].objectIndex = -1;
-			//}
+			// updating entity's movement
+			pos += glm::vec4(enemies[i].velocity.x, enemies[i].velocity.y, enemies[i].velocity.z, 0.f) * enemies[i].speed * dt;
+
+			enemies[i].object->transform[3] = pos;
+			enemies[i].collider.pos = glm::vec3{ pos.x, pos.y, pos.z };
 		}
 
 		// copying the position of the camera into the skybox
@@ -159,6 +140,7 @@ namespace dxe {
 					continue; 
 				}
 
+				// TODO: for bullets we may want to make sure we only hit one targe by checking which target was hit first and leaving any other collisions intact
 				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider)) {
 					enemies[i].object->isActive = false;
 				}

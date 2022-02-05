@@ -15,6 +15,10 @@ namespace dxe {
 	struct enemy {
 		sphere collider;
 		GameObject* object{ nullptr };
+		glm::vec3 velocity{ 0.f };
+		float speed{ 0.f };
+		float respawnTime{ 0.f };
+
 
 		enemy() = default;
 		~enemy() { object = nullptr; }
