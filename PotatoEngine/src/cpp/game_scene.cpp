@@ -6,6 +6,7 @@
 #include <iostream>
 #include <time.h>
 #include <limits>
+#include <string>
 
 // lib
 #include <glm/gtc/random.hpp>
@@ -16,6 +17,17 @@ namespace dxe {
 		std::srand(std::time(0));
 		camera.position = glm::vec3(0.f, 1.f, 0.f);
 		camera.updateView();
+
+		textui.clear();
+		textui.resize(1);
+		
+		textui[0].color = glm::vec4(1.f, 0.f, 1.f, 1.f);
+		textui[0].layer = 0.f;
+		textui[0].origin = glm::vec2(0.f, 0.f);
+		textui[0].position = glm::vec2(0.f, 0.f);
+		textui[0].rotation = 0.f;
+		textui[0].scale = glm::vec2(1.f, 1.f);
+		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
 
 		gameObjects.clear();
 		gameObjects.resize(MAX_ENEMIES + 1);
@@ -168,5 +180,9 @@ namespace dxe {
 	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
 
 	const View_t& GameScene::GetView() const { return camera; }
+
+	const Textwrap* GameScene::GetTextUI() const { return textui.data(); }
+
+	const uint32_t GameScene::GetTextUITotal() const { return static_cast<uint32_t>(textui.size()); }
 
 } // namespace dxe

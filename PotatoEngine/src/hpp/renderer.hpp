@@ -26,8 +26,6 @@ namespace dxe {
 
 		Window_cb& windowCbuffer;
 
-		Objectdata dCube;
-
 		/*PIPELINE_PROPERTY_DESC objDesc;
 		PIPELINE_PROPERTY_DESC skyboxDesc;*/
 	};

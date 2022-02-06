@@ -48,6 +48,8 @@ namespace dxe {
 
 		void drawGameObjects(const GameObject* gameObjects, uint32_t size);
 
+		void drawText(const Textwrap* set, const uint32_t size);
+
 		void setRenderTargetView();
 
 	private:

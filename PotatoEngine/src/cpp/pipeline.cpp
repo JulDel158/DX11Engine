@@ -286,11 +286,22 @@ namespace dxe {
 
 			context->DrawIndexed(static_cast<UINT>(gameObjects[i].model.indices.size()), 0, 0);
 		}
+	}
 
-
-		// testing font renderer, to be removed
+	void pipeline::drawText(const Textwrap* set, const uint32_t size) {
 		spriteBatch->Begin();
-		spriteFont->DrawString(spriteBatch.get(), L"YEEEEEEEEEEEEET!", DirectX::XMFLOAT2{ 0.F, 0.F }, DirectX::Colors::Red, 0.f, DirectX::XMFLOAT2{ 0.f, 0.f }, DirectX::XMFLOAT2{ 1.f, 1.f });
+
+		for (uint32_t i = 0; i < size; ++i) {
+			spriteFont->DrawString(spriteBatch.get(),
+				set[i].text.c_str(), // wide string text to draw
+				DirectX::XMFLOAT2{ set[i].position.x, set[i].position.y }, // position
+				DirectX::XMVECTOR{ set[i].color.x, set[i].color.y, set[i].color.z, set[i].color.w }, // color
+				set[i].rotation, // rotation
+				DirectX::XMFLOAT2{ set[i].origin.x, set[i].origin.y }, // origin
+				DirectX::XMFLOAT2{ set[i].scale.x, set[i].scale.y }, // scale
+				DirectX::SpriteEffects_None, // effects (default for now)
+				set[i].layer); // layer
+		}
 		spriteBatch->End();
 	}
 

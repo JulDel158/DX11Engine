@@ -7,7 +7,6 @@ namespace dxe {
 	renderer::renderer(HWND windowHandle, Window_cb& wcb) : 
 		implementation(windowHandle), 
 		windowCbuffer{ wcb } {
-		dCube.dMakeCube(1.f);
 
 		/*objDesc.inputLayout = INPUT_LAYOUT::OBJECT;
 		objDesc.vertexBuffer = VERTEX_BUFFER::OBJ_40000;
@@ -16,7 +15,6 @@ namespace dxe {
 		objDesc.vertexShader = VERTEX_SHADER::OBJECT;
 		objDesc.pixelShader = PIXEL_SHADER::OBJ_TEXTURE;
 		objDesc.samplerState = SAMPLER_STATE::DEFAULT;*/
-
 	}
 
 	renderer::~renderer() { }
@@ -48,12 +46,18 @@ namespace dxe {
 			implementation.drawSkybox(scene.GetSkyBox());
 		}
 
-		implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
+		if (scene.GetObjectTotal() > 0) {
+			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
+		}
 
-		implementation.drawDebugLines();
+		
+
+		if (scene.GetTextUITotal() > 0) {
+			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
+		}
 
 #ifdef _DEBUG
-		// implementation.drawObject(dCube);
+		implementation.drawDebugLines();
 #endif
 
 		implementation.present(0);

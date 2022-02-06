@@ -37,6 +37,8 @@ namespace dxe {
 		const uint32_t GetObjectTotal() const;
 		const View_t& GetView() const;
 		const Scene_cb& GetSceneBuffer() const;
+		const Textwrap* GetTextUI() const;
+		const uint32_t GetTextUITotal() const;
 
 	private:
 
@@ -59,6 +61,8 @@ namespace dxe {
 		enemy enemies[MAX_ENEMIES];
 
 		std::vector<Textwrap> textui;
+
+		uint32_t score{ 0 };
 	};
 
 
