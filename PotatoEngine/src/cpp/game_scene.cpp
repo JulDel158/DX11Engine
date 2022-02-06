@@ -42,7 +42,7 @@ namespace dxe {
 			const float scale = glm::linearRand(1.0f, 10.f);
 			enemies[i].collider.radius =  enemies[i].object->transform[0][0] = enemies[i].object->transform[1][1] = enemies[i].object->transform[2][2] = scale;
 			enemies[i].collider.radius += 0.2f;
-			glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 30.f, -80.f, 1.f }, glm::vec4{ 80.f, 80.f, 80.f, 1.f });
+			glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 60.f, -80.f, 1.f }, glm::vec4{ 80.f, 100.f, 80.f, 1.f });
 			enemies[i].object->transform[3] = randompos;
 			enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
 			enemies[i].object->isActive = true;
@@ -85,11 +85,26 @@ namespace dxe {
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
 
+		// updating the text ui
+		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
+
 		// updating enemies
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
 
-			if (!enemies[i].object || !enemies[i].object->isActive) { continue; }
-			
+			if (!enemies[i].object) { continue; }
+			if (!enemies[i].object->isActive) {
+				if (enemies[i].respawnTime <= 0.f) {
+					// we must respawn the enemy
+					glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 60.f, -80.f, 1.f }, glm::vec4{ 80.f, 100.f, 80.f, 1.f });
+					enemies[i].object->transform[3] = randompos;
+					enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
+					enemies[i].object->isActive = true;
+					enemies[i].velocity = -glm::normalize(randompos);
+					enemies[i].speed = glm::linearRand(3.0f, 10.f);
+				}
+				enemies[i].respawnTime -= dt;
+				continue;
+			}
 			glm::vec4 pos = enemies[i].object->transform[3];
 
 			// updating entity's movement
@@ -166,7 +181,11 @@ namespace dxe {
 				}
 
 
-				if (finalTarget) { finalTarget->object->isActive = false; }
+				if (finalTarget) { 
+					finalTarget->object->isActive = false; 
+					finalTarget->respawnTime = glm::linearRand(3.f, 5.f);
+					score += 10;
+				}
 			}
 		} 
 	}
