@@ -3,6 +3,13 @@
 // directx11
 #include <d3d11_2.h>
 
+// lib
+#include <SpriteBatch.h>
+#include <SpriteFont.h>
+
+// std
+#include <memory>
+
 #include "debug_lines.hpp"
 #include "pipeline_properties.hpp"
 #include "object_data.hpp"
@@ -77,6 +84,10 @@ namespace dxe {
 		ID3D11ShaderResourceView*	sResourceView[SUBRESOURCE_VIEW::COUNT]{};  // may be moved out of here for textures
 
 		ID3D11SamplerState*			samplerState[SAMPLER_STATE::COUNT]{};
+
+		// This classes are used to render fonts
+		std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
+		std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
 
 		void createDeviceAndSwapChain();

@@ -5,8 +5,8 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-//#include <SpriteBatch.h>
-//#include <SpriteFont.h>
+#include <DirectXMath.h>
+
 
 
 // std
@@ -46,6 +46,9 @@ namespace dxe {
 		createSResourceView(L"assets/images/SkyboxOcean.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SKYBOX));
 
 		createDebugTexture();
+
+		spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
+		spriteFont = std::make_unique<DirectX::SpriteFont>(device, L"assets\\fonts\\Comic_Sans_MS_16.spritefont");
 	}
 
 	pipeline::~pipeline() {
@@ -283,6 +286,12 @@ namespace dxe {
 
 			context->DrawIndexed(static_cast<UINT>(gameObjects[i].model.indices.size()), 0, 0);
 		}
+
+
+		// testing font renderer, to be removed
+		spriteBatch->Begin();
+		spriteFont->DrawString(spriteBatch.get(), L"YEEEEEEEEEEEEET!", DirectX::XMFLOAT2{ 0.F, 0.F }, DirectX::Colors::Red, 0.f, DirectX::XMFLOAT2{ 0.f, 0.f }, DirectX::XMFLOAT2{ 1.f, 1.f });
+		spriteBatch->End();
 	}
 
 	void pipeline::createDeviceAndSwapChain() {
