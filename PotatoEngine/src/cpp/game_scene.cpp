@@ -19,7 +19,7 @@ namespace dxe {
 		camera.updateView();
 
 		textui.clear();
-		textui.resize(1);
+		textui.resize(2);
 		
 		textui[0].color = glm::vec4(1.f, 0.f, 1.f, 1.f);
 		textui[0].layer = 0.f;
@@ -28,6 +28,16 @@ namespace dxe {
 		textui[0].rotation = 0.f;
 		textui[0].scale = glm::vec2(1.f, 1.f);
 		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
+
+		textui[1].color = glm::vec4(1.f, 0.f, 0.f, 1.f);
+		textui[1].layer = 0.f;
+		textui[1].origin = glm::vec2(0.f, 0.f);
+		textui[1].position = glm::vec2(610, 300);
+		textui[1].rotation = 0.f;
+		textui[1].scale = glm::vec2(2.5f, 2.5f);
+		textui[1].text = std::wstring(L"+");
+
+
 
 		gameObjects.clear();
 		gameObjects.resize(MAX_ENEMIES + 1);
@@ -41,7 +51,7 @@ namespace dxe {
 
 			const float scale = glm::linearRand(1.0f, 10.f);
 			enemies[i].collider.radius =  enemies[i].object->transform[0][0] = enemies[i].object->transform[1][1] = enemies[i].object->transform[2][2] = scale;
-			enemies[i].collider.radius += 0.2f;
+			enemies[i].collider.radius += 0.5f;
 			glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 60.f, -80.f, 1.f }, glm::vec4{ 80.f, 100.f, 80.f, 1.f });
 			enemies[i].object->transform[3] = randompos;
 			enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
@@ -159,19 +169,19 @@ namespace dxe {
 		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
 		if (input.KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
 		if (input.KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
-		//camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
 
 		camera.updateView(translate);
 
 		if (input.KeyPressed(VK_SPACE)) { // here we check collision with active objects
+			enemy* finalTarget = nullptr;
+			float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
+			float castTime{ 0.f };
 			for (int i = 0; i < MAX_ENEMIES; ++i) {
 				if (!enemies[i].object || !enemies[i].object->isActive) { 
 					continue; 
 				}
-
-				float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
-				float castTime{ 0.f };
-				enemy* finalTarget = nullptr;
+				
 				// TODO: for bullets we may want to make sure we only hit one targe by checking which target was hit first and leaving any other collisions intact
 				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider, castTime)) {
 					if (castTime < pTime) {
@@ -179,13 +189,12 @@ namespace dxe {
 						finalTarget = &enemies[i];
 					}
 				}
+			} // end for
 
-
-				if (finalTarget) { 
-					finalTarget->object->isActive = false; 
-					finalTarget->respawnTime = glm::linearRand(3.f, 5.f);
-					score += 10;
-				}
+			if (finalTarget) {
+				finalTarget->object->isActive = false;
+				finalTarget->respawnTime = glm::linearRand(3.f, 5.f);
+				score += 10;
 			}
 		} 
 	}
