@@ -57,6 +57,8 @@ namespace dxe {
 		static constexpr uint8_t MAX_ENEMIES = 10;
 
 		enemy enemies[MAX_ENEMIES];
+
+		std::vector<Textwrap> textui;
 	};
 
 

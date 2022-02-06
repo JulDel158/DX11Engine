@@ -5,6 +5,7 @@
 
 // std
 #include <vector>
+#include <string>
 
 namespace dxe {
 
@@ -111,5 +112,17 @@ namespace dxe {
 		SpotLight spotLight; // 64 BYTES
 		glm::vec4 ambient{ 0.f }; // 16 BYTES TOTAL: 144 BYTES X-X
 	};
+
+	struct Textwrap {
+		glm::vec4 color{0.f};
+		glm::vec2 position{ 0.f };
+		glm::vec2 origin{0.f};
+		glm::vec2 scale{0.f};
+		float rotation{0.f};
+		float layer{0.f};
+		std::wstring text;
+		// TODO: ADD FONT TYPE ONCE WE ADD MORE FONTS INTO THE PROJECT
+	};
+
 
 } // namespace dxe

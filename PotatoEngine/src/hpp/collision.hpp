@@ -9,7 +9,7 @@ namespace dxe {
 		float radius{ 0.f };
 	};
 
-	inline const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target) {
+	inline const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere target, float& time) {
 
 		glm::vec3 targetTopos = pos - target.pos;
 		direction = glm::normalize(direction);
@@ -26,7 +26,13 @@ namespace dxe {
 		// the ray missed
 		if (discriminant < 0.f) { return false; }
 
-		// in all other cases the ray is a hit
+		time = -b - glm::sqrt(discriminant);
+		if (time < 0.f) { time = 0.f; } // negative value means we started inside sphere, clamp to 0
+
+		// we can calculate the point at which we collided like this
+		// Vector3 hitpoint = pos + time * direction;
+
+		// otherwise the ray hits
 		return true;
 	}
 

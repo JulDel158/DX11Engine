@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <time.h>
+#include <limits>
 
 // lib
 #include <glm/gtc/random.hpp>
@@ -23,8 +24,8 @@ namespace dxe {
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
 			enemies[i].object = &gameObjects[i];
 
-			enemies[i].object->model.loadObject("assets/models/piramid.obj", false);//.dMakeCube(1.f);
-			enemies[i].object->resourceId = 1;
+			enemies[i].object->model.dMakeCube(1.f); //loadObject("assets/models/piramid.obj", false);
+			enemies[i].object->resourceId = 3;
 
 			const float scale = glm::linearRand(1.0f, 10.f);
 			enemies[i].collider.radius =  enemies[i].object->transform[0][0] = enemies[i].object->transform[1][1] = enemies[i].object->transform[2][2] = scale;
@@ -41,6 +42,7 @@ namespace dxe {
 		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
 		plane.resourceId = 0;
+		plane.isActive = true;
 		gameObjects.back() = plane;
 
 		skyBox.model.loadObject("assets/models/CUBE.obj");
@@ -130,20 +132,29 @@ namespace dxe {
 		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
 		if (input.KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
 		if (input.KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
-		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+		//camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
 
 		camera.updateView(translate);
 
-		if (input.KeyDown(VK_SPACE)) { // here we check collision with active objects
+		if (input.KeyPressed(VK_SPACE)) { // here we check collision with active objects
 			for (int i = 0; i < MAX_ENEMIES; ++i) {
-				if (!enemies[i].object) { 
+				if (!enemies[i].object || !enemies[i].object->isActive) { 
 					continue; 
 				}
 
+				float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
+				float castTime{ 0.f };
+				enemy* finalTarget = nullptr;
 				// TODO: for bullets we may want to make sure we only hit one targe by checking which target was hit first and leaving any other collisions intact
-				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider)) {
-					enemies[i].object->isActive = false;
+				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider, castTime)) {
+					if (castTime < pTime) {
+						pTime = castTime;
+						finalTarget = &enemies[i];
+					}
 				}
+
+
+				if (finalTarget) { finalTarget->object->isActive = false; }
 			}
 		} 
 	}
