@@ -7,8 +7,6 @@
 #include <glm/gtc/constants.hpp>
 #include <DirectXMath.h>
 
-
-
 // std
 #include <cassert>
 #include <stdexcept>

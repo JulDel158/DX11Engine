@@ -4,11 +4,18 @@
 #include "input.hpp"
 #include "collision.hpp"
 
+#pragma comment(lib,"dsound.lib")
+#pragma comment(lib,"dxguid.lib")
+
 // lib
 #include <glm/glm.hpp>
+#define NOMINMAX
+#include <dsound.h>
+#include <Audio.h>
 
 // std
 #include <vector>
+#include <memory>
 
 namespace dxe {
 
@@ -63,6 +70,11 @@ namespace dxe {
 		std::vector<Textwrap> textui;
 
 		uint32_t score{ 0 };
+		
+		// we will put the sound engine here for now
+		std::unique_ptr<DirectX::AudioEngine> audioEngine;
+		std::unique_ptr<DirectX::SoundEffect> soundData;
+		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance;
 	};
 
 
