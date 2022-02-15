@@ -79,6 +79,10 @@ namespace dxe {
 			safe_release(ptr);
 		}
 
+		for (auto& ptr : geometryShader) {
+			safe_release(ptr);
+		}
+
 		for (auto& ptr : samplerState) {
 			safe_release(ptr);
 		}
@@ -235,7 +239,7 @@ namespace dxe {
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &scb, 0, 0);
 
 		const uint32_t inx = (skybox->resourceId < SUBRESOURCE_VIEW::COUNT) ? skybox->resourceId : SUBRESOURCE_VIEW::DEBUG;
-		context->PSSetShaderResources(0, 1, &sResourceView[inx]);
+		context->PSSetShaderResources(1, 1, &sResourceView[inx]);
 
 		context->DrawIndexed(static_cast<UINT>(skybox->model.indices.size()), 0, 0); 
 
@@ -489,15 +493,20 @@ namespace dxe {
 
 	void pipeline::createShaderAndInputLayout() {
 		// vertex shaders loading
-		std::vector<uint8_t> svs_blob = tools::file_reader::load_binary_blob("shaders/simple_vertex_shader.cso");
-		std::vector<uint8_t> ovs_blob = tools::file_reader::load_binary_blob("shaders/obj_vertex_shader.cso");
-		std::vector<uint8_t> vss_blob = tools::file_reader::load_binary_blob("shaders/vs_skybox.cso");
+		std::vector<uint8_t> svs_blob = tools::file_reader::load_binary_blob("shaders\\simple_vertex_shader.cso");
+		std::vector<uint8_t> ovs_blob = tools::file_reader::load_binary_blob("shaders\\obj_vertex_shader.cso");
+		std::vector<uint8_t> vss_blob = tools::file_reader::load_binary_blob("shaders\\vs_skybox.cso");
+		std::vector<uint8_t> pvs_blob = tools::file_reader::load_binary_blob("shaders\\vs_particles.cso");
 
 		// pixel shaders loading
-		std::vector<uint8_t> sps_blob = tools::file_reader::load_binary_blob("shaders/simple_pixel_shader.cso");
-		std::vector<uint8_t> onps_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader_normals.cso");
-		std::vector<uint8_t> ops_blob = tools::file_reader::load_binary_blob("shaders/obj_pixel_shader.cso");
-		std::vector<uint8_t> pss_blob = tools::file_reader::load_binary_blob("shaders/ps_skybox.cso");
+		std::vector<uint8_t> sps_blob = tools::file_reader::load_binary_blob("shaders\\simple_pixel_shader.cso");
+		std::vector<uint8_t> onps_blob = tools::file_reader::load_binary_blob("shaders\\obj_pixel_shader_normals.cso");
+		std::vector<uint8_t> ops_blob = tools::file_reader::load_binary_blob("shaders\\obj_pixel_shader.cso");
+		std::vector<uint8_t> pss_blob = tools::file_reader::load_binary_blob("shaders\\ps_skybox.cso");
+		std::vector<uint8_t> pps_blob = tools::file_reader::load_binary_blob("shaders\\ps_particles.cso");
+
+		// geometry shader loading
+		std::vector<uint8_t> pgs_blob = tools::file_reader::load_binary_blob("shaders\\gs_particles.cso");
 
 		// vertex shaders creation
 		HRESULT hr = device->CreateVertexShader(svs_blob.data(), svs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
@@ -508,6 +517,9 @@ namespace dxe {
 
 		hr = device->CreateVertexShader(vss_blob.data(), vss_blob.size(), NULL, &vertexShader[VERTEX_SHADER::SKYBOX]);
 		assert(!FAILED(hr) && "failed to create skybox vertex shader");
+
+		hr = device->CreateVertexShader(pvs_blob.data(), pvs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::PARTICLES]);
+		assert(!FAILED(hr) && "failed to create particles vertex shader");
 
 		// pixel shaders creation
 		hr = device->CreatePixelShader(sps_blob.data(), sps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::DEFAULT]);
@@ -521,6 +533,13 @@ namespace dxe {
 
 		hr = device->CreatePixelShader(pss_blob.data(), pss_blob.size(), NULL, &pixelShader[PIXEL_SHADER::SKYBOX]);
 		assert(!FAILED(hr) && "failed to create skybox texture pixel shader");
+
+		hr = device->CreatePixelShader(pps_blob.data(), pps_blob.size(), NULL, &pixelShader[PIXEL_SHADER::PARTICLES]);
+		assert(!FAILED(hr) && "failed to create particle pixel shader");
+
+		// geometry shader creation
+		hr = device->CreateGeometryShader(pgs_blob.data(), pgs_blob.size(), NULL, &geometryShader[GEOMETRY_SHADER::DEFAULT]);
+		assert(!FAILED(hr) && "failed to create geometry pixel shader");
 
 		// input layouts
 
@@ -542,6 +561,15 @@ namespace dxe {
 
 		hr = device->CreateInputLayout(oidesc, ARRAYSIZE(oidesc), ovs_blob.data(), ovs_blob.size(), &inputLayout[INPUT_LAYOUT::OBJECT]);
 		assert(!FAILED(hr) && "failed to create OBJECT input layout");
+
+		// particle vertex
+		D3D11_INPUT_ELEMENT_DESC pidesc[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"SCALE", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+
+		hr = device->CreateInputLayout(pidesc, ARRAYSIZE(pidesc), pvs_blob.data(), pvs_blob.size(), &inputLayout[INPUT_LAYOUT::PARTICLES]);
+		assert(!FAILED(hr) && "failed to create PARTICLES input layout");
 
 	}
 

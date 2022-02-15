@@ -1,4 +1,4 @@
-textureCUBE cubemap : register(t0);
+textureCUBE cubemap : register(t1);
 SamplerState samLinear : register(s0);
 
 struct VS_OUT

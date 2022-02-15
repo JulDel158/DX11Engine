@@ -41,8 +41,8 @@ namespace dxe {
 		implementation.setRenderTargetView();
 
 		implementation.bindFrameBuffer(frameCbuffer, scene.GetSceneBuffer(), scene.GetView().invertView);
-		
-		if (scene.GetSkyBox()) {
+
+		if (scene.GetSkyBox()) { // Must be drawn first
 			implementation.drawSkybox(scene.GetSkyBox());
 		}
 
@@ -50,15 +50,13 @@ namespace dxe {
 			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
 		}
 
-		
-
-		if (scene.GetTextUITotal() > 0) {
-			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
-		}
-
 #ifdef _DEBUG
 		implementation.drawDebugLines();
 #endif
+
+		if (scene.GetTextUITotal() > 0) { // Must be drawn last
+			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
+		}
 
 		implementation.present(0);
 	}

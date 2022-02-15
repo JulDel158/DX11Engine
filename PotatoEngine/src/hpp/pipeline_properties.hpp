@@ -19,23 +19,27 @@ namespace dxe {
 	};
 
 	struct VERTEX_BUFFER {
-		enum { COLORED_LINES = 0, OBJ_40000, COUNT };
+		enum { COLORED_LINES = 0, OBJ_40000, PARTICLES, COUNT };
 	};
 
 	struct INDEX_BUFFER {
-		enum { OBJ_40000 = 0, COUNT };
+		enum { OBJ_40000 = 0, PARTICLES, COUNT };
 	};
 
 	struct INPUT_LAYOUT {
-		enum { DEFAULT = 0, OBJECT, COUNT };
+		enum { DEFAULT = 0, OBJECT, PARTICLES, COUNT };
 	};
 
 	struct VERTEX_SHADER {
-		enum { DEFAULT = 0, OBJECT, SKYBOX, COUNT };
+		enum { DEFAULT = 0, OBJECT, SKYBOX, PARTICLES, COUNT };
 	};
 
 	struct PIXEL_SHADER {
-		enum { DEFAULT = 0, OBJ_NRM, OBJ_TEXTURE, SKYBOX, COUNT };
+		enum { DEFAULT = 0, OBJ_NRM, OBJ_TEXTURE, SKYBOX, PARTICLES, COUNT };
+	};
+
+	struct GEOMETRY_SHADER {
+		enum { DEFAULT = 0, COUNT };
 	};
 
 	struct CONSTANT_BUFFER {

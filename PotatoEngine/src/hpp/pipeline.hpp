@@ -79,6 +79,8 @@ namespace dxe {
 
 		ID3D11PixelShader*			pixelShader[PIXEL_SHADER::COUNT]{};
 
+		ID3D11GeometryShader*		geometryShader[GEOMETRY_SHADER::COUNT]{};
+
 		ID3D11Buffer*				constantBuffer[CONSTANT_BUFFER::COUNT]{};
 
 		D3D11_VIEWPORT				viewPort[VIEWPORT::COUNT]{};

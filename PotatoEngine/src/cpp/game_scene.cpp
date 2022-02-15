@@ -21,6 +21,7 @@ namespace dxe {
 		textui.clear();
 		textui.resize(2);
 		
+		// score ui
 		textui[0].color = glm::vec4(1.f, 0.f, 1.f, 1.f);
 		textui[0].layer = 0.f;
 		textui[0].origin = glm::vec2(0.f, 0.f);
@@ -29,6 +30,7 @@ namespace dxe {
 		textui[0].scale = glm::vec2(1.f, 1.f);
 		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
 
+		// temp crosshair ui
 		textui[1].color = glm::vec4(1.f, 0.f, 0.f, 1.f);
 		textui[1].layer = 0.f;
 		textui[1].origin = glm::vec2(0.f, 0.f);
@@ -36,7 +38,6 @@ namespace dxe {
 		textui[1].rotation = 0.f;
 		textui[1].scale = glm::vec2(2.5f, 2.5f);
 		textui[1].text = std::wstring(L"+");
-
 
 
 		gameObjects.clear();
@@ -60,6 +61,7 @@ namespace dxe {
 			enemies[i].speed = glm::linearRand(3.0f, 10.f);
 		}
 		
+		// floor plane game object
 		plane.model.dMakePlane();
 		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
 		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
@@ -67,6 +69,7 @@ namespace dxe {
 		plane.isActive = true;
 		gameObjects.back() = plane;
 
+		// skybox
 		skyBox.model.loadObject("assets/models/CUBE.obj");
 		skyBox.resourceId = 0;
 
@@ -192,7 +195,11 @@ namespace dxe {
 		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
 		if (input.KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
 		if (input.KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
+
+#ifndef _DEBUG
 		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+#endif // !_DEBUG
+
 
 		camera.updateView(translate);
 

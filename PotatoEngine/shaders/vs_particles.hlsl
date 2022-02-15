@@ -28,6 +28,7 @@ struct VS_OUT
     float scale : SCALE;
 };
 
+// NOTE: We must move the point into projection space while in the geometry shader
 VS_OUT main(VS_IN input)
 {
     VS_OUT output = (VS_OUT)0;
