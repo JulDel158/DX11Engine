@@ -92,6 +92,8 @@ namespace dxe {
 
 		ID3D11SamplerState*			samplerState[SAMPLER_STATE::COUNT]{};
 
+		ID3D11BlendState*			blendState[BLEND_STATE::COUNT]{};
+
 		// This classes are used to render fonts
 		std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 		std::unique_ptr<DirectX::SpriteFont> spriteFont;
@@ -117,6 +119,8 @@ namespace dxe {
 		void createSResourceView(const wchar_t* filename, const uint32_t index);
 
 		void createDebugTexture();
+
+		void createBlendStates();
 
 	};
 

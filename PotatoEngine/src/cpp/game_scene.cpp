@@ -71,7 +71,7 @@ namespace dxe {
 
 		// skybox
 		skyBox.model.loadObject("assets/models/CUBE.obj");
-		skyBox.resourceId = 0;
+		skyBox.resourceId = 2;
 
 		// lights
 		scb.dirLight.color = { 0.f, 0.f, 0.f, 0.0f };
@@ -189,7 +189,7 @@ namespace dxe {
 		if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
 #endif // _DEBUG
 
-		if (input.KeyPressed('1')) { skyBox.resourceId = 0; }
+		if (input.KeyPressed('1')) { skyBox.resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
 		if (input.KeyPressed('2')) { skyBox.resourceId = 2; }
 		if (input.KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
 		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right

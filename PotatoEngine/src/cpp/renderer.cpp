@@ -50,11 +50,11 @@ namespace dxe {
 			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
 		}*/
 
-		implementation.drawParticle();
-
 #ifdef _DEBUG
 		implementation.drawDebugLines();
 #endif
+		// particles should be drawn last, but before the UI
+		implementation.drawParticle();
 
 		if (scene.GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());

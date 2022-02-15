@@ -58,6 +58,10 @@ namespace dxe {
 		enum { DEFAULT = 0, COUNT };
 	};
 
+	struct BLEND_STATE {
+		enum {OBJ_ALPHA = 0, PIXEL_ALPHA, ADDITIVE, COUNT };
+	};
+
 	struct PIPELINE_PROPERTY_DESC {
 		uint8_t renderTarget_V;
 		uint8_t depthStencil_V;

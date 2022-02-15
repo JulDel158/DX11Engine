@@ -45,11 +45,17 @@ namespace dxe {
 
 		createDebugTexture();
 
+		createBlendStates();
+
 		spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
 		spriteFont = std::make_unique<DirectX::SpriteFont>(device, L"assets\\fonts\\Comic_Sans_MS_16.spritefont");
 	}
 
 	pipeline::~pipeline() {
+
+		for (auto& ptr : blendState) {
+			safe_release(ptr);
+		}
 
 		for (auto& ptr : sResourceView) { // later on textures will be created and released somewhere else
 			safe_release(ptr);
@@ -317,6 +323,8 @@ namespace dxe {
 
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::PARTICLES], &stride, &offset);
 
+		context->OMSetBlendState(blendState[BLEND_STATE::ADDITIVE], 0, 0xffffffff);
+
 		// SETTING SHADERS 
 		context->VSSetShader(vertexShader[VERTEX_SHADER::PARTICLES], NULL, 0);
 
@@ -330,7 +338,7 @@ namespace dxe {
 
 		ParticleVertex particle;
 		particle.pos = glm::vec3(0.f, 0.f, 0.f);
-		particle.scale = 1.f;
+		particle.scale = 10.f;
 
 		pvBuffer.push_back(particle);
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::PARTICLES], 0, NULL, pvBuffer.data(), 0, 0);
@@ -339,7 +347,11 @@ namespace dxe {
 
 		context->Draw(pvBuffer.size(), 0);
 
+		// we must unbind the geometry shader as to dissable this stage in other draw calls
 		context->GSSetShader(NULL, NULL, 0);
+
+		// we must unbind the blend state to not cause any unwated blending with other draw calls
+		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
 	void pipeline::createDeviceAndSwapChain() {
@@ -794,6 +806,50 @@ namespace dxe {
 		safe_release(texture);
 		safe_release(texture2);
 		safe_release(texture3);
+	}
+
+	void pipeline::createBlendStates() {
+		D3D11_BLEND_DESC desc{ 0 };
+
+		D3D11_RENDER_TARGET_BLEND_DESC rtbd{ 0 };
+
+		rtbd.BlendEnable = true;
+
+		rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+		rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+		rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+		rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		// object alpha
+		rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.AlphaToCoverageEnable = false;
+		desc.RenderTarget[0] = rtbd;
+
+		HRESULT hr = device->CreateBlendState(&desc, &blendState[BLEND_STATE::OBJ_ALPHA]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create object alpha blend state!");
+		}
+
+		// pixel alpha
+		desc.AlphaToCoverageEnable = true;
+
+		hr = device->CreateBlendState(&desc, &blendState[BLEND_STATE::PIXEL_ALPHA]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create pixel alpha blend state!");
+		}
+
+		// additive (emissive)
+		rtbd.SrcBlend = D3D11_BLEND_ONE;
+		rtbd.DestBlend = D3D11_BLEND_ONE;
+		desc.AlphaToCoverageEnable = false;
+		desc.RenderTarget[0] = rtbd;
+
+		hr = device->CreateBlendState(&desc, &blendState[BLEND_STATE::ADDITIVE]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create additive (emissive) blend state!");
+		}
 	}
 
 } // namespace dxe
