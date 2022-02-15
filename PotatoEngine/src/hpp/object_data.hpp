@@ -124,5 +124,10 @@ namespace dxe {
 		// TODO: ADD FONT TYPE ONCE WE ADD MORE FONTS INTO THE PROJECT
 	};
 
+	struct ParticleVertex {
+		glm::vec3 pos{ 0.f };
+		float scale{ 1.f };
+	};
+
 
 } // namespace dxe

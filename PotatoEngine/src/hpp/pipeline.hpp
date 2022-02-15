@@ -50,6 +50,8 @@ namespace dxe {
 
 		void drawText(const Textwrap* set, const uint32_t size);
 
+		void drawParticle();
+
 		void setRenderTargetView();
 
 	private:
@@ -69,6 +71,7 @@ namespace dxe {
 
 		ID3D11Buffer*				vertexBuffer[VERTEX_BUFFER::COUNT]{};
 		std::vector<ObjVertex>		vBuffer;
+		std::vector<ParticleVertex> pvBuffer;
 
 		ID3D11Buffer*				indexBuffer[INDEX_BUFFER::COUNT]{};
 		std::vector<uint32_t>		iBuffer;

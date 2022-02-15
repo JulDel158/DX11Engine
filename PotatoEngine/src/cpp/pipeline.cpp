@@ -134,6 +134,8 @@ namespace dxe {
 	void pipeline::bindWindowBuffer(const Window_cb& wcb) {
 		context->VSSetConstantBuffers(2, 1, &constantBuffer[CONSTANT_BUFFER::WINDOW_CB]);
 
+		context->GSSetConstantBuffers(2, 1, &constantBuffer[CONSTANT_BUFFER::WINDOW_CB]);
+
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::WINDOW_CB], 0, NULL, &wcb, 0, 0);
 	}
 
@@ -305,6 +307,39 @@ namespace dxe {
 				set[i].layer); // layer
 		}
 		spriteBatch->End();
+	}
+
+	void pipeline::drawParticle() {
+		UINT stride = sizeof(ObjVertex);
+		UINT offset = 0;
+
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::PARTICLES]);
+
+		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::PARTICLES], &stride, &offset);
+
+		// SETTING SHADERS 
+		context->VSSetShader(vertexShader[VERTEX_SHADER::PARTICLES], NULL, 0);
+
+		context->GSSetShader(geometryShader[GEOMETRY_SHADER::DEFAULT], NULL, 0);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::PARTICLES], NULL, 0);
+
+		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+		ParticleVertex particle;
+		particle.pos = glm::vec3(0.f, 0.f, 0.f);
+		particle.scale = 1.f;
+
+		pvBuffer.push_back(particle);
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::PARTICLES], 0, NULL, pvBuffer.data(), 0, 0);
+
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]);
+
+		context->Draw(pvBuffer.size(), 0);
+
+		context->GSSetShader(NULL, NULL, 0);
 	}
 
 	void pipeline::createDeviceAndSwapChain() {
@@ -598,10 +633,23 @@ namespace dxe {
 		hr = device->CreateBuffer(&desc2, &srd2, &vertexBuffer[VERTEX_BUFFER::OBJ_40000]);
 		assert(!FAILED(hr) && "failed to create obj vertex buffer");
 
+		// particles vertex buffer
+		CD3D11_BUFFER_DESC desc3 = CD3D11_BUFFER_DESC(
+			static_cast<UINT>(sizeof(ParticleVertex) * 10),
+			D3D11_BIND_VERTEX_BUFFER);
+
+		pvBuffer.reserve(10);
+		D3D11_SUBRESOURCE_DATA srd3 = { 0 };
+		srd3.pSysMem = pvBuffer.data();
+
+		hr = device->CreateBuffer(&desc3, &srd3, &vertexBuffer[VERTEX_BUFFER::PARTICLES]);
+		assert(!FAILED(hr) && "failed to create particle vertex buffer");
+
 		// index buffer
 		CD3D11_BUFFER_DESC idesc = CD3D11_BUFFER_DESC(
 			sizeof(uint32_t) * 40000,
 			D3D11_BIND_INDEX_BUFFER);
+
 
 		iBuffer.reserve(40000); // allocating buffer memory
 		D3D11_SUBRESOURCE_DATA isrd = { 0 };

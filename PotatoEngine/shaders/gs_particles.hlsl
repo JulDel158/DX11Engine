@@ -27,13 +27,13 @@ inout TriangleStream<GS_OUT> output)
     GS_OUT quad[4];
     const float scale = 0.5f * input[0].scale;
     
-    // top left
-    quad[0].pos = float4(input[0].pos.x - scale, input[0].pos.y + scale, input[0].pos.zw);
-    quad[0].uv = float2(0.f, 0.f);
-    
     // bottom left
-    quad[1].pos = float4(input[0].pos.x - scale, input[0].pos.y - scale, input[0].pos.zw);
-    quad[1].uv = float2(0.f, 1.f);
+    quad[0].pos = float4(input[0].pos.x - scale, input[0].pos.y - scale, input[0].pos.zw);
+    quad[0].uv = float2(0.f, 1.f);
+    
+    // top left
+    quad[1].pos = float4(input[0].pos.x - scale, input[0].pos.y + scale, input[0].pos.zw);
+    quad[1].uv = float2(0.f, 0.f);
     
     // bottom right
     quad[2].pos = float4(input[0].pos.x + scale, input[0].pos.y - scale, input[0].pos.zw);

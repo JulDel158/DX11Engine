@@ -14,4 +14,6 @@ float4 main(GS_OUT input) : SV_Target
     output = diffuse.Sample(samLinear, input.uv);
     
     return saturate(output);
+    
+    // return float4(0.f, 0.f, 1.f, 1.f);
 }

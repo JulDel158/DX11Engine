@@ -46,9 +46,11 @@ namespace dxe {
 			implementation.drawSkybox(scene.GetSkyBox());
 		}
 
-		if (scene.GetObjectTotal() > 0) {
+		/*if (scene.GetObjectTotal() > 0) {
 			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
-		}
+		}*/
+
+		implementation.drawParticle();
 
 #ifdef _DEBUG
 		implementation.drawDebugLines();
