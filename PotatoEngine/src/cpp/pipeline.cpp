@@ -39,9 +39,11 @@ namespace dxe {
 		createConstantBuffers();
 
 		// temporary
-		createSResourceView(L"assets/images/obamium.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::DEFAULT));
+		createSResourceView(L"assets\\images\\obamium.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::DEFAULT));
 
-		createSResourceView(L"assets/images/SkyboxOcean.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SKYBOX));
+		createSResourceView(L"assets\\images\\smoke3.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SMOKE));
+
+		createSResourceView(L"assets\\images\\SkyboxOcean.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SKYBOX));
 
 		createDebugTexture();
 
@@ -323,7 +325,7 @@ namespace dxe {
 
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::PARTICLES], &stride, &offset);
 
-		context->OMSetBlendState(blendState[BLEND_STATE::ADDITIVE], 0, 0xffffffff);
+		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
 
 		// SETTING SHADERS 
 		context->VSSetShader(vertexShader[VERTEX_SHADER::PARTICLES], NULL, 0);
@@ -343,7 +345,7 @@ namespace dxe {
 		pvBuffer.push_back(particle);
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::PARTICLES], 0, NULL, pvBuffer.data(), 0, 0);
 
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::DEFAULT]);
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
 
 		context->Draw(pvBuffer.size(), 0);
 
