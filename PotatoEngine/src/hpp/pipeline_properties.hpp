@@ -46,12 +46,20 @@ namespace dxe {
 		enum { OBJECT_CB = 0, FRAME_CB, WINDOW_CB, SCENE_CB, COUNT };
 	};
 
+	struct RESOURCE_BUFFER {
+		enum { PARTICLE_IN = 0, PARTICLE_OUT, PARTICLE_RESULT, COUNT };
+	};
+
 	struct VIEWPORT {
 		enum { DEFAULT = 0, COUNT };
 	};
 
 	struct SUBRESOURCE_VIEW {
-		enum { DEBUG = 0, DEFAULT, SKYBOX, DEBUG_RED, DEBUG_GREEN, SMOKE, COUNT };
+		enum { DEBUG = 0, DEFAULT, SKYBOX, DEBUG_RED, DEBUG_GREEN, SMOKE, PARTICLE_IN, COUNT };
+	};
+
+	struct UACCESS_VIEW {
+		enum {PARTICLE_OUT = 0, COUNT };
 	};
 
 	struct SAMPLER_STATE {

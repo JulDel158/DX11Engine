@@ -63,6 +63,14 @@ namespace dxe {
 			safe_release(ptr);
 		}
 
+		for (auto& ptr : resourceBuffer) {
+			safe_release(ptr);
+		}
+
+		for (auto& ptr : uAccessView) {
+			safe_release(ptr);
+		}
+
 		for (auto& ptr : constantBuffer) {
 			safe_release(ptr);
 		}
@@ -851,6 +859,71 @@ namespace dxe {
 		hr = device->CreateBlendState(&desc, &blendState[BLEND_STATE::ADDITIVE]);
 		if (FAILED(hr)) {
 			throw std::runtime_error("failed to create additive (emissive) blend state!");
+		}
+	}
+
+	void pipeline::createParticleBuffers() {
+		const uint32_t MAX_PARTICLES = 10; // TEMPORARY
+
+		// CREATING THE BUFFER THAT WILL BE USED IN THE SRV
+		D3D11_BUFFER_DESC desc1{ 0 };
+		desc1.Usage = D3D11_USAGE_DYNAMIC; // A resource that is accessible by both the GPU (read only) and the CPU (write only).
+		desc1.ByteWidth = sizeof(ParticleVertex) * MAX_PARTICLES; // TODO: SHOULD BE * AMOUNT OF MAX PARTICLES
+		desc1.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc1.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		desc1.StructureByteStride = sizeof(ParticleVertex);
+		desc1.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		HRESULT hr = device->CreateBuffer(&desc1, 0, &resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle_in buffer!");
+		}
+
+		// Creating SRV with the buffer we just made
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		ZeroMemory(&srvDesc, sizeof(srvDesc));
+		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+		srvDesc.BufferEx.FirstElement = 0;
+		srvDesc.BufferEx.Flags = 0;
+		srvDesc.BufferEx.NumElements = MAX_PARTICLES;
+		hr = device->CreateShaderResourceView(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], &srvDesc, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle_in SRV!");
+		}
+
+		// gpu read/write buffer for UAV
+		D3D11_BUFFER_DESC desc2{ 0 };
+		desc2.Usage = D3D11_USAGE_DEFAULT; // A resource that requires read and write access by the GPU.
+		desc2.ByteWidth = sizeof(ParticleVertex) * MAX_PARTICLES;
+		desc2.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+		desc2.CPUAccessFlags = 0;
+		desc2.StructureByteStride = sizeof(ParticleVertex);
+		desc2.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		hr = device->CreateBuffer(&desc2, 0, &resourceBuffer[RESOURCE_BUFFER::PARTICLE_OUT]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle_out buffer!");
+		}
+
+		// creating buffer to read our results in the cpu from the compute shader
+		desc2.Usage = D3D11_USAGE_STAGING;
+		desc2.BindFlags = 0;
+		desc2.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		hr = device->CreateBuffer(&desc2, 0, &resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle_result buffer!");
+		}
+
+		// creating UAV with the particle_out buffer
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+		ZeroMemory(&uavDesc, sizeof(uavDesc));
+		uavDesc.Buffer.FirstElement = 0;
+		uavDesc.Buffer.Flags = 0;
+		uavDesc.Buffer.NumElements = MAX_PARTICLES;
+		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+		hr = device->CreateUnorderedAccessView(resourceBuffer[RESOURCE_BUFFER::PARTICLE_OUT], &uavDesc, &uAccessView[UACCESS_VIEW::PARTICLE_OUT]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle_out UAV!");
 		}
 	}
 
