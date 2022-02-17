@@ -54,7 +54,7 @@ namespace dxe {
 
 		void drawCsParticles();
 
-		void UpdateParticles(std::vector<ParticleVertex> &particles);
+		void UpdateParticles(std::vector<Particle>&const particles);
 
 		void setRenderTargetView();
 
@@ -75,7 +75,7 @@ namespace dxe {
 
 		ID3D11Buffer*				vertexBuffer[VERTEX_BUFFER::COUNT]{};
 		std::vector<ObjVertex>		vBuffer;
-		std::vector<ParticleVertex> pvBuffer;
+		std::vector<Particle> pvBuffer;
 
 		ID3D11Buffer*				indexBuffer[INDEX_BUFFER::COUNT]{};
 		std::vector<uint32_t>		iBuffer;

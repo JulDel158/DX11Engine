@@ -84,50 +84,65 @@ namespace dxe {
 	};
 
 	struct alignas(16)DirLight {
-		glm::vec4 color{ 0.f }; // 16 BYTES
+		glm::vec4 color{ 0.f };		// 16 BYTES
 		glm::vec3 direction{ 0.f };	// 16 BYTES TOTAL: 32 BYTES
 	};
 
 	struct alignas(16)PointLight {
-		glm::vec4 color{ 0.f }; // 16 BYTES
+		glm::vec4 color{ 0.f };		// 16 BYTES
 		glm::vec3 pos{ 0.f }; 
-		float radius{ 0.f }; // 16 BYTES TOTAL: 32 BYTES
+		float radius{ 0.f };		// 16 BYTES TOTAL: 32 BYTES
 	};
 
 	struct alignas(16)SpotLight {
-		glm::vec4 color{ 0.f };  // 16 BYTES
+		glm::vec4 color{ 0.f };		// 16 BYTES
 		glm::vec3 pos{ 0.f };
-		float innerRatio{ 0.f }; // +16 BYTES
+		float innerRatio{ 0.f };	// +16 BYTES
 		glm::vec3 direction{ 0.f };
-		float outerRatio{ 0.f }; // +16 BYTES
+		float outerRatio{ 0.f };	// +16 BYTES
 		float range{ 0.f }; 
 		float focus{ 0.f };
-		float falloff{ 0.f };
-		//  +16 TOTAL: 64 BYTES
+		float falloff{ 0.f };		// 12 
+		//  + 4 padding TOTAL: 64 BYTES
 	};
 
 	struct alignas(16)Scene_cb{
-		PointLight pointLight; // 32 BYTES
-		DirLight dirLight; // 32 BYTES
-		SpotLight spotLight; // 64 BYTES
-		glm::vec4 ambient{ 0.f }; // 16 BYTES TOTAL: 144 BYTES X-X
+		PointLight pointLight;		// 32 BYTES
+		DirLight dirLight;			// 32 BYTES
+		SpotLight spotLight;		// 64 BYTES
+		glm::vec4 ambient{ 0.f };	// 16 BYTES TOTAL: 144 BYTES X-X
 	};
 
 	struct Textwrap {
-		glm::vec4 color{0.f};
+		glm::vec4 color{0.f};		// 16
 		glm::vec2 position{ 0.f };
-		glm::vec2 origin{0.f};
+		glm::vec2 origin{0.f};		// 16
 		glm::vec2 scale{0.f};
 		float rotation{0.f};
-		float layer{0.f};
+		float layer{0.f};			// 16
 		std::wstring text;
 		// TODO: ADD FONT TYPE ONCE WE ADD MORE FONTS INTO THE PROJECT
 	};
 
-	struct ParticleVertex {
+	struct Particle {
 		glm::vec3 pos{ 0.f };
-		float scale{ 1.f };
+		float scale{ 1.f };			// 16
+		glm::vec3 velocity{ 0.f };
+		float lifeSpan{ 0.f };		// 16
 	};
+
+	struct ParticleFlyWeight { // shared data among particles
+		glm::vec3 velMinVals{ 0.f };
+		float scaleStart{ 1.f };	// 16
+		glm::vec3 velMaxVals{ 0.f };
+		float scaleRate{ 1.f };		// 16
+		uint32_t texture{ 0 };
+		float minTime{ 0.f };
+		float maxTime{ 0.f };		// 12
+		// + 4 padding TOTAL: 48
+	};
+
+
 
 
 } // namespace dxe

@@ -2,6 +2,8 @@ struct particle
 {
     float3 pos;
     float scale;
+    float3 velocity;
+    float lifeSpan;
 };
 
 StructuredBuffer<particle> inputParticle : register(t0); // SRV

@@ -356,7 +356,7 @@ namespace dxe {
 
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-		ParticleVertex particle;
+		Particle particle;
 		particle.pos = glm::vec3(0.f, 0.f, 0.f);
 		particle.scale = 10.f;
 
@@ -375,24 +375,24 @@ namespace dxe {
 	}
 
 	void pipeline::drawCsParticles() {
-		static std::vector<ParticleVertex> myParticles{
-			{glm::vec3(0.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(1.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(2.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(3.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(4.f, 0.f, 10.f), 0.5f},
-
-			{glm::vec3(-1.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(-2.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(-3.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(-4.f, 0.f, 10.f), 0.5f},
-			{glm::vec3(-5.f, 0.f, 10.f), 0.5f}
+		static std::vector<Particle> myParticles{
+			{glm::vec3(0.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(1.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(2.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(3.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(4.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+														
+			{glm::vec3(-1.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(-2.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(-3.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(-4.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
+			{glm::vec3(-5.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f}
 		}; // 10 test particles
-
+		int size = myParticles.size();
 		UpdateParticles(myParticles); // should be moved out of here eventually
 
 		// now that the particle data has been updated we can prepare to draw
-		UINT stride = sizeof(ParticleVertex);
+		UINT stride = sizeof(Particle);
 		UINT offset = 0;
 
 		// dissabling vertex and index buffers
@@ -412,12 +412,14 @@ namespace dxe {
 
 		context->GSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
 
+		// setting up pixel shader and required data for the stage
 		context->PSSetShader(pixelShader[PIXEL_SHADER::PARTICLES], NULL, 0);
 
 		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
+		// Blend state for particles and proper topology for geometry shader
 		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
 
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -431,7 +433,7 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
-	void pipeline::UpdateParticles(std::vector<ParticleVertex>& particles) {
+	void pipeline::UpdateParticles(std::vector<Particle>& const particles) {
 		// first we need to load particle data into our srv
 		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, particles.data(), 0, 0);
 
@@ -464,8 +466,8 @@ namespace dxe {
 		HRESULT hr = context->Map(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0, D3D11_MAP_READ, 0, &mappedResource);
 
 		if (SUCCEEDED(hr)) {
-			ParticleVertex* data = reinterpret_cast<ParticleVertex*>(mappedResource.pData);
-			memcpy(&particles[0], data, particles.size() * sizeof(ParticleVertex));
+			Particle* data = reinterpret_cast<Particle*>(mappedResource.pData);
+			memcpy(&particles[0], data, particles.size() * sizeof(Particle));
 
 			context->Unmap(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0);
 		}
@@ -768,7 +770,7 @@ namespace dxe {
 
 		// particles vertex buffer
 		CD3D11_BUFFER_DESC desc3 = CD3D11_BUFFER_DESC(
-			static_cast<UINT>(sizeof(ParticleVertex) * 10),
+			static_cast<UINT>(sizeof(Particle) * 10),
 			D3D11_BIND_VERTEX_BUFFER);
 
 		pvBuffer.reserve(10);
@@ -974,15 +976,15 @@ namespace dxe {
 	}
 
 	void pipeline::createParticleBuffers() {
-		const uint32_t MAX_PARTICLES = 10; // TEMPORARY
+		const uint32_t MAX_PARTICLES = 1000; // TEMPORARY
 
 		// CREATING THE BUFFER THAT WILL BE USED IN THE SRV
 		D3D11_BUFFER_DESC desc1{ 0 };
 		desc1.Usage = D3D11_USAGE_DEFAULT; // DYNAMIC A resource that is accessible by both the GPU (read only) and the CPU (write only).
-		desc1.ByteWidth = sizeof(ParticleVertex) * MAX_PARTICLES; // TODO: SHOULD BE * AMOUNT OF MAX PARTICLES
+		desc1.ByteWidth = sizeof(Particle) * MAX_PARTICLES; // TODO: SHOULD BE * AMOUNT OF MAX PARTICLES
 		desc1.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc1.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc1.StructureByteStride = sizeof(ParticleVertex);
+		desc1.StructureByteStride = sizeof(Particle);
 		desc1.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 		HRESULT hr = device->CreateBuffer(&desc1, 0, &resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN]);
 		if (FAILED(hr)) {
@@ -1005,10 +1007,10 @@ namespace dxe {
 		// gpu read/write buffer for UAV
 		D3D11_BUFFER_DESC desc2{ 0 };
 		desc2.Usage = D3D11_USAGE_DEFAULT; // A resource that requires read and write access by the GPU.
-		desc2.ByteWidth = sizeof(ParticleVertex) * MAX_PARTICLES;
+		desc2.ByteWidth = sizeof(Particle) * MAX_PARTICLES;
 		desc2.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
 		desc2.CPUAccessFlags = 0;
-		desc2.StructureByteStride = sizeof(ParticleVertex);
+		desc2.StructureByteStride = sizeof(Particle);
 		desc2.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 		hr = device->CreateBuffer(&desc2, 0, &resourceBuffer[RESOURCE_BUFFER::PARTICLE_OUT]);
 		if (FAILED(hr)) {
