@@ -24,8 +24,7 @@ struct GS_OUT
     float2 uv : TEXTCOORD;
 };
 
-struct empty
-{};
+struct empty{}; // this structs purpose is to allow this shader to compile as I need to provide
 
 [maxvertexcount(4)]
 void main(
@@ -35,28 +34,32 @@ inout TriangleStream<GS_OUT> output)
 {
     GS_OUT quad[4];
     const float4 position = mul(float4(inputParticle[index].pos, 1), view);
-    const float scale = 0.5f * inputParticle[index].scale;
+    const float4 screenPos = mul(position, projection);
     
-    // bottom left
-    quad[0].pos = float4(position.x - scale, position.y - scale, position.zw);
-    quad[0].uv = float2(0.f, 1.f);
-    
-    // top left
-    quad[1].pos = float4(position.x - scale, position.y + scale, position.zw);
-    quad[1].uv = float2(0.f, 0.f);
-    
-    // bottom right
-    quad[2].pos = float4(position.x + scale, position.y - scale, position.zw);
-    quad[2].uv = float2(1.f, 1.f);
-    
-    // top right
-    quad[3].pos = float4(position.x + scale, position.y + scale, position.zw);
-    quad[3].uv = float2(1.f, 0.f);
-    
-    for (int i = 0; i < 4; ++i)
+    if (abs(screenPos.x) <= screenPos.w && abs(screenPos.y) <= screenPos.w) // clipping particles: we may only want to do this occasionally, we should add some sort of check to turn this behavior on or off
     {
-        quad[i].pos = mul(quad[i].pos, projection);
-        output.Append(quad[i]);
+        const float scale = 0.5f * inputParticle[index].scale;
+        
+        // bottom left
+        quad[0].pos = float4(position.x - scale, position.y - scale, position.zw);
+        quad[0].uv = float2(0.f, 1.f);
+    
+        // top left
+        quad[1].pos = float4(position.x - scale, position.y + scale, position.zw);
+        quad[1].uv = float2(0.f, 0.f);
+    
+        // bottom right
+        quad[2].pos = float4(position.x + scale, position.y - scale, position.zw);
+        quad[2].uv = float2(1.f, 1.f);
+    
+        // top right
+        quad[3].pos = float4(position.x + scale, position.y + scale, position.zw);
+        quad[3].uv = float2(1.f, 0.f);
+    
+        for (int i = 0; i < 4; ++i)
+        {
+            quad[i].pos = mul(quad[i].pos, projection);
+            output.Append(quad[i]);
+        }
     }
-
 }

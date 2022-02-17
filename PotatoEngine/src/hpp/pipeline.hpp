@@ -54,6 +54,8 @@ namespace dxe {
 
 		void drawCsParticles();
 
+		void UpdateParticles(std::vector<ParticleVertex> &particles);
+
 		void setRenderTargetView();
 
 	private:
