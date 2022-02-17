@@ -142,7 +142,22 @@ namespace dxe {
 		// + 4 padding TOTAL: 48
 	};
 
+	struct Emitter {
+		glm::vec3 pos{ 0.f };
+		ParticleFlyWeight flyweigth;
+		std::vector<Particle> particles;
+	};
 
-
+	// used to updated particles inside compute shader
+	struct alignas(16)Particle_cb {
+		glm::vec3 velMin{ 0.f };
+		float scaleStart{ 1.f };	// 16
+		glm::vec3 velMax{ 0.f };
+		float scaleRate{ 0.f };		// 16
+		glm::vec3 startPos{ 0.f };
+		float minTime{ 0.f };		// 16
+		float maxTime{ 0.f };
+		float deltaTime{ 0.f };		// 8
+	};
 
 } // namespace dxe

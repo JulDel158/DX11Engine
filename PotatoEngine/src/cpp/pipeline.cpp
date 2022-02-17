@@ -374,22 +374,23 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
-	void pipeline::drawCsParticles() {
-		static std::vector<Particle> myParticles{
-			{glm::vec3(0.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(1.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(2.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(3.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(4.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-														
-			{glm::vec3(-1.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(-2.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(-3.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(-4.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f},
-			{glm::vec3(-5.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 1.0f}
-		}; // 10 test particles
+	void pipeline::drawCsParticles(const float dt) {
+		static std::vector<Particle> myParticles(100);
+		//{
+		//	{glm::vec3(0.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(1.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(2.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(3.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(4.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//												
+		//	{glm::vec3(-1.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(-2.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(-3.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(-4.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
+		//	{glm::vec3(-5.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f}
+		//}; // 10 test particles
 		int size = myParticles.size();
-		UpdateParticles(myParticles); // should be moved out of here eventually
+		UpdateParticles(myParticles, dt); // should be moved out of here eventually
 
 		// now that the particle data has been updated we can prepare to draw
 		UINT stride = sizeof(Particle);
@@ -433,9 +434,24 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
-	void pipeline::UpdateParticles(std::vector<Particle>& const particles) {
+	void pipeline::UpdateParticles(std::vector<Particle>& const particles, const float dt) {
 		// first we need to load particle data into our srv
 		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, particles.data(), 0, 0);
+
+		// next we need to update the constant buffer used in the compute shader
+		Particle_cb pcb;
+		pcb.startPos = glm::vec3(0.f, 0.f, 0.f);
+		pcb.minTime = 1.f;
+		pcb.maxTime = 2.5f;
+		pcb.scaleStart = 1.f;
+		pcb.scaleRate = 5.f;
+		pcb.velMin = glm::vec3(-20.f, 1.f, -20.f);
+		pcb.velMax = glm::vec3(20.f, 10.f, 20.f);
+		pcb.deltaTime = dt;
+
+		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::PARTICLE_CB], 0, NULL, &pcb, 0, 0);
+
+		context->CSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::PARTICLE_CB]);
 
 		// set the compute shader
 		context->CSSetShader(computeShader[COMPUTE_SHADER::DEFAULT], NULL, 0);
@@ -443,6 +459,8 @@ namespace dxe {
 		// set SRV and UAV
 		context->CSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
 		context->CSSetUnorderedAccessViews(0, 1, &uAccessView[UACCESS_VIEW::PARTICLE_OUT], 0);
+
+		
 
 		// Update our particles
 		context->Dispatch(static_cast<UINT>(particles.size()), 1, 1);
@@ -839,6 +857,17 @@ namespace dxe {
 
 		hr = device->CreateBuffer(&snd_cb, NULL, &constantBuffer[CONSTANT_BUFFER::SCENE_CB]);
 		assert(!FAILED(hr) && "failed to create constant buffer: Scene_cb");
+
+		// Particle constant buffer
+		D3D11_BUFFER_DESC p_cb{ 0 };
+
+		p_cb.Usage = D3D11_USAGE_DEFAULT;
+		p_cb.ByteWidth = sizeof(Particle_cb);
+		p_cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		p_cb.CPUAccessFlags = 0;
+
+		hr = device->CreateBuffer(&p_cb, NULL, &constantBuffer[CONSTANT_BUFFER::PARTICLE_CB]);
+		assert(!FAILED(hr) && "failed to create constant buffer: Particle_cb");
 	}
 
 	void pipeline::setRenderTargetView() {

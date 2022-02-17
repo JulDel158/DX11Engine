@@ -43,7 +43,7 @@ namespace dxe {
 	};
 
 	struct CONSTANT_BUFFER {
-		enum { OBJECT_CB = 0, FRAME_CB, WINDOW_CB, SCENE_CB, COUNT };
+		enum { OBJECT_CB = 0, FRAME_CB, WINDOW_CB, SCENE_CB, PARTICLE_CB, COUNT };
 	};
 
 	struct RESOURCE_BUFFER {
