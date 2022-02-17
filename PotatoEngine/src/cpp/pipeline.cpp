@@ -49,6 +49,10 @@ namespace dxe {
 
 		createBlendStates();
 
+		createParticleBuffers();
+
+		createComputeShaders();
+
 		spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
 		spriteFont = std::make_unique<DirectX::SpriteFont>(device, L"assets\\fonts\\Comic_Sans_MS_16.spritefont");
 	}
@@ -99,6 +103,10 @@ namespace dxe {
 			safe_release(ptr);
 		}
 
+		for (auto& ptr : computeShader) {
+			safe_release(ptr);
+		}
+
 		for (auto& ptr : samplerState) {
 			safe_release(ptr);
 		}
@@ -137,6 +145,8 @@ namespace dxe {
 		}
 
 		context->VSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
+
+		context->GSSetConstantBuffers(1, 1, &constantBuffer[CONSTANT_BUFFER::FRAME_CB]);
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::FRAME_CB], 0, NULL, &cb, 0, 0);
 
@@ -364,6 +374,99 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
+	void pipeline::drawCsParticles() {
+		static std::vector<ParticleVertex> myParticles{
+			{glm::vec3(0.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(1.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(2.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(3.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(4.f, 0.f, 0.f), 0.5f},
+
+			{glm::vec3(-1.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(-2.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(-3.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(-4.f, 0.f, 0.f), 0.5f},
+			{glm::vec3(-5.f, 0.f, 0.f), 0.5f}
+		}; // 10 test particles
+
+		// first we need to load particle data into our srv
+		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, myParticles.data(), 0, 0);
+
+		// set the shader
+		context->CSSetShader(computeShader[COMPUTE_SHADER::DEFAULT], NULL, 0);
+
+		context->CSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
+		context->CSSetUnorderedAccessViews(0, 1, &uAccessView[UACCESS_VIEW::PARTICLE_OUT], 0);
+
+		// Dispatch
+		context->Dispatch(1, 1, 1);
+
+		// we will unbind the resources as we will be reading and changing some data
+		ID3D11ShaderResourceView* nullSRV[] = { NULL };
+		context->CSSetShaderResources(0, 1, nullSRV);
+
+		// Unbind output from compute shader
+		ID3D11UnorderedAccessView* nullUAV[] = { NULL };
+		context->CSSetUnorderedAccessViews(0, 1, nullUAV, 0);
+
+		// Disable Compute Shader
+		context->CSSetShader(nullptr, nullptr, 0);
+
+		// Copy result
+		context->CopyResource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], resourceBuffer[RESOURCE_BUFFER::PARTICLE_OUT]);
+
+		// Update particle system data with output from Compute Shader
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = context->Map(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0, D3D11_MAP_READ, 0, &mappedResource);
+
+		if (SUCCEEDED(hr)) {
+			ParticleVertex* data = reinterpret_cast<ParticleVertex*>(mappedResource.pData);
+			// risky but we know how many particles we dealing with
+			for (std::size_t i = 0; i < 10; ++i) {
+				myParticles[i] = data[i];
+			}
+
+			context->Unmap(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0);
+		}
+
+		// now that the particle data has been updated we can prepare to draw
+		UINT stride = sizeof(ParticleVertex);
+		UINT offset = 0;
+
+		ID3D11Buffer* nullBuff[] = { NULL };
+		context->IASetVertexBuffers(0, 1, nullBuff, &stride, &offset);
+
+		context->IASetIndexBuffer(nullBuff[0], DXGI_FORMAT_R32_UINT, 0);
+
+		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
+
+		context->VSSetShader(vertexShader[VERTEX_SHADER::DEFAULT], NULL, 0); // PROVIDING A RANDOM SHADER FOR NOW NOT SURE WHAT WILL HAPPEN
+
+		// we will need a new geometry shader ;-;
+		context->GSSetShader(geometryShader[GEOMETRY_SHADER::PARTICLES2], NULL, 0);
+
+		// updating SRV
+		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, myParticles.data(), 0, 0);
+
+		context->GSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
+
+		context->PSSetShader(pixelShader[PIXEL_SHADER::PARTICLES], NULL, 0);
+
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
+
+		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+		context->Draw(myParticles.size(), 0);
+
+		// we must unbind the geometry shader as to dissable this stage in other draw calls
+		context->GSSetShader(NULL, NULL, 0);
+
+		// we must unbind the blend state to not cause any unwated blending with other draw calls
+		context->OMSetBlendState(NULL, NULL, 0);
+	}
+
 	void pipeline::createDeviceAndSwapChain() {
 		RECT crect;
 		GetClientRect(hwnd, &crect); // Retrieves the coordinates of a window's client area. The client coordinates specify the upper-left and lower-right corners
@@ -564,6 +667,7 @@ namespace dxe {
 
 		// geometry shader loading
 		std::vector<uint8_t> pgs_blob = tools::file_reader::load_binary_blob("shaders\\gs_particles.cso");
+		std::vector<uint8_t> p2gs_blob = tools::file_reader::load_binary_blob("shaders\\gs_particles2.cso");
 
 		// vertex shaders creation
 		HRESULT hr = device->CreateVertexShader(svs_blob.data(), svs_blob.size(), NULL, &vertexShader[VERTEX_SHADER::DEFAULT]);
@@ -596,7 +700,10 @@ namespace dxe {
 
 		// geometry shader creation
 		hr = device->CreateGeometryShader(pgs_blob.data(), pgs_blob.size(), NULL, &geometryShader[GEOMETRY_SHADER::DEFAULT]);
-		assert(!FAILED(hr) && "failed to create geometry pixel shader");
+		assert(!FAILED(hr) && "failed to create geometry shader");
+
+		hr = device->CreateGeometryShader(p2gs_blob.data(), p2gs_blob.size(), NULL, &geometryShader[GEOMETRY_SHADER::PARTICLES2]);
+		assert(!FAILED(hr) && "failed to create geometry shader 2");
 
 		// input layouts
 
@@ -867,7 +974,7 @@ namespace dxe {
 
 		// CREATING THE BUFFER THAT WILL BE USED IN THE SRV
 		D3D11_BUFFER_DESC desc1{ 0 };
-		desc1.Usage = D3D11_USAGE_DYNAMIC; // A resource that is accessible by both the GPU (read only) and the CPU (write only).
+		desc1.Usage = D3D11_USAGE_DEFAULT; // DYNAMIC A resource that is accessible by both the GPU (read only) and the CPU (write only).
 		desc1.ByteWidth = sizeof(ParticleVertex) * MAX_PARTICLES; // TODO: SHOULD BE * AMOUNT OF MAX PARTICLES
 		desc1.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		desc1.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -924,6 +1031,15 @@ namespace dxe {
 		hr = device->CreateUnorderedAccessView(resourceBuffer[RESOURCE_BUFFER::PARTICLE_OUT], &uavDesc, &uAccessView[UACCESS_VIEW::PARTICLE_OUT]);
 		if (FAILED(hr)) {
 			throw std::runtime_error("failed to create particle_out UAV!");
+		}
+	}
+
+	void pipeline::createComputeShaders() {
+		std::vector<uint8_t> cs_blob = tools::file_reader::load_binary_blob("shaders\\cs_particles.cso");
+
+		HRESULT hr = device->CreateComputeShader(cs_blob.data(), cs_blob.size(), NULL, &computeShader[COMPUTE_SHADER::DEFAULT]);
+		if (FAILED(hr)) {
+			throw std::runtime_error("failed to create particle compute shader!");
 		}
 	}
 

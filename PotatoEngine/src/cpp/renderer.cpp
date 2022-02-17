@@ -54,7 +54,9 @@ namespace dxe {
 		implementation.drawDebugLines();
 #endif
 		// particles should be drawn last, but before the UI
-		implementation.drawParticle();
+		// implementation.drawParticle();
+
+		implementation.drawCsParticles();
 
 		if (scene.GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());

@@ -39,7 +39,7 @@ namespace dxe {
 	};
 
 	struct GEOMETRY_SHADER {
-		enum { DEFAULT = 0, COUNT };
+		enum { DEFAULT = 0, PARTICLES2, COUNT };
 	};
 
 	struct CONSTANT_BUFFER {
@@ -68,6 +68,10 @@ namespace dxe {
 
 	struct BLEND_STATE {
 		enum {OBJ_ALPHA = 0, PIXEL_ALPHA, ADDITIVE, COUNT };
+	};
+
+	struct COMPUTE_SHADER {
+		enum {DEFAULT = 0, COUNT };
 	};
 
 	struct PIPELINE_PROPERTY_DESC {

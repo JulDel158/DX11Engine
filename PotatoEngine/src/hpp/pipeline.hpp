@@ -52,6 +52,8 @@ namespace dxe {
 
 		void drawParticle();
 
+		void drawCsParticles();
+
 		void setRenderTargetView();
 
 	private:
@@ -98,6 +100,8 @@ namespace dxe {
 
 		ID3D11UnorderedAccessView*  uAccessView[UACCESS_VIEW::COUNT]{};
 
+		ID3D11ComputeShader*		computeShader[COMPUTE_SHADER::COUNT]{};
+
 		// This classes are used to render fonts
 		std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 		std::unique_ptr<DirectX::SpriteFont> spriteFont;
@@ -127,6 +131,8 @@ namespace dxe {
 		void createBlendStates();
 
 		void createParticleBuffers();
+
+		void createComputeShaders();
 
 	};
 
