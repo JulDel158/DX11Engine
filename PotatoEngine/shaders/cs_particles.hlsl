@@ -55,9 +55,9 @@ void main(uint index : SV_DispatchThreadID)
         outputParticle[index].pos = startPos;
         outputParticle[index].scale = scaleStart;
         outputParticle[index].velocity = float3(
-        PsuedoRandF(velMin.x, velMax.x, index, deltaTime), 
-        PsuedoRandF(velMin.y, velMax.y, index, deltaTime), 
-        PsuedoRandF(velMin.z, velMax.z, index, deltaTime));
+        cos(PsuedoRandF(velMin.x, velMax.x, index, deltaTime)),
+        PsuedoRandF(velMin.y, velMax.y, index, deltaTime),
+        sin(PsuedoRandF(velMin.z, velMax.z, index, deltaTime)));
         
     } else { // Update this particle
         outputParticle[index].pos = inputParticle[index].pos + inputParticle[index].velocity * deltaTime;

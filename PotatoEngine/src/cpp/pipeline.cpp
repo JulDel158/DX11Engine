@@ -442,9 +442,9 @@ namespace dxe {
 		Particle_cb pcb;
 		pcb.startPos = glm::vec3(0.f, 0.f, 0.f);
 		pcb.minTime = 1.f;
-		pcb.maxTime = 2.5f;
-		pcb.scaleStart = 1.f;
-		pcb.scaleRate = 5.f;
+		pcb.maxTime = 1.5f;
+		pcb.scaleStart = 0.5f;
+		pcb.scaleRate = 1.5f;
 		pcb.velMin = glm::vec3(-20.f, 1.f, -20.f);
 		pcb.velMax = glm::vec3(20.f, 10.f, 20.f);
 		pcb.deltaTime = dt;
