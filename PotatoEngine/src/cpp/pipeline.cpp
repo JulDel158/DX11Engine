@@ -440,9 +440,9 @@ namespace dxe {
 
 		// next we need to update the constant buffer used in the compute shader
 		Particle_cb pcb;
-		pcb.startPos = glm::vec3(0.f, 0.f, 0.f);
-		pcb.minTime = 1.f;
-		pcb.maxTime = 1.5f;
+		pcb.startPos = glm::vec3(0.f, 0.f, 10.f);
+		pcb.minTime = 2.f;
+		pcb.maxTime = 5.5f;
 		pcb.scaleStart = 0.5f;
 		pcb.scaleRate = 1.5f;
 		pcb.velMin = glm::vec3(-20.f, 1.f, -20.f);
@@ -459,8 +459,6 @@ namespace dxe {
 		// set SRV and UAV
 		context->CSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
 		context->CSSetUnorderedAccessViews(0, 1, &uAccessView[UACCESS_VIEW::PARTICLE_OUT], 0);
-
-		
 
 		// Update our particles
 		context->Dispatch(static_cast<UINT>(particles.size()), 1, 1);
