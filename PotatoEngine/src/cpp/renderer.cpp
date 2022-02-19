@@ -35,7 +35,7 @@ namespace dxe {
 		frameCbuffer.view = camera.view;
 	}
 
-	void renderer::draw(GameScene const& scene, const float dt) {
+	void renderer::draw(GameScene& scene, const float dt) {
 		update(scene.GetView());
 
 		implementation.setRenderTargetView();
@@ -54,9 +54,15 @@ namespace dxe {
 		implementation.drawDebugLines();
 #endif
 		// particles should be drawn last, but before the UI
-		// implementation.drawParticle();
+		if (scene.GetParticles()) {
+			if (scene.GetParticles()->updated) {
+				implementation.drawParticle(scene.GetParticles()); // will not update particles
+			} else {
+				implementation.updateAndDrawParticles(*scene.GetParticles(), dt); // will update particles in the gpu
+			}
+		}
 
-		implementation.drawCsParticles(dt);
+		//implementation.drawCsParticles(dt);
 
 		if (scene.GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());

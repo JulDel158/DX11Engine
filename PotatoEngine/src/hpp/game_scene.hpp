@@ -46,6 +46,7 @@ namespace dxe {
 		const Scene_cb& GetSceneBuffer() const;
 		const Textwrap* GetTextUI() const;
 		const uint32_t GetTextUITotal() const;
+		Emitter* GetParticles();
 
 	private:
 
@@ -74,7 +75,13 @@ namespace dxe {
 		// we will put the sound engine here for now
 		std::unique_ptr<DirectX::AudioEngine> audioEngine;
 		std::unique_ptr<DirectX::SoundEffect> soundData;
+		std::unique_ptr<DirectX::SoundEffect> songData;
+		std::unique_ptr<DirectX::SoundEffect> songData2;
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance;
+		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance2;
+
+		// particle stuff
+		Emitter pEmitter;
 	};
 
 

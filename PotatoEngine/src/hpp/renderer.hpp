@@ -12,7 +12,7 @@ namespace dxe {
 		renderer(HWND windowHandle, Window_cb &window_cbuffer);
 		~renderer();
 
-		void draw(GameScene const& scene, const float dt);
+		void draw(GameScene& scene, const float dt);
 
 		void bindWindowBuffer();
 	

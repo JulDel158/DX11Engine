@@ -144,6 +144,7 @@ namespace dxe {
 
 	struct Emitter {
 		glm::vec3 pos{ 0.f };
+		bool updated{ false };
 		ParticleFlyWeight flyweigth;
 		std::vector<Particle> particles;
 	};

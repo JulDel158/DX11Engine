@@ -50,11 +50,11 @@ namespace dxe {
 
 		void drawText(const Textwrap* set, const uint32_t size);
 
-		void drawParticle();
+		void drawParticle(const Emitter* particleEmitter);
 
-		void drawCsParticles(const float dt);
+		void updateAndDrawParticles(Emitter& emitter, const float dt);
 
-		void UpdateParticles(std::vector<Particle>&const particles, const float dt);
+		void UpdateParticles(Emitter& emitter, const float dt);
 
 		void setRenderTargetView();
 

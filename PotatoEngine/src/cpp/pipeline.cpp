@@ -335,97 +335,38 @@ namespace dxe {
 		spriteBatch->End();
 	}
 
-	void pipeline::drawParticle() {
+	void pipeline::drawParticle(const Emitter* particleEmitter) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
-		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::PARTICLES]);
+		context->IASetInputLayout(inputLayout[INPUT_LAYOUT::PARTICLES]); // won't matter as data is being passed from SRV directly to geometry shader
 
-		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::PARTICLES], &stride, &offset);
-
-		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
-
-		// SETTING SHADERS 
-		context->VSSetShader(vertexShader[VERTEX_SHADER::PARTICLES], NULL, 0);
-
-		context->GSSetShader(geometryShader[GEOMETRY_SHADER::DEFAULT], NULL, 0);
-
-		context->PSSetShader(pixelShader[PIXEL_SHADER::PARTICLES], NULL, 0);
-
-		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
-
-		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-
-		Particle particle;
-		particle.pos = glm::vec3(0.f, 0.f, 0.f);
-		particle.scale = 10.f;
-
-		pvBuffer.push_back(particle);
-		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::PARTICLES], 0, NULL, pvBuffer.data(), 0, 0);
-
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
-
-		context->Draw(pvBuffer.size(), 0);
-
-		// we must unbind the geometry shader as to dissable this stage in other draw calls
-		context->GSSetShader(NULL, NULL, 0);
-
-		// we must unbind the blend state to not cause any unwated blending with other draw calls
-		context->OMSetBlendState(NULL, NULL, 0);
-	}
-
-	void pipeline::drawCsParticles(const float dt) {
-		static std::vector<Particle> myParticles(100);
-		//{
-		//	{glm::vec3(0.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(1.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(2.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(3.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(4.f, 0.f, 10.f),  0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//												
-		//	{glm::vec3(-1.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(-2.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(-3.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(-4.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f},
-		//	{glm::vec3(-5.f, 0.f, 10.f), 0.5f, glm::vec3(0.f, 0.f, 0.f), 0.0f}
-		//}; // 10 test particles
-		int size = myParticles.size();
-		UpdateParticles(myParticles, dt); // should be moved out of here eventually
-
-		// now that the particle data has been updated we can prepare to draw
-		UINT stride = sizeof(Particle);
-		UINT offset = 0;
-
-		// dissabling vertex and index buffers
 		ID3D11Buffer* nullBuff[] = { NULL };
 		context->IASetVertexBuffers(0, 1, nullBuff, &stride, &offset);
 
 		context->IASetIndexBuffer(nullBuff[0], DXGI_FORMAT_R32_UINT, 0);
 
-		// providing a default vertex shader for the pipeline so that we can run
-		context->VSSetShader(vertexShader[VERTEX_SHADER::DEFAULT], NULL, 0);
+		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
 
-		// This geometry shader will read vertex data directly from the SRV
-		context->GSSetShader(geometryShader[GEOMETRY_SHADER::PARTICLES2], NULL, 0);
+		// SETTING SHADERS 
+		context->VSSetShader(vertexShader[VERTEX_SHADER::PARTICLES], NULL, 0);  // we will ignore this stage so this won't matter
+
+		context->GSSetShader(geometryShader[GEOMETRY_SHADER::PARTICLES2], NULL, 0); // updated geometry shader, will require particle data as SRV
 
 		// updating the SRV used in the geometry shader and binding it
-		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, myParticles.data(), 0, 0);
+		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, particleEmitter->particles.data(), 0, 0);
 
 		context->GSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::PARTICLE_IN]);
 
-		// setting up pixel shader and required data for the stage
 		context->PSSetShader(pixelShader[PIXEL_SHADER::PARTICLES], NULL, 0);
-
-		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
 
 		context->PSSetSamplers(0, 1, &samplerState[SAMPLER_STATE::DEFAULT]);
 
-		// Blend state for particles and proper topology for geometry shader
-		context->OMSetBlendState(blendState[BLEND_STATE::PIXEL_ALPHA], 0, 0xffffffff);
-
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-		context->Draw(static_cast<UINT>(myParticles.size()), 0);
+		context->PSSetShaderResources(0, 1, &sResourceView[SUBRESOURCE_VIEW::SMOKE]);
+
+		context->Draw(static_cast<UINT>(particleEmitter->particles.size()), 0);
 
 		// we must unbind the geometry shader as to dissable this stage in other draw calls
 		context->GSSetShader(NULL, NULL, 0);
@@ -434,19 +375,25 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
-	void pipeline::UpdateParticles(std::vector<Particle>& const particles, const float dt) {
+	void pipeline::updateAndDrawParticles(Emitter& emitter, const float dt) {
+		
+		UpdateParticles(emitter, dt); // should be moved out of here probably
+		drawParticle(&emitter);
+	}
+
+	void pipeline::UpdateParticles(Emitter& emitter, const float dt) {
 		// first we need to load particle data into our srv
-		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, particles.data(), 0, 0);
+		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, emitter.particles.data(), 0, 0);
 
 		// next we need to update the constant buffer used in the compute shader
 		Particle_cb pcb;
-		pcb.startPos = glm::vec3(0.f, 0.f, 10.f);
-		pcb.minTime = 2.f;
-		pcb.maxTime = 5.5f;
-		pcb.scaleStart = 0.5f;
-		pcb.scaleRate = 1.5f;
-		pcb.velMin = glm::vec3(-20.f, 1.f, -20.f);
-		pcb.velMax = glm::vec3(20.f, 10.f, 20.f);
+		pcb.startPos = emitter.pos;
+		pcb.minTime = emitter.flyweigth.minTime;
+		pcb.maxTime = emitter.flyweigth.maxTime;
+		pcb.scaleStart = emitter.flyweigth.scaleStart;
+		pcb.scaleRate = emitter.flyweigth.scaleRate;
+		pcb.velMin = emitter.flyweigth.velMinVals;
+		pcb.velMax = emitter.flyweigth.velMaxVals;
 		pcb.deltaTime = dt;
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::PARTICLE_CB], 0, NULL, &pcb, 0, 0);
@@ -461,7 +408,7 @@ namespace dxe {
 		context->CSSetUnorderedAccessViews(0, 1, &uAccessView[UACCESS_VIEW::PARTICLE_OUT], 0);
 
 		// Update our particles
-		context->Dispatch(static_cast<UINT>(particles.size()), 1, 1);
+		context->Dispatch(static_cast<UINT>(emitter.particles.size()), 1, 1);
 
 		// we will unbind the resources as we will be reading and changing some data
 		ID3D11ShaderResourceView* nullSRV[] = { NULL };
@@ -483,7 +430,7 @@ namespace dxe {
 
 		if (SUCCEEDED(hr)) {
 			Particle* data = reinterpret_cast<Particle*>(mappedResource.pData);
-			memcpy(&particles[0], data, particles.size() * sizeof(Particle));
+			memcpy(&emitter.particles[0], data, emitter.particles.size() * sizeof(Particle));
 
 			context->Unmap(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0);
 		}
@@ -789,7 +736,7 @@ namespace dxe {
 			static_cast<UINT>(sizeof(Particle) * 10),
 			D3D11_BIND_VERTEX_BUFFER);
 
-		pvBuffer.reserve(10);
+		pvBuffer.reserve(1000);
 		D3D11_SUBRESOURCE_DATA srd3 = { 0 };
 		srd3.pSysMem = pvBuffer.data();
 

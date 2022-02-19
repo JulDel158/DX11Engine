@@ -102,8 +102,21 @@ namespace dxe {
 		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
 
 		soundData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\8bit_gunloop_explosion.wav");
+		songData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\mc_theme.wav");
+		songData2 = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\sd_theme_v1.wav");
 
-		soundInstance = soundData->CreateInstance();
+		soundInstance = songData->CreateInstance();
+		soundInstance2 = songData2->CreateInstance();
+
+		// particle emitter
+		pEmitter.pos = glm::vec3(0.f, 0.f, 10.f);
+		pEmitter.flyweigth.minTime = 2.f;
+		pEmitter.flyweigth.maxTime = 5.5f;
+		pEmitter.flyweigth.scaleStart = 0.5f;
+		pEmitter.flyweigth.scaleRate = 1.5f;
+		pEmitter.flyweigth.velMinVals = glm::vec3(-20.f, 1.f, -20.f);
+		pEmitter.flyweigth.velMaxVals = glm::vec3(20.f, 10.f, 20.f);
+		pEmitter.particles.resize(50);
 	}
 
 	GameScene::~GameScene() {}
@@ -172,6 +185,26 @@ namespace dxe {
 			scb.spotLight.direction = camforw;
 			scb.spotLight.pos = campos;
 		}
+
+		// small particle update for debug purposes
+		if (pEmitter.updated) {
+			pEmitter.pos.z = -10.f;
+			for (auto& p : pEmitter.particles) {
+				if (p.lifeSpan <= 0.0f) {
+					p.lifeSpan = glm::linearRand(pEmitter.flyweigth.minTime, pEmitter.flyweigth.maxTime);
+					p.pos = pEmitter.pos;
+					p.scale = pEmitter.flyweigth.scaleStart;
+					p.velocity = glm::linearRand(pEmitter.flyweigth.velMinVals, pEmitter.flyweigth.velMaxVals);
+				} else {
+					p.pos += p.velocity * dt;
+					p.scale += pEmitter.flyweigth.scaleRate * dt;
+					p.lifeSpan -= dt;
+				}
+			}
+		}
+		else { // gonna update in the gpu, switching positions to differentiate update functions
+			pEmitter.pos.z = 10.f;
+		}
 	}
 
 	void GameScene::inputUpdate(const float dt) {
@@ -188,7 +221,16 @@ namespace dxe {
 		if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
 		if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
 #endif // _DEBUG
-
+		static bool released0 = true;
+		if (input.KeyPressed('0') && released0) { 
+			pEmitter.updated = !pEmitter.updated; 
+			released0 = false; 
+		} else {
+			released0 = true;
+		}
+		if (input.KeyPressed('8')) { soundInstance2->Stop(); }
+		if (input.KeyPressed('7')) { soundInstance2->Play(true); }
+		if (input.KeyPressed('5')) { soundInstance->Play(false); }
 		if (input.KeyPressed('1')) { skyBox.resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
 		if (input.KeyPressed('2')) { skyBox.resourceId = 2; }
 		if (input.KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
@@ -245,5 +287,7 @@ namespace dxe {
 	const Textwrap* GameScene::GetTextUI() const { return textui.data(); }
 
 	const uint32_t GameScene::GetTextUITotal() const { return static_cast<uint32_t>(textui.size()); }
+
+	Emitter* GameScene::GetParticles() { return &pEmitter; }
 
 } // namespace dxe
