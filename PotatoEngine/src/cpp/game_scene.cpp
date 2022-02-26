@@ -212,14 +212,14 @@ namespace dxe {
 		// he will however be able to rotate the camera
 		
 		glm::vec4 translate{ 0.f };
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		if (input::KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
 		if (input::KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
 		if (input::KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
 		if (input::KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
 		if (input::KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
 		if (input::KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
-#endif // _DEBUG
+//#endif // _DEBUG
 		static bool released0 = true;
 		if (input::KeyPressed('0') && released0) { 
 			pEmitter.updated = !pEmitter.updated; 
@@ -237,9 +237,9 @@ namespace dxe {
 		if (input::KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
 		if (input::KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
 
-#ifndef _DEBUG
-		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
-#endif // !_DEBUG
+//#ifndef _DEBUG
+//		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+//#endif // !_DEBUG
 
 
 		camera.updateView(translate);

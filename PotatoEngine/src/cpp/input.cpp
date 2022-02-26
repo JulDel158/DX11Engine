@@ -20,7 +20,7 @@ namespace dxe {
 	}
 
 	bool input::KeyDown(int i) {
-		return (bool)(keyboardState[i] & 0x80);
+		return static_cast<bool>(keyboardState[i] & 0x80);
 	}
 
 	bool input::KeyUp(int i) {
