@@ -43,6 +43,7 @@ namespace dxe {
 			}
 			else { // do updates and render down here
 				timer.Signal();
+				input::Update(); // updating global input
 				const float dt = static_cast<float>(timer.Delta());
 				scene1.update(dt);
 

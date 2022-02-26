@@ -7,25 +7,26 @@ namespace dxe {
 	class input {
 	public:
 
-		input();
-		~input();
+		input() = delete;
+		~input() = delete;
+		input(const input&) = delete;
+		input& operator=(const input&) = delete;
 
 		// updates the key map
-		void Update();
+		static void Update();
 
 		// returns true when a key is pressed once
-		bool KeyPressed(int i);
+		static bool KeyPressed(int i);
 
 		// returns true while a key is being held down
-		bool KeyDown(int i);
+		static bool KeyDown(int i);
 
 		// returns true once a pressed key is released
-		bool KeyUp(int i);
+		static bool KeyUp(int i);
 
 	private:
 
-		unsigned char keyboardState[256];
-		unsigned char prevKeyboardState[256];
+		
 	};
 
 	//if (GetKeyState('A') & 0x8000) {} // key is held

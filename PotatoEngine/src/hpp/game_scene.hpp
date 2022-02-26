@@ -60,8 +60,6 @@ namespace dxe {
 
 		GameObject skyBox;
 
-		input input;
-
 		Scene_cb scb;
 
 		static constexpr uint8_t MAX_ENEMIES = 10;

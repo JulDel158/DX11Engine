@@ -89,6 +89,9 @@
     <ClInclude Include="src\hpp\collision.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\hpp\scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\simple_vertex_shader.hlsl">

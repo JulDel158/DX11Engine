@@ -2,9 +2,12 @@
 #define NOMINMAX
 #include <Windows.h>
 
+namespace {
+	unsigned char keyboardState[256];
+	unsigned char prevKeyboardState[256];
+}
+
 namespace dxe {
-	input::input() : keyboardState{ 0 }, prevKeyboardState{ 0 } {}
-	input::~input() {}
 
 	void input::Update() {
 		GetKeyboardState(keyboardState);

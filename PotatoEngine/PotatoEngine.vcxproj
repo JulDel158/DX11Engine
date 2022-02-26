@@ -192,6 +192,7 @@
     <ClInclude Include="src\hpp\pipeline.hpp" />
     <ClInclude Include="src\hpp\pipeline_properties.hpp" />
     <ClInclude Include="src\hpp\renderer.hpp" />
+    <ClInclude Include="src\hpp\scene.hpp" />
     <ClInclude Include="src\hpp\XTime.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -208,35 +208,34 @@ namespace dxe {
 	}
 
 	void GameScene::inputUpdate(const float dt) {
-		input.Update();
 		// in our demo the player will be unable to move and will be fixated at one point on the screen
 		// he will however be able to rotate the camera
 		
 		glm::vec4 translate{ 0.f };
 #ifdef _DEBUG
-		if (input.KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
-		if (input.KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
-		if (input.KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
-		if (input.KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
-		if (input.KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
-		if (input.KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
+		if (input::KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
+		if (input::KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
+		if (input::KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
+		if (input::KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
+		if (input::KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
+		if (input::KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
 #endif // _DEBUG
 		static bool released0 = true;
-		if (input.KeyPressed('0') && released0) { 
+		if (input::KeyPressed('0') && released0) { 
 			pEmitter.updated = !pEmitter.updated; 
 			released0 = false; 
 		} else {
 			released0 = true;
 		}
-		if (input.KeyPressed('8')) { soundInstance2->Stop(); }
-		if (input.KeyPressed('7')) { soundInstance2->Play(true); }
-		if (input.KeyPressed('5')) { soundInstance->Play(false); }
-		if (input.KeyPressed('1')) { skyBox.resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
-		if (input.KeyPressed('2')) { skyBox.resourceId = 2; }
-		if (input.KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
-		if (input.KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
-		if (input.KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
-		if (input.KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
+		if (input::KeyPressed('8')) { soundInstance2->Stop(); }
+		if (input::KeyPressed('7')) { soundInstance2->Play(true); }
+		if (input::KeyPressed('5')) { soundInstance->Play(false); }
+		if (input::KeyPressed('1')) { skyBox.resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
+		if (input::KeyPressed('2')) { skyBox.resourceId = 2; }
+		if (input::KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
+		if (input::KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
+		if (input::KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
+		if (input::KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
 
 #ifndef _DEBUG
 		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
@@ -245,7 +244,7 @@ namespace dxe {
 
 		camera.updateView(translate);
 
-		if (input.KeyPressed(VK_SPACE)) { // here we check collision with active objects
+		if (input::KeyPressed(VK_SPACE)) { // here we check collision with active objects
 			enemy* finalTarget = nullptr;
 			float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
 			float castTime{ 0.f };
