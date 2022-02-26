@@ -42,6 +42,8 @@ namespace dxe {
 
 		XTime timer;
 
+		std::unique_ptr<DirectX::AudioEngine> audioEngine;
+
 		// std::vector<GameObject> gameObjects;
 
 		// std::vector<GameObject> skyBoxes;
