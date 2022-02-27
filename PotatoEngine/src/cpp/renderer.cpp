@@ -71,6 +71,33 @@ namespace dxe {
 		implementation.present(0);
 	}
 
+	void renderer::draw(scene& scene, const float dt) {
+		update(*scene.getView());
+
+		implementation.setRenderTargetView();
+
+		implementation.bindFrameBuffer(frameCbuffer, *scene.getSceneBuffer(), scene.getView()->invertView);
+
+		if (scene.getSkyBox()) {
+			implementation.drawSkybox(scene.getSkyBox());
+		}
+
+	#ifdef _DEBUG
+		implementation.drawDebugLines();
+	#endif
+
+		if (scene.getTerrain()) {
+			implementation.drawGameObjects(scene.getTerrain(), 1);
+		}
+
+		if (scene.getObjCount() > 0) {
+			implementation.drawGameObjects(scene.getSceneObjects(), scene.getObjCount());
+		}
+
+
+
+	}
+
 	void renderer::bindWindowBuffer() {
 		implementation.bindWindowBuffer(windowCbuffer);
 	}

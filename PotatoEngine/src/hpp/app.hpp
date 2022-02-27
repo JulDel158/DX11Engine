@@ -7,6 +7,10 @@
 #include "renderer.hpp"
 #include "XTime.hpp"
 
+// should probably be done in another place
+//#pragma comment(lib,"dsound.lib")
+//#pragma comment(lib,"dxguid.lib")
+
 // std
 #include <vector>
 
@@ -28,25 +32,13 @@ namespace dxe {
 	private:
 		dx_window dxWindow;
 
-		// input input;
-
 		renderer dxRenderer;
 
-		// View_t camera;
-
-		// Frame_cb frameBuffer;
-
 		Window_cb windowBuffer;
-
-		// Scene_cb scb;
 
 		XTime timer;
 
 		std::unique_ptr<DirectX::AudioEngine> audioEngine;
-
-		// std::vector<GameObject> gameObjects;
-
-		// std::vector<GameObject> skyBoxes;
 
 		GameScene scene1;
 	};

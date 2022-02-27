@@ -4,9 +4,6 @@
 #include "input.hpp"
 #include "collision.hpp"
 
-#pragma comment(lib,"dsound.lib")
-#pragma comment(lib,"dxguid.lib")
-
 // lib
 #include <glm/glm.hpp>
 #define NOMINMAX

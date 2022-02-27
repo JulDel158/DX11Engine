@@ -2,6 +2,7 @@
 #include "pipeline.hpp"
 #include "object_data.hpp"
 #include "game_scene.hpp"
+#include "scene.hpp"
 
 // Object information should be passed into the renderer which we will then pass into our pipeline to draw
 // this class is also intended to handle pipeline settings and determine which data to send in which order (transparent objects get drawn last for example)
@@ -13,6 +14,8 @@ namespace dxe {
 		~renderer();
 
 		void draw(GameScene& scene, const float dt);
+
+		void draw(scene& scene, const float dt);
 
 		void bindWindowBuffer();
 	

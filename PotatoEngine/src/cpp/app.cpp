@@ -21,6 +21,15 @@ namespace dxe {
 		// creating camera
 		windowBuffer.setPerspectiveProjection(glm::pi<float>() / 4.f, aspect, 0.01f, 1000.f);
 		dxRenderer.bindWindowBuffer();
+
+		// audio engine
+		DirectX::AUDIO_ENGINE_FLAGS eflags = DirectX::AudioEngine_Default;
+
+#ifdef _DEBUG
+		eflags = eflags | DirectX::AudioEngine_Debug;
+#endif // _DEBUG
+
+		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
 	}
 
 	app::~app() {}

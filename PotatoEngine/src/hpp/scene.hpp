@@ -2,10 +2,6 @@
 
 #include "object_data.hpp"
 
-// should probably be done in another place
-#pragma comment(lib,"dsound.lib")
-#pragma comment(lib,"dxguid.lib")
-
 // lib
 #define NOMINMAX
 #include <dsound.h>
@@ -24,6 +20,8 @@ namespace dxe {
 		virtual void update(const float dt) = 0;
 
 		// getters
+		inline const View_t* getView() const { return camera.get(); }
+
 		inline const GameObject* getSceneObjects() const { return gameObjects; }
 
 		inline const GameObject* getSceneObjAt(uint32_t inx) { if (inx < gObjCount) { return &gameObjects[inx]; } return nullptr; }
@@ -44,7 +42,7 @@ namespace dxe {
 
 	private:
 
-		View_t camera;
+		std::unique_ptr<View_t> camera;
 
 		// all the game objects in this scene, to be dynamically allocated
 		GameObject* gameObjects{ nullptr };

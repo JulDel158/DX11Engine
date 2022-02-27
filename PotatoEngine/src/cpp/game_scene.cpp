@@ -7,7 +7,6 @@
 #include <limits>
 #include <string>
 
-
 // lib
 #include <glm/gtc/random.hpp>
 
