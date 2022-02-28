@@ -375,25 +375,25 @@ namespace dxe {
 		context->OMSetBlendState(NULL, NULL, 0);
 	}
 
-	void pipeline::updateAndDrawParticles(Emitter& emitter, const float dt) {
+	void pipeline::updateAndDrawParticles(Emitter* const emitter, const float dt) {
 		
 		UpdateParticles(emitter, dt); // should be moved out of here probably
-		drawParticle(&emitter);
+		drawParticle(emitter);
 	}
 
-	void pipeline::UpdateParticles(Emitter& emitter, const float dt) {
+	void pipeline::UpdateParticles(Emitter* const emitter, const float dt) {
 		// first we need to load particle data into our srv
-		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, emitter.particles.data(), 0, 0);
+		context->UpdateSubresource(resourceBuffer[RESOURCE_BUFFER::PARTICLE_IN], 0, NULL, emitter->particles.data(), 0, 0);
 
 		// next we need to update the constant buffer used in the compute shader
 		Particle_cb pcb;
-		pcb.startPos = emitter.pos;
-		pcb.minTime = emitter.flyweigth.minTime;
-		pcb.maxTime = emitter.flyweigth.maxTime;
-		pcb.scaleStart = emitter.flyweigth.scaleStart;
-		pcb.scaleRate = emitter.flyweigth.scaleRate;
-		pcb.velMin = emitter.flyweigth.velMinVals;
-		pcb.velMax = emitter.flyweigth.velMaxVals;
+		pcb.startPos = emitter->pos;
+		pcb.minTime = emitter->flyweigth.minTime;
+		pcb.maxTime = emitter->flyweigth.maxTime;
+		pcb.scaleStart = emitter->flyweigth.scaleStart;
+		pcb.scaleRate = emitter->flyweigth.scaleRate;
+		pcb.velMin = emitter->flyweigth.velMinVals;
+		pcb.velMax = emitter->flyweigth.velMaxVals;
 		pcb.deltaTime = dt;
 
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::PARTICLE_CB], 0, NULL, &pcb, 0, 0);
@@ -408,7 +408,7 @@ namespace dxe {
 		context->CSSetUnorderedAccessViews(0, 1, &uAccessView[UACCESS_VIEW::PARTICLE_OUT], 0);
 
 		// Update our particles
-		context->Dispatch(static_cast<UINT>(emitter.particles.size()), 1, 1);
+		context->Dispatch(static_cast<UINT>(emitter->particles.size()), 1, 1);
 
 		// we will unbind the resources as we will be reading and changing some data
 		ID3D11ShaderResourceView* nullSRV[] = { NULL };
@@ -430,8 +430,8 @@ namespace dxe {
 
 		if (SUCCEEDED(hr)) {
 			Particle* data = reinterpret_cast<Particle*>(mappedResource.pData);
-			memcpy(&emitter.particles[0], data, emitter.particles.size() * sizeof(Particle));
-
+			memcpy(&emitter->particles[0], data, emitter->particles.size() * sizeof(Particle));
+			
 			context->Unmap(resourceBuffer[RESOURCE_BUFFER::PARTICLE_RESULT], 0);
 		}
 	}

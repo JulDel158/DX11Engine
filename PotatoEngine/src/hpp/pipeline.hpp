@@ -52,9 +52,9 @@ namespace dxe {
 
 		void drawParticle(const Emitter* particleEmitter);
 
-		void updateAndDrawParticles(Emitter& emitter, const float dt);
+		void updateAndDrawParticles(Emitter* const emitter, const float dt);
 
-		void UpdateParticles(Emitter& emitter, const float dt);
+		void UpdateParticles(Emitter* const emitter, const float dt);
 
 		void setRenderTargetView();
 

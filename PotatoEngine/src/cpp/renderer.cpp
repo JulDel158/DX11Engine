@@ -58,7 +58,7 @@ namespace dxe {
 			if (scene.GetParticles()->updated) {
 				implementation.drawParticle(scene.GetParticles()); // will not update particles
 			} else {
-				implementation.updateAndDrawParticles(*scene.GetParticles(), dt); // will update particles in the gpu
+				implementation.updateAndDrawParticles(scene.GetParticles(), dt); // will update particles in the gpu
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace dxe {
 	}
 
 	void renderer::draw(scene& scene, const float dt) {
-		update(*scene.getView());
+		update(*scene.getView()); // updating view buffer
 
 		implementation.setRenderTargetView();
 
@@ -94,8 +94,19 @@ namespace dxe {
 			implementation.drawGameObjects(scene.getSceneObjects(), scene.getObjCount());
 		}
 
+		if (scene.getEmitters()) {
+			if (scene.getEmitters()->updated) {
+				implementation.drawParticle(scene.getEmitters());
+			} else {
+				implementation.updateAndDrawParticles(scene.getEmitters(), dt);
+			}
+		}
 
+		if (scene.GetTextUITotal() > 0) { // Must be drawn last
+			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
+		}
 
+		implementation.present(0);
 	}
 
 	void renderer::bindWindowBuffer() {

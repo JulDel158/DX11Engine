@@ -34,11 +34,17 @@ namespace dxe {
 
 		inline const Scene_cb* getSceneBuffer() const { return scb; }
 
-		inline const Emitter* getEmitters() const { return particleEmitters; }
+		inline Emitter* getEmitters() const { return particleEmitters; }
 
-		inline const Emitter* getEmitterAt(uint32_t inx) { if (inx < emitterCount) { return &particleEmitters[inx]; } return nullptr; }
+		inline Emitter* getEmitterAt(uint32_t inx) { if (inx < emitterCount) { return &particleEmitters[inx]; } return nullptr; }
 
 		inline const uint32_t getEmitterCount() const { return emitterCount; }
+
+		inline const Textwrap* GetTextUI() const { return textui; }
+
+		inline const Textwrap* GetTextUIAt(uint32_t inx) const { if (inx < textUiCount) { return &textui[inx]; } return nullptr; }
+
+		inline const uint32_t GetTextUITotal() const { return textUiCount; }
 
 	private:
 
@@ -63,6 +69,10 @@ namespace dxe {
 		std::unique_ptr<DirectX::SoundEffectInstance[]> soundInstances;
 
 		uint32_t sInstancesCount{ 0 };
+
+		Textwrap* textui{ nullptr };
+
+		uint32_t textUiCount{ 0 };
 
 	};
 
