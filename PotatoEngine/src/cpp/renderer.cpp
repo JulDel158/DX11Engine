@@ -35,75 +35,75 @@ namespace dxe {
 		frameCbuffer.view = camera.view;
 	}
 
-	void renderer::draw(GameScene& scene, const float dt) {
-		update(scene.GetView());
+	//void renderer::draw(GameScene& scene, const float dt) {
+//		update(scene.GetView());
+//
+//		implementation.setRenderTargetView();
+//
+//		implementation.bindFrameBuffer(frameCbuffer, scene.GetSceneBuffer(), scene.GetView().invertView);
+//
+//		if (scene.GetSkyBox()) { // Must be drawn first
+//			implementation.drawSkybox(scene.GetSkyBox());
+//		}
+//
+//		/*if (scene.GetObjectTotal() > 0) {
+//			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
+//		}*/
+//
+//#ifdef _DEBUG
+//		implementation.drawDebugLines();
+//#endif
+//		// particles should be drawn last, but before the UI
+//		if (scene.GetParticles()) {
+//			if (scene.GetParticles()->updated) {
+//				implementation.drawParticle(scene.GetParticles()); // will not update particles
+//			} else {
+//				implementation.updateAndDrawParticles(scene.GetParticles(), dt); // will update particles in the gpu
+//			}
+//		}
+//
+//		//implementation.drawCsParticles(dt);
+//
+//		if (scene.GetTextUITotal() > 0) { // Must be drawn last
+//			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
+//		}
+//
+//		implementation.present(0);
+	//}
+
+	void renderer::draw(scene* const scene, const float dt) {
+		update(*scene->getView()); // updating view buffer
 
 		implementation.setRenderTargetView();
 
-		implementation.bindFrameBuffer(frameCbuffer, scene.GetSceneBuffer(), scene.GetView().invertView);
+		implementation.bindFrameBuffer(frameCbuffer, *scene->getSceneBuffer(), scene->getView()->invertView);
 
-		if (scene.GetSkyBox()) { // Must be drawn first
-			implementation.drawSkybox(scene.GetSkyBox());
-		}
-
-		/*if (scene.GetObjectTotal() > 0) {
-			implementation.drawGameObjects(scene.GetSceneObjects(), scene.GetObjectTotal());
-		}*/
-
-#ifdef _DEBUG
-		implementation.drawDebugLines();
-#endif
-		// particles should be drawn last, but before the UI
-		if (scene.GetParticles()) {
-			if (scene.GetParticles()->updated) {
-				implementation.drawParticle(scene.GetParticles()); // will not update particles
-			} else {
-				implementation.updateAndDrawParticles(scene.GetParticles(), dt); // will update particles in the gpu
-			}
-		}
-
-		//implementation.drawCsParticles(dt);
-
-		if (scene.GetTextUITotal() > 0) { // Must be drawn last
-			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
-		}
-
-		implementation.present(0);
-	}
-
-	void renderer::draw(scene& scene, const float dt) {
-		update(*scene.getView()); // updating view buffer
-
-		implementation.setRenderTargetView();
-
-		implementation.bindFrameBuffer(frameCbuffer, *scene.getSceneBuffer(), scene.getView()->invertView);
-
-		if (scene.getSkyBox()) {
-			implementation.drawSkybox(scene.getSkyBox());
+		if (scene->getSkyBox()) {
+			implementation.drawSkybox(scene->getSkyBox());
 		}
 
 	#ifdef _DEBUG
 		implementation.drawDebugLines();
 	#endif
 
-		if (scene.getTerrain()) {
-			implementation.drawGameObjects(scene.getTerrain(), 1);
+		if (scene->getTerrain()) {
+			implementation.drawGameObjects(scene->getTerrain(), 1);
 		}
 
-		if (scene.getObjCount() > 0) {
-			implementation.drawGameObjects(scene.getSceneObjects(), scene.getObjCount());
+		if (scene->getObjCount() > 0) {
+			implementation.drawGameObjects(scene->getSceneObjects(), scene->getObjCount());
 		}
 
-		if (scene.getEmitters()) {
-			if (scene.getEmitters()->updated) {
-				implementation.drawParticle(scene.getEmitters());
+		if (scene->getEmitters()) {
+			if (scene->getEmitters()->updated) {
+				implementation.drawParticle(scene->getEmitters());
 			} else {
-				implementation.updateAndDrawParticles(scene.getEmitters(), dt);
+				implementation.updateAndDrawParticles(scene->getEmitters(), dt);
 			}
 		}
 
-		if (scene.GetTextUITotal() > 0) { // Must be drawn last
-			implementation.drawText(scene.GetTextUI(), scene.GetTextUITotal());
+		if (scene->GetTextUITotal() > 0) { // Must be drawn last
+			implementation.drawText(scene->GetTextUI(), scene->GetTextUITotal());
 		}
 
 		implementation.present(0);

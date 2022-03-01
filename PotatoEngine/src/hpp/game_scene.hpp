@@ -3,6 +3,7 @@
 #include "object_data.hpp"
 #include "input.hpp"
 #include "collision.hpp"
+#include "scene.hpp"
 
 // lib
 #include <glm/glm.hpp>
@@ -28,7 +29,7 @@ namespace dxe {
 		~enemy() { object = nullptr; }
 	};
 
-	class GameScene {
+	class GameScene : public scene {
 
 	public:
 		GameScene();
@@ -36,34 +37,34 @@ namespace dxe {
 
 		void update(const float dt);
 
-		const GameObject* GetSceneObjects() const;
+		/*const GameObject* GetSceneObjects() const;
 		const GameObject* GetSkyBox() const;
 		const uint32_t GetObjectTotal() const;
 		const View_t& GetView() const;
 		const Scene_cb& GetSceneBuffer() const;
 		const Textwrap* GetTextUI() const;
 		const uint32_t GetTextUITotal() const;
-		Emitter* GetParticles();
+		Emitter* GetParticles();*/
 
 	private:
 
 		void inputUpdate(const float dt);
 
-		View_t camera;
+		// View_t camera;
 
-		std::vector<GameObject> gameObjects;
+		// std::vector<GameObject> gameObjects;
 
-		GameObject plane;
+		// GameObject plane;
 
-		GameObject skyBox;
+		// GameObject skyBox;
 
-		Scene_cb scb;
+		// Scene_cb scb;
 
 		static constexpr uint8_t MAX_ENEMIES = 10;
 
 		enemy enemies[MAX_ENEMIES];
 
-		std::vector<Textwrap> textui;
+		// std::vector<Textwrap> textui;
 
 		uint32_t score{ 0 };
 		
@@ -76,7 +77,7 @@ namespace dxe {
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance2;
 
 		// particle stuff
-		Emitter pEmitter;
+		// Emitter pEmitter;
 	};
 
 

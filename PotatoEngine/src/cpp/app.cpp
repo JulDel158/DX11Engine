@@ -73,7 +73,7 @@ namespace dxe {
 				debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
-				dxRenderer.draw(scene1, dt);
+				dxRenderer.draw(&scene1, dt);
 			}
 		}
 

@@ -14,11 +14,17 @@ namespace dxe {
 
 	GameScene::GameScene() {
 		std::srand(static_cast<unsigned int>(std::time(0)));
-		camera.position = glm::vec3(0.f, 1.f, 0.f);
-		camera.updateView();
 
-		textui.clear();
-		textui.resize(2);
+		// camera initialization
+		camera = std::make_unique<View_t>();
+		camera->position = glm::vec3(0.f, 1.f, 0.f);
+		camera->updateView();
+
+		/*textui = new Textwrap[2];
+		textUiCount = 2;*/
+		allocateTextwraps(2);
+		/*textui.clear();
+		textui.resize(2);*/
 		
 		// score ui
 		textui[0].color = glm::vec4(1.f, 0.f, 1.f, 1.f);
@@ -39,8 +45,11 @@ namespace dxe {
 		textui[1].text = std::wstring(L"+");
 
 
-		gameObjects.clear();
-		gameObjects.resize(MAX_ENEMIES + 1);
+		//gameObjects.clear();
+		//gameObjects.resize(MAX_ENEMIES + 1);
+		/*gameObjects = new GameObject[MAX_ENEMIES + 1];
+		gobjSize = MAX_ENEMIES + 1;*/
+		allocateGameObjs(MAX_ENEMIES);
 		
 		// IMPORTANT, SINCE WE ARE ALLOCATING THE ENEMY UNITS FIRST THIS IS FINE, IF WE INSERT OTHER GAME OBJECTS PRIOR, YOU WILL HAVE TO PROPERLY MATCH THE GAME OBJECT FROM THE ENEMY ARRAY
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
@@ -60,36 +69,40 @@ namespace dxe {
 			enemies[i].speed = glm::linearRand(3.0f, 10.f);
 		}
 		
-		// floor plane game object
-		plane.model.dMakePlane();
-		plane.transform[0][0] = plane.transform[1][1] = plane.transform[2][2] = 40.f;
-		plane.transform[3] = { -20.f, 0.f, -20.f, 1.f };
-		plane.resourceId = 0;
-		plane.isActive = true;
-		gameObjects.back() = plane;
+		// terrain plane game object
+		terrain = new GameObject;
+		terrain->model.dMakePlane();
+		//plane.model.dMakePlane();
+		terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
+		terrain->transform[3] = { -20.f, 0.f, -20.f, 1.f };
+		terrain->resourceId = 0;
+		terrain->isActive = true;
+		// gameObjects[gobjSize - 1] = plane;
 
 		// skybox
-		skyBox.model.loadObject("assets/models/CUBE.obj");
-		skyBox.resourceId = 2;
+		skybox = new GameObject;
+		skybox->model.loadObject("assets/models/CUBE.obj");
+		skybox->resourceId = 2;
 
 		// lights
-		scb.dirLight.color = { 0.f, 0.f, 0.f, 0.0f };
-		scb.dirLight.direction = { 0.f, 0.f, 0.f };
-		scb.ambient = { 1.f, 1.f, 1.f, 0.1f };
+		scb = new Scene_cb;
+		scb->dirLight.color = { 0.f, 0.f, 0.f, 0.0f };
+		scb->dirLight.direction = { 0.f, 0.f, 0.f };
+		scb->ambient = { 1.f, 1.f, 1.f, 0.1f };
 
-		scb.pointLight.color = { 1.f, 1.f, 0.f, 1.f };
-		scb.pointLight.pos = { 4.f, 3.f, 0.f };
-		scb.pointLight.radius = 10.f;
+		scb->pointLight.color = { 1.f, 1.f, 0.f, 1.f };
+		scb->pointLight.pos = { 4.f, 3.f, 0.f };
+		scb->pointLight.radius = 10.f;
 
-		scb.spotLight.color = { 0.f, 1.f, 0.f, 1.f };
+		scb->spotLight.color = { 0.f, 1.f, 0.f, 1.f };
 
 		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
-		scb.spotLight.outerRatio = 0.2f;
-		scb.spotLight.innerRatio = 0.05f;
-		scb.spotLight.falloff    = 0.f;
+		scb->spotLight.outerRatio = 0.2f;
+		scb->spotLight.innerRatio = 0.05f;
+		scb->spotLight.falloff    = 0.f;
 
-		scb.spotLight.range = 200.f;
-		scb.spotLight.focus = 100.f;
+		scb->spotLight.range = 200.f;
+		scb->spotLight.focus = 100.f;
 
 		// sound stuff
 		DirectX::AUDIO_ENGINE_FLAGS eflags = DirectX::AudioEngine_Default;
@@ -108,14 +121,15 @@ namespace dxe {
 		soundInstance2 = songData2->CreateInstance();
 
 		// particle emitter
-		pEmitter.pos = glm::vec3(0.f, 0.f, 10.f);
-		pEmitter.flyweigth.minTime = 2.f;
-		pEmitter.flyweigth.maxTime = 5.5f;
-		pEmitter.flyweigth.scaleStart = 0.5f;
-		pEmitter.flyweigth.scaleRate = 1.5f;
-		pEmitter.flyweigth.velMinVals = glm::vec3(-20.f, 1.f, -20.f);
-		pEmitter.flyweigth.velMaxVals = glm::vec3(20.f, 10.f, 20.f);
-		pEmitter.particles.resize(50);
+		allocateEmitters(1);
+		particleEmitters->pos = glm::vec3(0.f, 0.f, 10.f);
+		particleEmitters->flyweigth.minTime = 2.f;
+		particleEmitters->flyweigth.maxTime = 5.5f;
+		particleEmitters->flyweigth.scaleStart = 0.5f;
+		particleEmitters->flyweigth.scaleRate = 1.5f;
+		particleEmitters->flyweigth.velMinVals = glm::vec3(-20.f, 1.f, -20.f);
+		particleEmitters->flyweigth.velMaxVals = glm::vec3(20.f, 10.f, 20.f);
+		particleEmitters->particles.resize(50);
 	}
 
 	GameScene::~GameScene() {}
@@ -162,12 +176,12 @@ namespace dxe {
 		}
 
 		// copying the position of the camera into the skybox
-		skyBox.transform[3] = camera.view[3];
+		skybox->transform[3] = camera->view[3];
 
 		// temp light debug stuff for spot light
 		{
-			glm::vec3 campos = camera.view[3];
-			glm::vec3 camforw = camera.view[2];
+			glm::vec3 campos = camera->view[3];
+			glm::vec3 camforw = camera->view[2];
 			//// att1 outer cone
 			//if (input.KeyDown('Z')) { scb.spotLight.outerRatio += 0.05f * dt; }
 			//if (input.KeyDown('X')) { scb.spotLight.outerRatio -= 0.05f * dt; scb.spotLight.outerRatio = glm::clamp(scb.spotLight.outerRatio, 0.f, 1000.f); }
@@ -181,28 +195,28 @@ namespace dxe {
 			//if (input.KeyDown('O')) { scb.spotLight.focus+= 20.0f * dt; }
 			//if (input.KeyDown('P')) { scb.spotLight.focus-= 20.0f * dt; scb.spotLight.focus = glm::clamp(scb.spotLight.focus, 0.f, 1000.f); }
 
-			scb.spotLight.direction = camforw;
-			scb.spotLight.pos = campos;
+			scb->spotLight.direction = camforw;
+			scb->spotLight.pos = campos;
 		}
 
 		// small particle update for debug purposes
-		if (pEmitter.updated) {
-			pEmitter.pos.z = -10.f;
-			for (auto& p : pEmitter.particles) {
+		if (particleEmitters->updated) {
+			particleEmitters->pos.z = -10.f;
+			for (auto& p : particleEmitters->particles) {
 				if (p.lifeSpan <= 0.0f) {
-					p.lifeSpan = glm::linearRand(pEmitter.flyweigth.minTime, pEmitter.flyweigth.maxTime);
-					p.pos = pEmitter.pos;
-					p.scale = pEmitter.flyweigth.scaleStart;
-					p.velocity = glm::linearRand(pEmitter.flyweigth.velMinVals, pEmitter.flyweigth.velMaxVals);
+					p.lifeSpan = glm::linearRand(particleEmitters->flyweigth.minTime, particleEmitters->flyweigth.maxTime);
+					p.pos = particleEmitters->pos;
+					p.scale = particleEmitters->flyweigth.scaleStart;
+					p.velocity = glm::linearRand(particleEmitters->flyweigth.velMinVals, particleEmitters->flyweigth.velMaxVals);
 				} else {
 					p.pos += p.velocity * dt;
-					p.scale += pEmitter.flyweigth.scaleRate * dt;
+					p.scale += particleEmitters->flyweigth.scaleRate * dt;
 					p.lifeSpan -= dt;
 				}
 			}
 		}
 		else { // gonna update in the gpu, switching positions to differentiate update functions
-			pEmitter.pos.z = 10.f;
+			particleEmitters->pos.z = 10.f;
 		}
 	}
 
@@ -212,16 +226,16 @@ namespace dxe {
 		
 		glm::vec4 translate{ 0.f };
 //#ifdef _DEBUG
-		if (input::KeyDown('W')) { translate.z += camera.translationSpeed * dt; } // FOWARD
-		if (input::KeyDown('S')) { translate.z -= camera.translationSpeed * dt; } // BACKWARDS
-		if (input::KeyDown('D')) { translate.x += camera.translationSpeed * dt; } // RIGHT
-		if (input::KeyDown('A')) { translate.x -= camera.translationSpeed * dt; } // LEFT
-		if (input::KeyDown('Q')) { translate.y += camera.translationSpeed * dt; } // UP
-		if (input::KeyDown('E')) { translate.y -= camera.translationSpeed * dt; } // DOWN
+		if (input::KeyDown('W')) { translate.z += camera->translationSpeed * dt; } // FOWARD
+		if (input::KeyDown('S')) { translate.z -= camera->translationSpeed * dt; } // BACKWARDS
+		if (input::KeyDown('D')) { translate.x += camera->translationSpeed * dt; } // RIGHT
+		if (input::KeyDown('A')) { translate.x -= camera->translationSpeed * dt; } // LEFT
+		if (input::KeyDown('Q')) { translate.y += camera->translationSpeed * dt; } // UP
+		if (input::KeyDown('E')) { translate.y -= camera->translationSpeed * dt; } // DOWN
 //#endif // _DEBUG
 		static bool released0 = true;
 		if (input::KeyPressed('0') && released0) { 
-			pEmitter.updated = !pEmitter.updated; 
+			particleEmitters->updated = !particleEmitters->updated;
 			released0 = false; 
 		} else {
 			released0 = true;
@@ -229,19 +243,19 @@ namespace dxe {
 		if (input::KeyPressed('8')) { soundInstance2->Stop(); }
 		if (input::KeyPressed('7')) { soundInstance2->Play(true); }
 		if (input::KeyPressed('5')) { soundInstance->Play(false); }
-		if (input::KeyPressed('1')) { skyBox.resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
-		if (input::KeyPressed('2')) { skyBox.resourceId = 2; }
-		if (input::KeyDown(VK_LEFT)) { camera.rotation.y -= camera.rotationSpeed * dt; } // look left
-		if (input::KeyDown(VK_RIGHT)) { camera.rotation.y += camera.rotationSpeed * dt; } // look right
-		if (input::KeyDown(VK_UP)) { camera.rotation.x -= camera.rotationSpeed * dt; } // look up
-		if (input::KeyDown(VK_DOWN)) { camera.rotation.x += camera.rotationSpeed * dt; } // look down
+		if (input::KeyPressed('1')) { skybox->resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
+		if (input::KeyPressed('2')) { skybox->resourceId = 2; }
+		if (input::KeyDown(VK_LEFT)) { camera->rotation.y -= camera->rotationSpeed * dt; } // look left
+		if (input::KeyDown(VK_RIGHT)) { camera->rotation.y += camera->rotationSpeed * dt; } // look right
+		if (input::KeyDown(VK_UP)) { camera->rotation.x -= camera->rotationSpeed * dt; } // look up
+		if (input::KeyDown(VK_DOWN)) { camera->rotation.x += camera->rotationSpeed * dt; } // look down
 
 //#ifndef _DEBUG
 //		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
 //#endif // !_DEBUG
 
 
-		camera.updateView(translate);
+		camera->updateView(translate);
 
 		if (input::KeyPressed(VK_SPACE)) { // here we check collision with active objects
 			enemy* finalTarget = nullptr;
@@ -253,7 +267,7 @@ namespace dxe {
 				}
 				
 				// TODO: for bullets we may want to make sure we only hit one targe by checking which target was hit first and leaving any other collisions intact
-				if (RayToSphereCollision(camera.position, camera.getFoward(), enemies[i].collider, castTime)) {
+				if (RayToSphereCollision(camera->position, camera->getFoward(), enemies[i].collider, castTime)) {
 					if (castTime < pTime) {
 						pTime = castTime;
 						finalTarget = &enemies[i];
@@ -272,7 +286,7 @@ namespace dxe {
 		} 
 	}
 
-	const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
+	/*const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
 
 	const GameObject* GameScene::GetSkyBox() const { return &skyBox; }
 
@@ -286,6 +300,6 @@ namespace dxe {
 
 	const uint32_t GameScene::GetTextUITotal() const { return static_cast<uint32_t>(textui.size()); }
 
-	Emitter* GameScene::GetParticles() { return &pEmitter; }
+	Emitter* GameScene::GetParticles() { return &pEmitter; }*/
 
 } // namespace dxe

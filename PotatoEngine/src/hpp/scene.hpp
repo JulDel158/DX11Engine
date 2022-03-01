@@ -14,7 +14,7 @@ namespace dxe {
 
 		scene(const scene&) = delete;
 		scene& operator=(const scene&) = delete;
-
+		scene();
 		virtual ~scene();
 
 		virtual void update(const float dt) = 0;
@@ -24,13 +24,13 @@ namespace dxe {
 
 		inline const GameObject* getSceneObjects() const { return gameObjects; }
 
-		inline const GameObject* getSceneObjAt(uint32_t inx) { if (inx < gObjCount) { return &gameObjects[inx]; } return nullptr; }
+		inline const GameObject* getSceneObjAt(uint32_t inx) { if (inx < gobjSize) { return &gameObjects[inx]; } return nullptr; }
 
-		inline const uint32_t getObjCount() const { return gObjCount; }
+		inline const uint32_t getObjCount() const { return gobjSize; }
 
 		inline const GameObject* getTerrain() const { return terrain; }
 
-		inline const GameObject* getSkyBox() const { return skyBox; }
+		inline const GameObject* getSkyBox() const { return skybox; }
 
 		inline const Scene_cb* getSceneBuffer() const { return scb; }
 
@@ -46,18 +46,18 @@ namespace dxe {
 
 		inline const uint32_t GetTextUITotal() const { return textUiCount; }
 
-	private:
+	protected:
 
 		std::unique_ptr<View_t> camera;
 
 		// all the game objects in this scene, to be dynamically allocated
 		GameObject* gameObjects{ nullptr };
 
-		uint32_t gObjCount{ 0 };
+		uint32_t gobjSize{ 0 };
 
 		GameObject* terrain{ nullptr };
 
-		GameObject* skyBox{ nullptr };
+		GameObject* skybox{ nullptr };
 
 		Scene_cb* scb{ nullptr };
 
@@ -74,6 +74,13 @@ namespace dxe {
 
 		uint32_t textUiCount{ 0 };
 
+	protected:
+
+		void allocateGameObjs(uint32_t size);
+
+		void allocateEmitters(uint32_t size);
+
+		void allocateTextwraps(uint32_t size);
 	};
 
 

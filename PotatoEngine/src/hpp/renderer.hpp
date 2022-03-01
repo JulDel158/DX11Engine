@@ -13,9 +13,9 @@ namespace dxe {
 		renderer(HWND windowHandle, Window_cb &window_cbuffer);
 		~renderer();
 
-		void draw(GameScene& scene, const float dt);
+		// void draw(GameScene& scene, const float dt);
 
-		void draw(scene& scene, const float dt);
+		void draw(scene* const scene, const float dt);
 
 		void bindWindowBuffer();
 	
