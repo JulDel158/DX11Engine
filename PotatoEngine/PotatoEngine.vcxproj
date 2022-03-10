@@ -183,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\hpp\app.hpp" />
+    <ClInclude Include="src\hpp\bvh_node.hpp" />
     <ClInclude Include="src\hpp\collision.hpp" />
     <ClInclude Include="src\hpp\debug_lines.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "collision.hpp"
+
 // lib
 #include <glm/glm.hpp>
 
@@ -159,6 +161,18 @@ namespace dxe {
 		float minTime{ 0.f };		// 16
 		float maxTime{ 0.f };
 		float deltaTime{ 0.f };		// 8
+	};
+
+	struct Triangle_t {
+		glm::vec3 pos[3];
+		glm::vec3 centroid{ 0 };
+		aabb_t box;
+	};
+
+	struct Triangle_i {
+		uint32_t indx[3];
+		glm::vec3 centroid{ 0 };
+		aabb_t box;
 	};
 
 } // namespace dxe
