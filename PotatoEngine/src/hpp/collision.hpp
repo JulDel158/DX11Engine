@@ -1,25 +1,50 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <limits>
 
 namespace dxe {
 
-	struct sphere {
+	struct sphere_t {
 		glm::vec3 pos{ 0.f };
 		float radius{ 0.f };
 	};
 
 	struct aabb_t {
 		union {
-			glm::vec3 center{ 0.f };
-			glm::vec3 min;
+			glm::vec3 center;
+			glm::vec3 min{std::numeric_limits<float>::max()};
 		};
 		bool isMinMax{ false };
 		union {
-			glm::vec3 extent{ 0.f };
-			glm::vec3 max;
+			glm::vec3 extent;
+			glm::vec3 max{ std::numeric_limits<float>::min() };
 		};
 	};
+
+
+	inline const bool ComputeBounds(const aabb_t& ls, const aabb_t& rs, aabb_t& result) {
+		// invalid input, boxes must be in the same format
+		if (ls.isMinMax != rs.isMinMax) { return false; }
+
+		result.isMinMax = ls.isMinMax;
+
+		if (ls.isMinMax) { 
+			// for the min max format we just need the smallest and largest values
+			result.min = glm::min(ls.min, rs.min);
+			result.max = glm::max(ls.max, ls.max);
+
+		} else {
+
+			result.max = glm::max(glm::vec3(ls.center + ls.extent), glm::vec3(rs.center + rs.extent));
+			result.min = glm::min(ls.center, rs.center);
+
+			result.center = glm::vec3(result.min + result.max) / 2.f;
+			result.extent = glm::vec3(result.max - result.center);
+		}
+
+		return true;
+	}
 
 	inline const bool aabbToaabbCollision(const aabb_t& ls, const aabb_t& rs) {
 		if (ls.isMinMax != rs.isMinMax) { // error, boxes in different formats
@@ -49,30 +74,7 @@ namespace dxe {
 		return true;
 	}
 
-	inline const bool ComputeBounds(const aabb_t& ls, const aabb_t& rs, aabb_t& result) {
-		// invalid input, boxes must be in the same format
-		if (ls.isMinMax != rs.isMinMax) { return false; }
-
-		result.isMinMax = ls.isMinMax;
-
-		if (ls.isMinMax) { 
-			// for the min max format we just need the smallest and largest values
-			result.min = glm::min(ls.min, rs.min);
-			result.max = glm::max(ls.max, ls.max);
-
-		} else {
-
-			result.max = glm::max(glm::vec3(ls.center + ls.extent), glm::vec3(rs.center + rs.extent));
-			result.min = glm::min(ls.center, rs.center);
-
-			result.center = glm::vec3(result.min + result.max) / 2.f;
-			result.extent = glm::vec3(result.max - result.center);
-		}
-
-		return true;
-	}
-
-	inline const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere& target, float& time) {
+	inline const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere_t& target, float& time) {
 
 		glm::vec3 targetTopos = pos - target.pos;
 		direction = glm::normalize(direction);
@@ -99,15 +101,32 @@ namespace dxe {
 		return true;
 	}
 
-	inline const bool SphereToSphereCollision(const sphere& ls, const sphere& rs) {
+	inline const bool SphereToSphereCollision(const sphere_t& ls, const sphere_t& rs) {
 
 		if (ls.pos == rs.pos) { return true; }
 
 		const glm::vec3 l_to_r = rs.pos - ls.pos;
 
-		const float distance = glm::length(l_to_r);
+		const float distancesqr = (l_to_r.x * l_to_r.x) + (l_to_r.y * l_to_r.y) + (l_to_r.z * l_to_r.z);
 
-		return (distance <= (ls.radius + rs.radius));
+		return (distancesqr <= (ls.radius + rs.radius) * (ls.radius + rs.radius));
+	}
+
+	inline const bool SphereToaabbCollision(const sphere_t& sphere, const aabb_t& target) {
+
+		glm::vec3 closestPoint{ 0.f };
+		
+		if (target.isMinMax) {
+			closestPoint = glm::clamp(sphere.pos, target.min, target.max);
+		} else {
+			closestPoint = glm::clamp(sphere.pos, target.center - target.extent, target.center + target.extent);
+		}
+
+		const float distancesqr = (closestPoint.x * closestPoint.x) + (closestPoint.y * closestPoint.y) + (closestPoint.z * closestPoint.z);
+
+		if (distancesqr <= (sphere.radius * sphere.radius)) { return true; }
+
+		return false;
 	}
 
 } // namespace dxe
