@@ -294,4 +294,56 @@ namespace dxe {
 		indices.push_back(1);
 	}
 
+	void Terrain::loadTerrain(const char* filepath, bool invertY, bool minMaxFormat) {
+		// 1. Load Mesh data
+		// 2. Generate Triangle data
+		// 3. Generate BVH tree
+
+
+		// getting the object model for terrain
+		object.model.loadObject(filepath, invertY);
+
+		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
+		const int vertCount = object.model.vertices.size() / 3;
+		// generating triangle data
+		{
+			// preparing containers
+			triangles.resize(vertCount);
+			tInds.resize(vertCount);
+
+			for (int i = 0, j = 0; i < triangles.size(); ++i) {
+				tInds[i] = i;
+
+				//glm::vec3 avg{ 0.f };
+
+				// we must get the next triangle from our data
+				for (int k = 0; k < 3; ++k) {
+					triangles[i].indx[k] = object.model.indices[j++];
+					triangles[i].centroid += object.model.vertices[ triangles[i].indx[k] ].pos; // average position of current triangle
+				}
+				triangles[i].centroid /= 3.f; // the average is the center of the triangle
+
+				
+				glm::vec3 tmin, tmax; // aabb 
+				// initialize min & max
+				//tmin = tmax;
+				triangles[i].box.min = triangles[i].box.max = object.model.vertices[triangles[i].indx[0]].pos;
+
+				for (int k = 1; k < 3; ++k) {
+					triangles[i].box.min = glm::min(triangles[i].box.min, object.model.vertices[triangles[i].indx[k]].pos);
+					triangles[i].box.max = glm::max(triangles[i].box.max, object.model.vertices[triangles[i].indx[k]].pos);
+				}
+
+				triangles[i].box.isMinMax = minMaxFormat;
+				if (!minMaxFormat) { // adjusting format
+					triangles[i].box.center = (triangles[i].box.min + triangles[i].box.max) / 2.f;
+					triangles[i].box.extent -= triangles[i].box.center;
+				}
+			}
+
+
+		}
+
+	}
+
 } // namespace dxe

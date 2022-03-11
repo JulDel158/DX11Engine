@@ -1,6 +1,7 @@
 #pragma once
 
 #include "collision.hpp"
+#include "bvh_node.hpp"
 
 // lib
 #include <glm/glm.hpp>
@@ -173,6 +174,14 @@ namespace dxe {
 		uint32_t indx[3];
 		glm::vec3 centroid{ 0 };
 		aabb_t box;
+	};
+
+	struct Terrain {
+		GameObject object;
+		std::vector<bvh_node> tree;
+		std::vector<Triangle_i> triangles;
+
+		void loadTerrain(const char* filepath, bool invertY = true, bool minMaxFormat = false);
 	};
 
 } // namespace dxe

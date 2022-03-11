@@ -22,6 +22,17 @@ namespace dxe {
 		};
 	};
 
+	inline void swapFormat(aabb_t& box) {
+		if (box.isMinMax) {
+			box.center = (box.min + box.max) / 2.f;
+			box.extent -= box.center;
+		} else {
+			box.min -= box.max;
+			box.max = box.min + box.extent + box.extent;
+		}
+
+		box.isMinMax = !box.isMinMax;
+	}
 
 	inline const bool ComputeBounds(const aabb_t& ls, const aabb_t& rs, aabb_t& result) {
 		// invalid input, boxes must be in the same format
@@ -35,7 +46,7 @@ namespace dxe {
 			result.max = glm::max(ls.max, ls.max);
 
 		} else {
-
+			// need testing to prove this logic works as intended
 			result.max = glm::max(glm::vec3(ls.center + ls.extent), glm::vec3(rs.center + rs.extent));
 			result.min = glm::min(ls.center, rs.center);
 
