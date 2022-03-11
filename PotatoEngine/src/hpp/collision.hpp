@@ -46,7 +46,7 @@ namespace dxe {
 		return true;
 	}
 
-	inline const bool aabbToaabbCollision(const aabb_t& ls, const aabb_t& rs) {
+	inline const bool AabbToAabbCollision(const aabb_t& ls, const aabb_t& rs) {
 		if (ls.isMinMax != rs.isMinMax) { // error, boxes in different formats
 			return false;
 		}
@@ -72,6 +72,71 @@ namespace dxe {
 		if (lmax.z < rmin.z || lmin.z > rmax.z) { return false; }
 
 		return true;
+	}
+
+	inline const bool RayToAabbCollision(const glm::vec3 pos, glm::vec3 direction, const aabb_t& target, glm::vec3& point) {
+		// https://web.archive.org/web/20090803054252/http://tog.acm.org/resources/GraphicsGems/gems/RayBox.c
+		glm::vec3 minB = (target.isMinMax) ? target.min : target.center - target.extent;
+		glm::vec3 maxB = (target.isMinMax) ? target.max : target.center + target.extent;
+		
+		bool inside = true;
+		char quadrant[3];
+		int i = 0;
+		int whichPlane = 0;
+		glm::vec3 maxT{ 0.f };
+		glm::vec3 candidatePlane{ 0.f };
+
+		enum { RIGHT = 0, LEFT = 1, MIDDLE = 2};
+
+		// find candidate planes
+		for (i = 0; i < 3; ++i) {
+			if (pos[i] < minB[i]) {
+				quadrant[i] = LEFT;
+				candidatePlane[i] = minB[i];
+				inside = false;
+			} else if (pos[i] > maxB[i]) {
+				quadrant[i] = RIGHT;
+				candidatePlane[i] = maxB[i];
+				inside = false;
+			} else {
+				quadrant[i] = MIDDLE;
+			}
+		}
+
+		// origin inside box
+		if (inside) {
+			point = pos;
+			return true;
+		}
+
+		// calculate T distances to candidate planes
+		for (i = 0; i < 3; ++i) {
+			if (quadrant[i] != MIDDLE && direction[i] != 0.f) {
+				maxT[i] = (candidatePlane[i] - pos[i]) / direction[i];
+			} else {
+				maxT[i] = -1;
+			}
+		}
+
+		// get largest of the maxT's for final choice of intersection
+		for (i = 1; i < 3; ++i) {
+			if (maxT[whichPlane] < maxT[i]) {
+				whichPlane = i;
+			}
+		}
+
+		// check if final candidate is inside box
+		if (maxT[whichPlane] < 0.f) { return false; }
+		for (i = 0; i < 3; ++i) {
+			if (whichPlane != i) {
+				point[i] = pos[i] + maxT[whichPlane] * direction[i];
+				if (point[i] < minB[i] || point[i] > maxB[i]) { return false; }
+			} else {
+				point[i] = candidatePlane[i];
+			}
+		}
+
+		return true; // ray hits box
 	}
 
 	inline const bool RayToSphereCollision(const glm::vec3 pos, glm::vec3 direction, const sphere_t& target, float& time) {
@@ -112,7 +177,7 @@ namespace dxe {
 		return (distancesqr <= (ls.radius + rs.radius) * (ls.radius + rs.radius));
 	}
 
-	inline const bool SphereToaabbCollision(const sphere_t& sphere, const aabb_t& target) {
+	inline const bool SphereToAabbCollision(const sphere_t& sphere, const aabb_t& target) {
 
 		glm::vec3 closestPoint{ 0.f };
 		
