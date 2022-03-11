@@ -181,7 +181,7 @@ namespace dxe {
 		std::vector<bvh_node> tree;
 		std::vector<Triangle_i> triangles;
 
-		void loadTerrain(const char* filepath, bool invertY = true, bool minMaxFormat = false);
+		void loadTerrain(const char* filepath, const bool invertY = true, const bool minMaxFormat = false);
 	};
 
 } // namespace dxe

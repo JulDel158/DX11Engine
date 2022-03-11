@@ -1,9 +1,11 @@
 #include "../hpp/object_data.hpp"
 
 // std
+#include <algorithm>
 #include <cassert>
-#include <limits>
 #include <iostream>
+#include <limits>
+#include <random>
 #include <unordered_map>
 
 
@@ -165,10 +167,11 @@ namespace dxe {
 				ObjVertex vertex{};
 				const int sign = (invertY) ? -1 : 1;
 				if (index.vertex_index >= 0) {
+					const std::size_t vertInx = static_cast<std::size_t>(index.vertex_index);
 					vertex.pos = {
-						attrib.vertices[3 * index.vertex_index + 0],
-						attrib.vertices[3 * index.vertex_index + 1] * sign,
-						attrib.vertices[3 * index.vertex_index + 2]
+						attrib.vertices[3 * vertInx + 0],
+						attrib.vertices[3 * vertInx + 1] * sign,
+						attrib.vertices[3 * vertInx + 2]
 					};
 
 					/*vertex.color = {
@@ -179,17 +182,19 @@ namespace dxe {
 				}
 
 				if (index.normal_index >= 0) {
+					const std::size_t nrmInx = static_cast<std::size_t>(index.normal_index);
 					vertex.nrm = {
-						attrib.normals[3 * index.normal_index + 0],
-						attrib.normals[3 * index.normal_index + 1] * sign,
-						attrib.normals[3 * index.normal_index + 2]
+						attrib.normals[3 * nrmInx + 0],
+						attrib.normals[3 * nrmInx + 1] * sign,
+						attrib.normals[3 * nrmInx + 2]
 					};
 				}
 
 				if (index.texcoord_index >= 0) {
+					const std::size_t texCoordInx = static_cast<std::size_t>(index.texcoord_index);
 					vertex.uv = {
-						attrib.texcoords[2 * index.texcoord_index + 0],
-						attrib.texcoords[2 * index.texcoord_index + 1]
+						attrib.texcoords[2 * texCoordInx + 0],
+						attrib.texcoords[2 * texCoordInx + 1]
 					};
 				}
 
@@ -294,7 +299,7 @@ namespace dxe {
 		indices.push_back(1);
 	}
 
-	void Terrain::loadTerrain(const char* filepath, bool invertY, bool minMaxFormat) {
+	void Terrain::loadTerrain(const char* filepath, const bool invertY, const bool minMaxFormat) {
 		// 1. Load Mesh data
 		// 2. Generate Triangle data
 		// 3. Generate BVH tree
@@ -305,45 +310,80 @@ namespace dxe {
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
 		const int vertCount = object.model.vertices.size() / 3;
-		// generating triangle data
-		{
-			// preparing containers
-			triangles.resize(vertCount);
-			tInds.resize(vertCount);
 
-			for (int i = 0, j = 0; i < triangles.size(); ++i) {
-				tInds[i] = i;
+		//===================== generating triangle data =====================
+		// preparing containers
+		triangles.resize(vertCount);
+		tInds.resize(vertCount);
 
-				//glm::vec3 avg{ 0.f };
+		for (int i = 0, j = 0; i < triangles.size(); ++i) {
+			tInds[i] = i;
 
-				// we must get the next triangle from our data
-				for (int k = 0; k < 3; ++k) {
-					triangles[i].indx[k] = object.model.indices[j++];
-					triangles[i].centroid += object.model.vertices[ triangles[i].indx[k] ].pos; // average position of current triangle
-				}
-				triangles[i].centroid /= 3.f; // the average is the center of the triangle
+			//glm::vec3 avg{ 0.f };
 
-				
-				glm::vec3 tmin, tmax; // aabb 
-				// initialize min & max
-				//tmin = tmax;
-				triangles[i].box.min = triangles[i].box.max = object.model.vertices[triangles[i].indx[0]].pos;
+			// we must get the next triangle from our data
+			for (int k = 0; k < 3; ++k) {
+				triangles[i].indx[k] = object.model.indices[j++];
+				triangles[i].centroid += object.model.vertices[ triangles[i].indx[k] ].pos; // average position of current triangle
+			}
+			triangles[i].centroid /= 3.f; // the average is the center of the triangle
+			
+			// initialize min & max for our aabb
+			triangles[i].box.min = triangles[i].box.max = object.model.vertices[triangles[i].indx[0]].pos;
 
-				for (int k = 1; k < 3; ++k) {
-					triangles[i].box.min = glm::min(triangles[i].box.min, object.model.vertices[triangles[i].indx[k]].pos);
-					triangles[i].box.max = glm::max(triangles[i].box.max, object.model.vertices[triangles[i].indx[k]].pos);
-				}
-
-				triangles[i].box.isMinMax = minMaxFormat;
-				if (!minMaxFormat) { // adjusting format
-					triangles[i].box.center = (triangles[i].box.min + triangles[i].box.max) / 2.f;
-					triangles[i].box.extent -= triangles[i].box.center;
-				}
+			// calculating the min and max for this triangle
+			for (int k = 1; k < 3; ++k) {
+				triangles[i].box.min = glm::min(triangles[i].box.min, object.model.vertices[triangles[i].indx[k]].pos);
+				triangles[i].box.max = glm::max(triangles[i].box.max, object.model.vertices[triangles[i].indx[k]].pos);
 			}
 
+			triangles[i].box.isMinMax = minMaxFormat;
+			if (!minMaxFormat) { // adjusting format to center and extent if enabled
+				triangles[i].box.center = (triangles[i].box.min + triangles[i].box.max) / 2.f;
+				triangles[i].box.extent -= triangles[i].box.center;
+			}
 
-		}
+		} // for each triangle
 
+		// shuffling all triangles to prepare for tree generation
+		std::random_device randDevice; // used to seed engine
+		std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
+		std::shuffle(tInds.begin(), tInds.end(), randEngine);
+
+		// ===================== generating bvh tree =====================
+		bvh_node root = bvh_node(triangles[tInds[0]].box, tInds[0]);
+		tree.push_back(root);
+
+		// manhattan distance function
+		auto manhDistance = [](const glm::vec3& lhs, const glm::vec3& rhs)->float {
+			return glm::abs(lhs.x - rhs.x) + glm::abs(lhs.y - rhs.y) + glm::abs(lhs.z - rhs.z);
+		};
+
+		for (int i = 1; i < tInds.size(); ++i) {
+
+			bvh_node node = bvh_node(triangles[tInds[i]].box, tInds[i]);
+			tree.push_back(node);
+
+			int curr = 0;
+
+			// we need to reach a leaf so we can insert the next entry into the tree
+			while (tree[curr].isBranch()) { 
+				 ComputeBounds(tree[curr].aabb(), root.aabb(), tree[curr].aabb());
+				 // we will used distance to balance the tree
+				 const float leftDist = manhDistance(root.aabb().center, tree[tree[curr].left()].aabb().center);
+				 const float rightDist = manhDistance(root.aabb().center, tree[tree[curr].right()].aabb().center);
+				 
+				 curr = (leftDist < rightDist) ? tree[curr].left() : tree[curr].right();
+			}
+
+			bvh_node child = bvh_node(tree[curr].aabb(), tree[curr].elementId());
+			tree.push_back(child);
+
+			ComputeBounds(tree[curr].aabb(), node.aabb(), tree[curr].aabb());
+			tree[curr].left() = tree.size() - 2;
+			tree[curr].right() = tree.size() - 1;
+
+		} // end for each index
 	}
 
 } // namespace dxe

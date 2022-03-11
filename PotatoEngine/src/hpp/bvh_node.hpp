@@ -7,6 +7,7 @@ namespace dxe {
 
 
 	class bvh_node {
+	public:
 		bvh_node(uint32_t left_index, uint32_t right_index) : _left{ left_index }, _right{ right_index } {}
 		bvh_node(const aabb_t& bounds, uint32_t id) : _aabb{ bounds }, _id{ id }, _left{ 0 } {}
 
