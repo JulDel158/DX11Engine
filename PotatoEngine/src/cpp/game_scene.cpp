@@ -70,13 +70,17 @@ namespace dxe {
 		}
 		
 		// terrain plane game object
-		terrain = new GameObject;
-		terrain->model.dMakePlane();
+		terrain = new Terrain;
+		terrain->loadTerrain("assets/models/terrain_1.obj", false);
+		terrain->object.isActive = true;
+		
+		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		terrain->object.transform[3][1] = -10.f;
 		//plane.model.dMakePlane();
-		terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
-		terrain->transform[3] = { -20.f, 0.f, -20.f, 1.f };
-		terrain->resourceId = 0;
-		terrain->isActive = true;
+		//terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
+		//terrain->transform[3] = { -20.f, 0.f, -20.f, 1.f };
+		//terrain->resourceId = 0;
+		
 		// gameObjects[gobjSize - 1] = plane;
 
 		// skybox

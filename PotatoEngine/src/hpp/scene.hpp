@@ -28,7 +28,7 @@ namespace dxe {
 
 		inline const uint32_t getObjCount() const { return gobjSize; }
 
-		inline const GameObject* getTerrain() const { return terrain; }
+		inline const Terrain* getTerrain() const { return terrain; }
 
 		inline const GameObject* getSkyBox() const { return skybox; }
 
@@ -55,7 +55,7 @@ namespace dxe {
 
 		uint32_t gobjSize{ 0 };
 
-		GameObject* terrain{ nullptr };
+		Terrain* terrain{ nullptr };
 
 		GameObject* skybox{ nullptr };
 

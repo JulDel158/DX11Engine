@@ -24,12 +24,12 @@ namespace dxe {
 		bool isLeaf()const { return !isBranch(); }
 
 		uint32_t elementId()const {
-			assert(isLeaf());
+			//assert(isLeaf());
 			return _id;
 		}
 
 		uint32_t& left() {
-			assert(isBranch());
+			//assert(isBranch());
 			return _left;
 		}
 
@@ -39,17 +39,17 @@ namespace dxe {
 		}
 
 		uint32_t& right() {
-			assert(isBranch());
+			//assert(isBranch());
 			return _right;
 		}
 
 		uint32_t right() const {
-			assert(isBranch());
+			//assert(isBranch());
 			return _right;
 		}
 
 		uint32_t parent()const {
-			assert(!isRoot());
+			//assert(!isRoot());
 			return _parent;
 		}
 		

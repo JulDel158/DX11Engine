@@ -45,6 +45,13 @@ namespace dxe {
 		Objectdata model;
 		// TODO: IMPLEMENT TEXTURE REFERENCES ON OBJECTS, CONSIDER USING AN ID TO AN ARRAY OF ID3D11ShaderResourceView INSTEAD TO KEEP ABSTRACTION
 		// ID3D11ShaderResourceView* resourceView;
+
+		void translateMatrix(const glm::vec3 translation);
+		void setPosition(const glm::vec3 position);
+		void setScale(const float scale);
+		void setScale(const glm::vec3 scale);
+		void scaleMatrix(const float scale);
+		void scaleMatrix(const glm::vec3 scale);
 	};
 
 	struct View_t {

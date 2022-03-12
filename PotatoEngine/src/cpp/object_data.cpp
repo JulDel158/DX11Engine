@@ -359,12 +359,13 @@ namespace dxe {
 			return glm::abs(lhs.x - rhs.x) + glm::abs(lhs.y - rhs.y) + glm::abs(lhs.z - rhs.z);
 		};
 
+		int curr = 0;
 		for (int i = 1; i < tInds.size(); ++i) {
 
 			bvh_node node = bvh_node(triangles[tInds[i]].box, tInds[i]);
 			tree.push_back(node);
 
-			int curr = 0;
+			curr = 0;
 
 			// we need to reach a leaf so we can insert the next entry into the tree
 			while (tree[curr].isBranch()) { 
@@ -384,6 +385,38 @@ namespace dxe {
 			tree[curr].right() = tree.size() - 1;
 
 		} // end for each index
+	}
+
+	void GameObject::translateMatrix(const glm::vec3 translation) {
+		transform[3] += glm::vec4(translation, 0.f);
+	}
+
+	void GameObject::setPosition(const glm::vec3 position) {
+		transform[3] = glm::vec4(position, 1.f);
+	}
+
+	void GameObject::setScale(const float scale) {
+		for (int i = 0; i < 3; ++i) {
+			transform[i][i] = scale;
+		}
+	}
+
+	void GameObject::setScale(const glm::vec3 scale) {
+		for (int i = 0; i < 3; ++i) {
+			transform[i][i] = scale[i];
+		}
+	}
+
+	void GameObject::scaleMatrix(const float scale) {
+		for (int i = 0; i < 3; ++i) {
+			transform[i][i] *= scale;
+		}
+	}
+
+	void GameObject::scaleMatrix(const glm::vec3 scale) {
+		for (int i = 0; i < 3; ++i) {
+			transform[i][i] *= scale[i];
+		}
 	}
 
 } // namespace dxe

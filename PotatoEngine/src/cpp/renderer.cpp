@@ -87,7 +87,7 @@ namespace dxe {
 	#endif
 
 		if (scene->getTerrain()) {
-			implementation.drawGameObjects(scene->getTerrain(), 1);
+			implementation.drawGameObjects(&scene->getTerrain()->object, 1);
 		}
 
 		if (scene->getObjCount() > 0) {
