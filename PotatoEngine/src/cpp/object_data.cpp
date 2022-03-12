@@ -309,7 +309,7 @@ namespace dxe {
 		object.model.loadObject(filepath, invertY);
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
-		const int vertCount = object.model.vertices.size() / 3;
+		const int vertCount = object.model.indices.size() / 3;
 
 		//===================== generating triangle data =====================
 		// preparing containers
@@ -387,7 +387,7 @@ namespace dxe {
 		} // end for each index
 	}
 
-	void GameObject::translateMatrix(const glm::vec3 translation) {
+	void GameObject::translatePosition(const glm::vec3 translation) {
 		transform[3] += glm::vec4(translation, 0.f);
 	}
 

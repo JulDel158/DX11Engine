@@ -71,11 +71,12 @@ namespace dxe {
 		
 		// terrain plane game object
 		terrain = new Terrain;
-		terrain->loadTerrain("assets/models/terrain_1.obj", false);
+		terrain->loadTerrain("assets/models/terrain_1.obj", false, false);
 		terrain->object.isActive = true;
+		terrain->object.resourceId = 7;
 		
-		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
-		terrain->object.transform[3][1] = -10.f;
+		//terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		//terrain->object.transform[3][1] = -10.f;
 		//plane.model.dMakePlane();
 		//terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
 		//terrain->transform[3] = { -20.f, 0.f, -20.f, 1.f };
@@ -90,9 +91,9 @@ namespace dxe {
 
 		// lights
 		scb = new Scene_cb;
-		scb->dirLight.color = { 0.f, 0.f, 0.f, 0.0f };
-		scb->dirLight.direction = { 0.f, 0.f, 0.f };
-		scb->ambient = { 1.f, 1.f, 1.f, 0.1f };
+		scb->dirLight.color = { 0.1f, 0.1f, 0.f, 0.0f };
+		scb->dirLight.direction = { 1.f, -1.f, -1.f };
+		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
 		scb->pointLight.color = { 1.f, 1.f, 0.f, 1.f };
 		scb->pointLight.pos = { 4.f, 3.f, 0.f };
@@ -157,26 +158,27 @@ namespace dxe {
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
 
 			if (!enemies[i].object) { continue; }
-			if (!enemies[i].object->isActive) {
-				if (enemies[i].respawnTime <= 0.f) {
-					// we must respawn the enemy
-					glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 60.f, -80.f, 1.f }, glm::vec4{ 80.f, 100.f, 80.f, 1.f });
-					enemies[i].object->transform[3] = randompos;
-					enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
-					enemies[i].object->isActive = true;
-					enemies[i].velocity = -glm::normalize(randompos);
-					enemies[i].speed = glm::linearRand(3.0f, 10.f);
-				}
-				enemies[i].respawnTime -= dt;
-				continue;
-			}
-			glm::vec4 pos = enemies[i].object->transform[3];
+			enemies[i].object->isActive = false;
+			//if (!enemies[i].object->isActive) {
+			//	if (enemies[i].respawnTime <= 0.f) {
+			//		// we must respawn the enemy
+			//		glm::vec4 randompos = glm::linearRand(glm::vec4{ -80.f, 60.f, -80.f, 1.f }, glm::vec4{ 80.f, 100.f, 80.f, 1.f });
+			//		enemies[i].object->transform[3] = randompos;
+			//		enemies[i].collider.pos = glm::vec3(randompos.x, randompos.y, randompos.z);
+			//		enemies[i].object->isActive = true;
+			//		enemies[i].velocity = -glm::normalize(randompos);
+			//		enemies[i].speed = glm::linearRand(3.0f, 10.f);
+			//	}
+			//	enemies[i].respawnTime -= dt;
+			//	continue;
+			//}
+			//glm::vec4 pos = enemies[i].object->transform[3];
 
-			// updating entity's movement
-			pos += glm::vec4(enemies[i].velocity.x, enemies[i].velocity.y, enemies[i].velocity.z, 0.f) * enemies[i].speed * dt;
+			//// updating entity's movement
+			//pos += glm::vec4(enemies[i].velocity.x, enemies[i].velocity.y, enemies[i].velocity.z, 0.f) * enemies[i].speed * dt;
 
-			enemies[i].object->transform[3] = pos;
-			enemies[i].collider.pos = glm::vec3{ pos.x, pos.y, pos.z };
+			//enemies[i].object->transform[3] = pos;
+			//enemies[i].collider.pos = glm::vec3{ pos.x, pos.y, pos.z };
 		}
 
 		// copying the position of the camera into the skybox

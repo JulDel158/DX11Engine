@@ -47,16 +47,16 @@ namespace dxe {
 
 		} else {
 			// need testing to prove this logic works as intended
-			/*result.max = glm::max(glm::vec3(ls.center + ls.extent), glm::vec3(rs.center + rs.extent));
+			result.max = glm::max(glm::vec3(ls.center + ls.extent), glm::vec3(rs.center + rs.extent));
 			result.min = glm::min(ls.center, rs.center);
 
 			result.center = glm::vec3(result.min + result.max) / 2.f;
-			result.extent = glm::vec3(result.max - result.center);*/
-			result.max = glm::max(ls.center + ls.extent, rs.center + rs.extent);
+			result.extent = glm::vec3(result.max - result.center);
+			/*result.max = glm::max(ls.center + ls.extent, rs.center + rs.extent);
 			result.min = glm::min(ls.center - ls.extent, rs.center - rs.extent);
 
 			result.center = (result.min + result.max) / 2.f;
-			result.extent -= result.center;
+			result.extent -= result.center;*/
 		}
 
 		return true;

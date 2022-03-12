@@ -82,17 +82,25 @@ namespace dxe {
 			implementation.drawSkybox(scene->getSkyBox());
 		}
 
-	#ifdef _DEBUG
-		implementation.drawDebugLines();
-	#endif
-
 		if (scene->getTerrain()) {
 			implementation.drawGameObjects(&scene->getTerrain()->object, 1);
+
+		#ifdef  _DEBUG
+			for (const auto& n : scene->getTerrain()->tree) {
+				debug_lines::addAabb(n.aabb());
+			}
+			//debug_lines::addAabb(scene->getTerrain()->tree[0].aabb());
+		#endif //  _DEBUG
+
 		}
 
 		if (scene->getObjCount() > 0) {
 			implementation.drawGameObjects(scene->getSceneObjects(), scene->getObjCount());
 		}
+
+	#ifdef _DEBUG
+		implementation.drawDebugLines();
+	#endif
 
 		if (scene->getEmitters()) {
 			if (scene->getEmitters()->updated) {
@@ -101,6 +109,7 @@ namespace dxe {
 				implementation.updateAndDrawParticles(scene->getEmitters(), dt);
 			}
 		}
+
 
 		if (scene->GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene->GetTextUI(), scene->GetTextUITotal());

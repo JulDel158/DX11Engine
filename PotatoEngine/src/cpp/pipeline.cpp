@@ -45,6 +45,8 @@ namespace dxe {
 
 		createSResourceView(L"assets\\images\\SkyboxOcean.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::SKYBOX));
 
+		createSResourceView(L"assets\\images\\ground1.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::GROUND1));
+
 		createDebugTexture();
 
 		createBlendStates();

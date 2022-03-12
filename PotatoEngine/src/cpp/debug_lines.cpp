@@ -4,10 +4,10 @@
 #include <glm/gtx/compatibility.hpp>
 
 namespace {
-	constexpr size_t MAX_LINE_VERTS = 2000;
+	constexpr size_t MAX_LINE_VERTS = 100000;
 
 	size_t lineVertCount = 0;
-	std::array<dxe::ColoredVertex, MAX_LINE_VERTS> lineVerts;
+	std::vector<dxe::ColoredVertex> lineVerts(MAX_LINE_VERTS);
     
     uint8_t colorIndex = 0;
    
@@ -30,7 +30,8 @@ namespace dxe {
 
 	void debug_lines::clearLines() { lineVertCount = 0; }
 
-	void debug_lines::addLine(glm::vec3 apos, glm::vec3 bpos, glm::vec4 acolor, glm::vec4 bcolor) {
+	void debug_lines::addLine(const glm::vec3& apos, const glm::vec3& bpos, const glm::vec4& acolor, const glm::vec4& bcolor) {
+        if (lineVertCount + 2 >= MAX_LINE_VERTS) { return; } // prevent going out of bounds
 		lineVerts[lineVertCount].pos = apos;
 		lineVerts[lineVertCount++].color = acolor;
 		lineVerts[lineVertCount].pos = bpos;
@@ -59,12 +60,12 @@ namespace dxe {
             addLine(
                 glm::vec3(cx, 0.0f, dxz), // first point
                 glm::vec3(cx + size, 0.0f, dxz),  // second point
-                glm::vec4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+                glm::vec4(0.0, 0.2f, 1.0f, 1.0f));   // color for both
             //linez
             addLine(
                 glm::vec3(dxz, 0.0f, cz), // first point
                 glm::vec3(dxz, 0.0f, cz + size),  // second point
-                glm::vec4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+                glm::vec4(0.0, 0.2f, 1.0f, 1.0f));  // color for both
 
             dxz += spacing;
         }
@@ -72,12 +73,12 @@ namespace dxe {
         addLine(
             glm::vec3(cx, 0.0f, dxz), // first point
             glm::vec3(cx + size, 0.0f, dxz),  // second point
-            glm::vec4(1.0, 0.0f, 1.0f, 1.0f));   // color for both
+            glm::vec4(0.0, 0.2f, 1.0f, 1.0f));   // color for both
 
         addLine(
             glm::vec3(dxz, 0.0f, cz), // first point
             glm::vec3(dxz, 0.0f, cz + size),  // second point
-            glm::vec4(1.0, 0.0f, 1.0f, 1.0f));  // color for both
+            glm::vec4(0.0, 0.2f, 1.0f, 1.0f));  // color for both
 	}
 
     void debug_lines::addDebugCube(glm::vec3 pos, float offset, glm::vec4 color) {
@@ -117,6 +118,39 @@ namespace dxe {
         addLine(p5, p7, color);
         addLine(p6, p8, color);
         addLine(p8, p7, color);
+    }
+
+    void debug_lines::addAabb(const aabb_t& box, glm::vec4 color) {
+        const glm::vec3 min = (box.isMinMax) ? box.min : box.center - box.extent;
+        const glm::vec3 max = (box.isMinMax) ? box.max : box.center + box.extent;
+
+        glm::vec3 p[6];
+        //p1 = min
+        p[0] = {max.x, min.y, min.z};
+        p[1] = {min.x, min.y, max.z};
+        p[2] = {max.x, min.y, max.z};
+        p[3] = {min.x, max.y, min.z};
+        p[4] = {max.x, max.y, min.z};
+        p[5] = {min.x, max.y, max.z};
+        //p8 = max
+
+        // bottom h lines
+        addLine(min, p[0], color);
+        addLine(min, p[1], color);
+        addLine(p[0], p[2], color);
+        addLine(p[1], p[2], color);
+
+        // bottom to top lines
+        addLine(min, p[3], color);
+        addLine(p[0], p[4], color);
+        addLine(p[1], p[5], color);
+        addLine(p[2], max, color);
+
+        // top lines
+        addLine(p[3], p[4], color);
+        addLine(p[3], p[5], color);
+        addLine(p[4], max, color);
+        addLine(p[5], max, color);
     }
 
     void debug_lines::rainbowUpdate(const float dt) {
