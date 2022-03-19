@@ -71,7 +71,7 @@ namespace dxe {
 		
 		// terrain plane game object
 		terrain = new Terrain;
-		terrain->loadTerrain("assets/models/terrain_1.obj", false, false);
+		terrain->loadTerrain("assets/models/terrain_1.obj", false, true);
 		terrain->object.isActive = true;
 		terrain->object.resourceId = 7;
 		

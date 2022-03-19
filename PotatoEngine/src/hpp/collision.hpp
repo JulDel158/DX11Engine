@@ -43,7 +43,7 @@ namespace dxe {
 		if (ls.isMinMax) { 
 			// for the min max format we just need the smallest and largest values
 			result.min = glm::min(ls.min, rs.min);
-			result.max = glm::max(ls.max, ls.max);
+			result.max = glm::max(ls.max, rs.max);
 
 		} else {
 			// need testing to prove this logic works as intended
