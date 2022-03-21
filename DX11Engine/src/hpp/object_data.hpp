@@ -189,6 +189,8 @@ namespace dxe {
 		std::vector<Triangle_i> triangles;
 
 		void loadTerrain(const char* filepath, const bool invertY = true, const bool minMaxFormat = false);
+
+		void resizeBVH(const glm::mat4& transform);
 	};
 
 } // namespace dxe

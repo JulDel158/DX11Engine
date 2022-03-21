@@ -309,7 +309,7 @@ namespace dxe {
 		object.model.loadObject(filepath, invertY);
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
-		const int vertCount = object.model.indices.size() / 3;
+		const int vertCount = static_cast<int>(object.model.indices.size()) / 3;
 
 		//===================== generating triangle data =====================
 		// preparing containers
@@ -381,10 +381,18 @@ namespace dxe {
 			tree.push_back(child);
 
 			ComputeBounds(tree[curr].aabb(), node.aabb(), tree[curr].aabb());
-			tree[curr].left() = tree.size() - 2;
-			tree[curr].right() = tree.size() - 1;
+			tree[curr].left() =  static_cast<uint32_t>(tree.size()) - 2;
+			tree[curr].right() = static_cast<uint32_t>(tree.size()) - 1;
 
 		} // end for each index
+	}
+
+	void Terrain::resizeBVH(const glm::mat4& transform) {
+		for (auto& node : tree) {
+			
+			node.aabb().center = static_cast<glm::mat3>(transform) * node.aabb().center;
+			node.aabb().extent = static_cast<glm::mat3>(transform) * node.aabb().extent;
+		}
 	}
 
 	void GameObject::translatePosition(const glm::vec3 translation) {

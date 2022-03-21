@@ -1,8 +1,18 @@
 #pragma once
-#include <vector>
+
+
+// std
+#include <assert.h>
 #include <functional>
+#include <fstream>
+#include <vector>
+#include <string>
 
 // this is a tool class to read various types of files and retrive their data into the required formats
+
+namespace dxe {
+	struct Terrain;
+}
 
 namespace tools {
 
@@ -16,6 +26,14 @@ namespace tools {
 	class file_reader {
 	public:
 		static std::vector<uint8_t> load_binary_blob(const char* path);
+
+		static void loadBVH(const char* filepath, dxe::Terrain& object);
 	};
+
+	void replaceExtension(std::string& filepath, std::string& extension);
+
+	
+
+	void exportBVH(const char* outputFile, const dxe::Terrain& object);
 
 } // namespace tools
