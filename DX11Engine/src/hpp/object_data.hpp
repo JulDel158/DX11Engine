@@ -31,11 +31,13 @@ namespace dxe {
 		std::vector<ObjVertex> vertices;
 		std::vector<uint32_t> indices;
 
-		void loadObject(const char* filepath, bool invertY = true);
+		void loadObject(const char* filepath, bool invertY = false);
 
 		void dMakeCube(float offset);
 
 		void dMakePlane();
+
+		~Objectdata() { vertices.clear(); indices.clear(); }
 	};
 
 	struct GameObject {
@@ -191,6 +193,8 @@ namespace dxe {
 		void loadTerrain(const char* filepath, const bool invertY = true, const bool minMaxFormat = false);
 
 		void resizeBVH(const glm::mat4& transform);
+
+		~Terrain() { tree.clear(); triangles.clear(); }
 	};
 
 } // namespace dxe

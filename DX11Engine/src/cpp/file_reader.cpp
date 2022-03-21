@@ -27,16 +27,16 @@ namespace tools {
 
 		assert(file.is_open() && "Failed to open file: " && filepath);
 
-		const uint32_t treeSize{ 0 }, triangleCount{ 0 };
+		uint32_t treeSize{ 0 }, triangleCount{ 0 };
 
 		// loading tree data
 		file.read((char*)&treeSize, sizeof(uint32_t));
-		object.tree.reserve(treeSize);
+		object.tree.resize(treeSize);
 		file.read((char*)object.tree.data(), treeSize * sizeof(dxe::bvh_node));
 
 		// loading triangle data
 		file.read((char*)&triangleCount, sizeof(uint32_t));
-		object.triangles.reserve(triangleCount);
+		object.triangles.resize(triangleCount);
 		file.read((char*)object.triangles.data(), triangleCount * sizeof(dxe::Triangle_i));
 
 		file.close();
@@ -61,11 +61,11 @@ namespace tools {
 
 		// tree data
 		file.write((const char*)&treeSize, sizeof(uint32_t));
-		file.write((const char*)object.tree.data(), sizeof(dxe::bvh_node) * treeSize);
+		file.write((const char*)object.tree.data(), sizeof(dxe::bvh_node) * object.tree.size());
 
 		// triangle data
 		file.write((const char*)&triangleCount, sizeof(uint32_t));
-		file.write((const char*)object.triangles.data(), sizeof(dxe::Triangle_i) * triangleCount);
+		file.write((const char*)object.triangles.data(), sizeof(dxe::Triangle_i) * object.triangles.size());
 
 		file.close();
 	}

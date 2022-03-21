@@ -23,7 +23,7 @@ namespace dxe {
 	};
 
 	struct INDEX_BUFFER {
-		enum { OBJ_40000 = 0, COUNT };
+		enum { OBJ_50000 = 0, COUNT };
 	};
 
 	struct INPUT_LAYOUT {

@@ -1,5 +1,7 @@
 #include "../hpp/game_scene.hpp"
 
+#include "../hpp/file_reader.hpp"
+
 // std
 #include <Windows.h>
 #include <iostream>
@@ -71,12 +73,22 @@ namespace dxe {
 		
 		// terrain plane game object
 		terrain = new Terrain;
-		terrain->loadTerrain("assets/models/terrain_1.obj", false, true);
+		// terrain->loadTerrain("assets/models/terrain_1.obj", false, true); // generates bvh tree
+		terrain->object.model.loadObject("assets/models/terrain_1.obj", false);
 		terrain->object.isActive = true;
 		terrain->object.resourceId = 7;
+
+		// testing terrain stuff
+		// tools::exportBVH("assets/models/terrain_1.bvh", *terrain);
+
+		tools::file_reader::loadBVH("assets/models/terrain_1.bvh", *terrain);
 		
-		//terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
-		//terrain->object.transform[3][1] = -10.f;
+		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		terrain->object.transform[3][1] = -10.f;
+
+		// testing bvh resizing
+		terrain->resizeBVH(terrain->object.transform);
+
 		//plane.model.dMakePlane();
 		//terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
 		//terrain->transform[3] = { -20.f, 0.f, -20.f, 1.f };
@@ -86,7 +98,7 @@ namespace dxe {
 
 		// skybox
 		skybox = new GameObject;
-		skybox->model.loadObject("assets/models/CUBE.obj");
+		skybox->model.loadObject("assets/models/CUBE.obj", true);
 		skybox->resourceId = 2;
 
 		// lights
@@ -95,11 +107,11 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		scb->pointLight.color = { 1.f, 1.f, 0.f, 1.f };
-		scb->pointLight.pos = { 4.f, 3.f, 0.f };
-		scb->pointLight.radius = 10.f;
+		scb->pointLight.color = { 1.f, 0.40f, 0.f, 1.f };
+		scb->pointLight.pos = { 0.f, 0.f, 12.f };
+		scb->pointLight.radius = 40.f;
 
-		scb->spotLight.color = { 0.f, 1.f, 0.f, 1.f };
+		scb->spotLight.color = { 0.f, 0.f, 0.f, 1.f };
 
 		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
 		scb->spotLight.outerRatio = 0.2f;

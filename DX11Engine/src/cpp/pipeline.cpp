@@ -207,10 +207,10 @@ namespace dxe {
 		vBuffer = obj.vertices; // we must first copy the data into the buffer
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
 
-		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_50000], DXGI_FORMAT_R32_UINT, 0);
 
 		iBuffer = obj.indices;
-		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
 
 		Object_cb cb;
 		cb.modeling = glm::mat4{ 1.f };
@@ -243,7 +243,7 @@ namespace dxe {
 
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
 
-		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_50000], DXGI_FORMAT_R32_UINT, 0);
 
 		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
 
@@ -263,7 +263,7 @@ namespace dxe {
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
 
 		iBuffer = skybox->model.indices;
-		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0);
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
 
 		scb.modeling = skybox->transform;
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &scb, 0, 0);
@@ -285,7 +285,7 @@ namespace dxe {
 
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
 
-		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_40000], DXGI_FORMAT_R32_UINT, 0);
+		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_50000], DXGI_FORMAT_R32_UINT, 0);
 
 		context->VSSetConstantBuffers(0, 1, &constantBuffer[CONSTANT_BUFFER::OBJECT_CB]);
 
@@ -308,7 +308,7 @@ namespace dxe {
 			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
 
 			iBuffer = gameObjects[i].model.indices;
-			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_40000], 0, NULL, iBuffer.data(), 0, 0);
+			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
 
 			ocb.modeling = gameObjects[i].transform;
 			context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &ocb, 0, 0);
@@ -747,7 +747,7 @@ namespace dxe {
 
 		// index buffer
 		CD3D11_BUFFER_DESC idesc = CD3D11_BUFFER_DESC(
-			sizeof(uint32_t) * 40000,
+			sizeof(uint32_t) * 50000,
 			D3D11_BIND_INDEX_BUFFER);
 
 
@@ -756,7 +756,7 @@ namespace dxe {
 		isrd.pSysMem = iBuffer.data();
 
 
-		hr = device->CreateBuffer(&idesc, &isrd, &indexBuffer[INDEX_BUFFER::OBJ_40000]);
+		hr = device->CreateBuffer(&idesc, &isrd, &indexBuffer[INDEX_BUFFER::OBJ_50000]);
 		assert(!FAILED(hr) && "failed to create index buffer");
 	}
 

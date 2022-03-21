@@ -385,13 +385,16 @@ namespace dxe {
 			tree[curr].right() = static_cast<uint32_t>(tree.size()) - 1;
 
 		} // end for each index
+
+		tree.shrink_to_fit();
+		triangles.shrink_to_fit();
 	}
 
 	void Terrain::resizeBVH(const glm::mat4& transform) {
 		for (auto& node : tree) {
 			
-			node.aabb().center = static_cast<glm::mat3>(transform) * node.aabb().center;
-			node.aabb().extent = static_cast<glm::mat3>(transform) * node.aabb().extent;
+			node.aabb().center = transform * glm::vec4(node.aabb().center, 1.f);
+			node.aabb().extent = transform * glm::vec4(node.aabb().extent, 1.f);
 		}
 	}
 
