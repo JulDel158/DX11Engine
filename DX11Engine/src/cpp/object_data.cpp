@@ -398,6 +398,36 @@ namespace dxe {
 		}
 	}
 
+	void Terrain::traverseTree(const aabb_t& box) {
+		traverseRecurse(box, 0);
+	}
+
+	void Terrain::traverseRecurse(const aabb_t& box, uint32_t inx) {
+
+		if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
+
+		if (!tree[inx].isBranch()) { 
+			// we can use id to find our triangle
+			const uint32_t id = tree[inx].elementId();
+
+			Triangle_i t = triangles[id];
+
+
+			glm::mat3 currentTriangle{ 0.f };
+			for (int i = 0; i < 3; ++i) {
+				currentTriangle[i] = object.model.vertices[i].pos;
+			}
+
+			// RayToTriangleCollision(/*pos*/, /*dir*/, currentTriangle, /*interPoint*/);
+
+			return; 
+		}
+		
+		traverseRecurse(box, tree[inx].left());
+		traverseRecurse(box, tree[inx].right());
+
+	}
+
 	void GameObject::translatePosition(const glm::vec3 translation) {
 		transform[3] += glm::vec4(translation, 0.f);
 	}

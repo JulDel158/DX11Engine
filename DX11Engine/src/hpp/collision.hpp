@@ -210,4 +210,29 @@ namespace dxe {
 		return false;
 	}
 
+	inline const bool RayToTriangleCollision(const glm::vec3 pos, const glm::vec3 dir, const glm::mat3 triangle, glm::vec3& intersectionPoint) {
+
+		glm::vec3 E1 = triangle[1] - triangle[0];
+		glm::vec3 E2 = triangle[2] - triangle[0];
+
+		glm::vec3 normal = glm::cross(E1, E2);
+
+		float det = -glm::dot(dir, normal);
+		float invdet = 1.0f / det;
+
+		glm::vec3 AO = pos - triangle[0];
+		glm::vec3 DAO = cross(AO, dir);
+
+		float u = glm::dot(E2, DAO) * invdet;
+		float v = -glm::dot(E1, DAO) * invdet;
+		float t = glm::dot(AO, normal) * invdet;
+
+		if (det >= 1e-6 && t >= 0.0f && u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f) {
+			intersectionPoint = pos + t * dir;
+			return true;
+		}
+
+		return false;
+	}
+
 } // namespace dxe

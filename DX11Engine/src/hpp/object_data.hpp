@@ -194,7 +194,17 @@ namespace dxe {
 
 		void resizeBVH(const glm::mat4& transform);
 
+		void traverseTree(const aabb_t& box);
+
+		void traverseTree(const glm::vec3& pos);
+
 		~Terrain() { tree.clear(); triangles.clear(); }
+
+	private:
+		
+		void traverseRecurse(const aabb_t& box, uint32_t inx);
+
+		void traverseRecurse(const glm::vec3& pos, uint32_t inx);
 	};
 
 } // namespace dxe
