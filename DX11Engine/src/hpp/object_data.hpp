@@ -67,6 +67,8 @@ namespace dxe {
 
 		void updateView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});
 
+		void setPosition(glm::vec3 pos);
+
 		glm::vec3 getFoward()const;
 
 		// these functions won't work in this engine
@@ -194,17 +196,15 @@ namespace dxe {
 
 		void resizeBVH(const glm::mat4& transform);
 
-		void traverseTree(const aabb_t& box);
-
-		void traverseTree(const glm::vec3& pos);
+		template<typename f>
+		void traverseTree(const aabb_t& box, f& lamda);
 
 		~Terrain() { tree.clear(); triangles.clear(); }
 
 	private:
-		
-		void traverseRecurse(const aabb_t& box, uint32_t inx);
+		template<typename f>
+		bool traverseRecurse(const aabb_t& box, uint32_t inx, f &lamda, bool& check);
 
-		void traverseRecurse(const glm::vec3& pos, uint32_t inx);
 	};
 
 } // namespace dxe

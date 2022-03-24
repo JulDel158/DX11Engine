@@ -19,7 +19,7 @@ namespace dxe {
 
 		// camera initialization
 		camera = std::make_unique<View_t>();
-		camera->position = glm::vec3(0.f, 1.f, 0.f);
+		camera->position = glm::vec3(0.f, 60.f, 0.f);
 		camera->updateView();
 
 		/*textui = new Textwrap[2];
@@ -147,6 +147,10 @@ namespace dxe {
 		particleEmitters->flyweigth.velMinVals = glm::vec3(-20.f, 1.f, -20.f);
 		particleEmitters->flyweigth.velMaxVals = glm::vec3(20.f, 10.f, 20.f);
 		particleEmitters->particles.resize(50);
+
+		// player stuff
+		player_collider.center = camera->position;
+		player_collider.extent = { 1.f, 5.f, 1.f };
 	}
 
 	GameScene::~GameScene() {}
@@ -194,7 +198,29 @@ namespace dxe {
 		}
 
 		// copying the position of the camera into the skybox
-		skybox->transform[3] = camera->view[3];
+		skybox->transform[3] = glm::vec4(camera->position, 1.f);
+
+
+
+		auto f = [&](const glm::mat3 triangle)->bool {
+			glm::vec3 intersection{ 0.f };
+			if (RayToTriangleCollision(camera->position + glm::vec3{ 0.f, -10.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
+
+				intersection.x = camera->position.x;
+				intersection.z = camera->position.z;
+				intersection.y += 5.f;
+				camera->setPosition(intersection);
+				return true;
+			}
+			return false;
+		};
+
+		const float grav = 5.f;
+		camera->position.y -= grav * dt;
+		camera->setPosition(camera->position);
+
+		terrain->traverseTree(player_collider, f);
+		player_collider.center = camera->position;
 
 		// temp light debug stuff for spot light
 		{

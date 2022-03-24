@@ -54,8 +54,9 @@ namespace dxe {
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance;
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance2;
 
-		// particle stuff
-		// Emitter pEmitter;
+		aabb_t player_collider;
+
+
 	};
 
 

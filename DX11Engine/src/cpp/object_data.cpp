@@ -59,6 +59,13 @@ namespace dxe {
 		invertView = true;
 	}
 
+	void View_t::setPosition(glm::vec3 pos) {
+		position = pos;
+		view[3][0] = position.x;
+		view[3][1] = position.y;
+		view[3][2] = position.z;
+	}
+
 	glm::vec3 View_t::getFoward() const {
 		return glm::normalize(glm::vec3{view[2].x, view[2].y, view[2].z});
 	}
@@ -398,34 +405,34 @@ namespace dxe {
 		}
 	}
 
-	void Terrain::traverseTree(const aabb_t& box) {
-		traverseRecurse(box, 0);
+	template<typename f>
+	void Terrain::traverseTree(const aabb_t& box, f& lamda) {
+		traverseRecurse(box, 0, lamda, false);
 	}
 
-	void Terrain::traverseRecurse(const aabb_t& box, uint32_t inx) {
+	template<typename f>
+	bool Terrain::traverseRecurse(const aabb_t& box, uint32_t inx, f& lamda, bool& check) {
+
+		if (check) { return; } // prevents further checking once we reach
 
 		if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
 
 		if (!tree[inx].isBranch()) { 
 			// we can use id to find our triangle
-			const uint32_t id = tree[inx].elementId();
-
-			Triangle_i t = triangles[id];
-
+			const Triangle_i t = triangles[tree[inx].elementId()];
 
 			glm::mat3 currentTriangle{ 0.f };
 			for (int i = 0; i < 3; ++i) {
-				currentTriangle[i] = object.model.vertices[i].pos;
+				currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
 			}
 
-			// RayToTriangleCollision(/*pos*/, /*dir*/, currentTriangle, /*interPoint*/);
+			check = lamda(currentTriangle); // here we can process any logic we need to do in our game
 
 			return; 
 		}
 		
-		traverseRecurse(box, tree[inx].left());
-		traverseRecurse(box, tree[inx].right());
-
+		traverseRecurse(box, tree[inx].left(), lamda, check);
+		traverseRecurse(box, tree[inx].right(), lamda, check);
 	}
 
 	void GameObject::translatePosition(const glm::vec3 translation) {
