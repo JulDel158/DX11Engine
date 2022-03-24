@@ -70,7 +70,7 @@ namespace dxe {
 				std::cout << "------------------------------------------------------------\n\n\n";*/
 
 				// RAINBOW DEBUG LINES!!!!!!
-				debug_lines::rainbowUpdate(dt);
+				// debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
 				dxRenderer.draw(&scene1, dt);

@@ -1,6 +1,7 @@
 #include "../hpp/game_scene.hpp"
 
 #include "../hpp/file_reader.hpp"
+#include "../hpp/debug_lines.hpp"
 
 // std
 #include <Windows.h>
@@ -83,11 +84,13 @@ namespace dxe {
 
 		tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
 		
-		//terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
-		//terrain->object.transform[3][1] = -10.f;
+		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		terrain->object.transform[3][1] = -10.f;
 
 		// testing bvh resizing
-		//terrain->resizeBVH(terrain->object.transform);
+		terrain->resizeBVH(terrain->object.transform);
+
+		terrain->object.transform = glm::mat4{ 1.f };
 
 		//plane.model.dMakePlane();
 		//terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
@@ -150,7 +153,7 @@ namespace dxe {
 
 		// player stuff
 		player_collider.center = camera->position;
-		player_collider.extent = { 1.f, 5.f, 1.f };
+		player_collider.extent = { 1.5f, 2.5f, 1.5f };
 	}
 
 	GameScene::~GameScene() {}
@@ -198,29 +201,31 @@ namespace dxe {
 		}
 
 		// copying the position of the camera into the skybox
-		skybox->transform[3] = glm::vec4(camera->position, 1.f);
+		
 
 
 
 		auto f = [&](glm::mat3 triangle)->bool {
 			glm::vec3 intersection{ 0.f };
-			if (RayToTriangleCollision(camera->position, glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
+			if (RayToTriangleCollision(camera->position, glm::vec3{ 0.f, -1.f, 0.f }, triangle, intersection)) {
 
 				intersection.x = camera->position.x;
 				intersection.z = camera->position.z;
-				intersection.y += 5.f;
+				intersection.y += 4.f;
 				camera->setPosition(intersection);
 				return true;
 			}
 			return false;
 		};
 
-		const float grav = 0.f;
+		const float grav = 5.f;
 		camera->position.y -= grav * dt;
 		camera->setPosition(camera->position);
 		bool check = false;
-		// terrain->traverseTree(player_collider, f, 0, check);
+		terrain->traverseTree(player_collider, f, 0, check);
+
 		player_collider.center = camera->position;
+		skybox->transform[3] = glm::vec4(camera->position, 1.f);
 
 		// temp light debug stuff for spot light
 		{
@@ -262,6 +267,11 @@ namespace dxe {
 		else { // gonna update in the gpu, switching positions to differentiate update functions
 			particleEmitters->pos.z = 10.f;
 		}
+
+#ifdef _DEBUG
+		debug_lines::addAabb(player_collider, { 1.f, 1.f, 0.f, 1.f });
+#endif // _DEBUG
+
 	}
 
 	void GameScene::inputUpdate(const float dt) {

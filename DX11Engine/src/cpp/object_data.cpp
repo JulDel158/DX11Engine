@@ -417,6 +417,12 @@ namespace dxe {
 
 			if (!mm) { swapFormat(node.aabb()); }
 		}
+
+		for (auto& vertex : object.model.vertices) {
+			vertex.pos = transform * glm::vec4(vertex.pos, 1.f);
+		}
+
+
 	}
 
 	//template<typename f>
