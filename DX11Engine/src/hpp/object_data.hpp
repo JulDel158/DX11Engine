@@ -197,13 +197,35 @@ namespace dxe {
 		void resizeBVH(const glm::mat4& transform);
 
 		template<typename f>
-		void traverseTree(const aabb_t& box, f& lamda);
+		void traverseTree(const aabb_t& box, f&& lamda, uint32_t inx, bool& check) {
+
+			if (check) { return; } // prevents further checking once we reach
+
+			if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
+
+			if (!tree[inx].isBranch()) {
+				// we can use id to find our triangle
+				const Triangle_i t = triangles[tree[inx].elementId()];
+
+				glm::mat3 currentTriangle{ 0.f };
+				for (int i = 0; i < 3; ++i) {
+					currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
+				}
+
+				check = std::forward<f>(lamda)(currentTriangle); // here we can process any logic we need to do in our game
+
+				return;
+			}
+
+			this->traverseTree(box, lamda, tree[inx].left(), check);
+			this->traverseTree(box, lamda, tree[inx].right(), check);
+		}
 
 		~Terrain() { tree.clear(); triangles.clear(); }
 
 	private:
-		template<typename f>
-		bool traverseRecurse(const aabb_t& box, uint32_t inx, f &lamda, bool& check);
+		/*template<typename f>
+		bool traverseRecurse(const aabb_t& box, uint32_t inx, f &lamda, bool& check);*/
 
 	};
 

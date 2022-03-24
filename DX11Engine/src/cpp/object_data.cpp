@@ -7,6 +7,7 @@
 #include <limits>
 #include <random>
 #include <unordered_map>
+#include <utility>
 
 
 // libs
@@ -316,12 +317,12 @@ namespace dxe {
 		object.model.loadObject(filepath, invertY);
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
-		const int vertCount = static_cast<int>(object.model.indices.size()) / 3;
+		const int triangleCount = static_cast<int>(object.model.indices.size()) / 3;
 
 		//===================== generating triangle data =====================
 		// preparing containers
-		triangles.resize(vertCount);
-		tInds.resize(vertCount);
+		triangles.resize(triangleCount);
+		tInds.resize(triangleCount);
 
 		for (int i = 0, j = 0; i < triangles.size(); ++i) {
 			tInds[i] = i;
@@ -347,15 +348,15 @@ namespace dxe {
 			triangles[i].box.isMinMax = minMaxFormat;
 			if (!minMaxFormat) { // adjusting format to center and extent if enabled
 				triangles[i].box.center = (triangles[i].box.min + triangles[i].box.max) / 2.f;
-				triangles[i].box.extent -= triangles[i].box.center;
+				triangles[i].box.extent = triangles[i].box.max - triangles[i].box.center;
 			}
 
 		} // for each triangle
 
 		// shuffling all triangles to prepare for tree generation
-		std::random_device randDevice; // used to seed engine
-		std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
-		std::shuffle(tInds.begin(), tInds.end(), randEngine);
+		//std::random_device randDevice; // used to seed engine
+		//std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
+		//std::shuffle(tInds.begin(), tInds.end(), randEngine);
 
 		// ===================== generating bvh tree =====================
 		bvh_node root = bvh_node(triangles[tInds[0]].box, tInds[0]);
@@ -376,10 +377,18 @@ namespace dxe {
 
 			// we need to reach a leaf so we can insert the next entry into the tree
 			while (tree[curr].isBranch()) { 
-				 ComputeBounds(tree[curr].aabb(), root.aabb(), tree[curr].aabb());
+				 ComputeBounds(tree[curr].aabb(), node.aabb(), tree[curr].aabb());
 				 // we will used distance to balance the tree
-				 const float leftDist = manhDistance(root.aabb().center, tree[tree[curr].left()].aabb().center);
-				 const float rightDist = manhDistance(root.aabb().center, tree[tree[curr].right()].aabb().center);
+				 float leftDist = 0.f; // manhDistance(node.aabb().center, tree[tree[curr].left()].aabb().center);
+				 float rightDist = 0.f; // manhDistance(node.aabb().center, tree[tree[curr].right()].aabb().center);
+
+				 if (node.aabb().isMinMax) {
+					 leftDist = manhDistance((node.aabb().min + node.aabb().max) / 2.f, (tree[tree[curr].left()].aabb().min + tree[tree[curr].left()].aabb().max) / 2.f);
+					 rightDist = manhDistance((node.aabb().min + node.aabb().max) / 2.f, (tree[tree[curr].right()].aabb().min + tree[tree[curr].right()].aabb().max) / 2.f);
+				 } else {
+					 leftDist = manhDistance(node.aabb().center, tree[tree[curr].left()].aabb().center);
+					 rightDist = manhDistance(node.aabb().center, tree[tree[curr].right()].aabb().center);
+				 }
 				 
 				 curr = (leftDist < rightDist) ? tree[curr].left() : tree[curr].right();
 			}
@@ -399,41 +408,72 @@ namespace dxe {
 
 	void Terrain::resizeBVH(const glm::mat4& transform) {
 		for (auto& node : tree) {
-			
+			const bool mm = node.aabb().isMinMax;
+
+			if (!mm) { swapFormat(node.aabb()); }
+
 			node.aabb().center = transform * glm::vec4(node.aabb().center, 1.f);
 			node.aabb().extent = transform * glm::vec4(node.aabb().extent, 1.f);
+
+			if (!mm) { swapFormat(node.aabb()); }
 		}
 	}
 
-	template<typename f>
-	void Terrain::traverseTree(const aabb_t& box, f& lamda) {
-		traverseRecurse(box, 0, lamda, false);
-	}
+	//template<typename f>
+	//void Terrain::traverseTree(const aabb_t& box, f&& lamda, uint32_t inx, bool& check) {
+	//	//bool check = false;
+	//	// traverseRecurse(box, 0, lamda, check);
 
-	template<typename f>
-	bool Terrain::traverseRecurse(const aabb_t& box, uint32_t inx, f& lamda, bool& check) {
+	//	if (check) { return; } // prevents further checking once we reach
 
-		if (check) { return; } // prevents further checking once we reach
+	//	if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
 
-		if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
+	//	if (!tree[inx].isBranch()) {
+	//		// we can use id to find our triangle
+	//		const Triangle_i t = triangles[tree[inx].elementId()];
 
-		if (!tree[inx].isBranch()) { 
-			// we can use id to find our triangle
-			const Triangle_i t = triangles[tree[inx].elementId()];
+	//		glm::mat3 currentTriangle{ 0.f };
+	//		for (int i = 0; i < 3; ++i) {
+	//			currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
+	//		}
 
-			glm::mat3 currentTriangle{ 0.f };
-			for (int i = 0; i < 3; ++i) {
-				currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
-			}
+	//		check = std::forward<f>(lamda)(currentTriangle); // here we can process any logic we need to do in our game
 
-			check = lamda(currentTriangle); // here we can process any logic we need to do in our game
+	//		return;
+	//	}
 
-			return; 
-		}
-		
-		traverseRecurse(box, tree[inx].left(), lamda, check);
-		traverseRecurse(box, tree[inx].right(), lamda, check);
-	}
+	//	this->traverseTree(box, lamda, tree[inx].left(), check);
+	//	this->traverseTree(box, lamda, tree[inx].right(), check);
+
+	//	//traverseRecurse(box, tree[inx].left(), lamda, check);
+	//	//traverseRecurse(box, tree[inx].right(), lamda, check);
+
+	//}
+
+	//template<typename f>
+	//bool Terrain::traverseRecurse(const aabb_t& box, uint32_t inx, f& lamda, bool& check) {
+
+	//	if (check) { return; } // prevents further checking once we reach
+
+	//	if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
+
+	//	if (!tree[inx].isBranch()) { 
+	//		// we can use id to find our triangle
+	//		const Triangle_i t = triangles[tree[inx].elementId()];
+
+	//		glm::mat3 currentTriangle{ 0.f };
+	//		for (int i = 0; i < 3; ++i) {
+	//			currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
+	//		}
+
+	//		check = lamda(currentTriangle); // here we can process any logic we need to do in our game
+
+	//		return; 
+	//	}
+	//	
+	//	traverseRecurse(box, tree[inx].left(), lamda, check);
+	//	traverseRecurse(box, tree[inx].right(), lamda, check);
+	//}
 
 	void GameObject::translatePosition(const glm::vec3 translation) {
 		transform[3] += glm::vec4(translation, 0.f);

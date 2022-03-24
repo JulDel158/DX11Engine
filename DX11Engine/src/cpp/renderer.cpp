@@ -21,7 +21,7 @@ namespace dxe {
 
 	void renderer::update(const View_t& camera) {
 #ifdef _DEBUG
-		debug_lines::addGrid();
+		/*debug_lines::addGrid();
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f }, 1.f, glm::vec4{1.f, 1.f, 1.f, 1.f});
 
@@ -29,7 +29,7 @@ namespace dxe {
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 5.f, 0.f }, 0.5f, glm::vec4{ 0.f, 1.f, 0.f, 1.f });
 
-		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });
+		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });*/
 
 #endif // DEBUG
 		frameCbuffer.view = camera.view;
@@ -87,9 +87,9 @@ namespace dxe {
 
 		#ifdef  _DEBUG
 			for (const auto& n : scene->getTerrain()->tree) {
-				debug_lines::addAabb(n.aabb());
+				debug_lines::addAabb(n.aabb(), {0.f, 1.f, 1.f, 1.f});
 			}
-			//debug_lines::addAabb(scene->getTerrain()->tree[0].aabb());
+			debug_lines::addAabb(scene->getTerrain()->tree[0].aabb(), { 0.f, 1.f, 1.f, 1.f });
 		#endif //  _DEBUG
 
 		}

@@ -19,7 +19,7 @@ namespace dxe {
 
 		// camera initialization
 		camera = std::make_unique<View_t>();
-		camera->position = glm::vec3(0.f, 60.f, 0.f);
+		camera->position = glm::vec3(0.f, 0.f, 0.f);
 		camera->updateView();
 
 		/*textui = new Textwrap[2];
@@ -73,21 +73,21 @@ namespace dxe {
 		
 		// terrain plane game object
 		terrain = new Terrain;
-		// terrain->loadTerrain("assets/models/terrain_1.obj", false, true); // generates bvh tree
-		terrain->object.model.loadObject("assets/models/terrain_1.obj", false);
+		terrain->loadTerrain("assets/models/debug_terrain.obj", false, false); // generates bvh tree
+		//terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
 		terrain->object.isActive = true;
 		terrain->object.resourceId = 7;
 
 		// testing terrain stuff
-		// tools::exportBVH("assets/models/terrain_1.bvh", *terrain);
+		tools::exportBVH("assets/models/debug_terrain.bvh", *terrain);
 
-		tools::file_reader::loadBVH("assets/models/terrain_1.bvh", *terrain);
+		tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
 		
-		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
-		terrain->object.transform[3][1] = -10.f;
+		//terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		//terrain->object.transform[3][1] = -10.f;
 
 		// testing bvh resizing
-		terrain->resizeBVH(terrain->object.transform);
+		//terrain->resizeBVH(terrain->object.transform);
 
 		//plane.model.dMakePlane();
 		//terrain->transform[0][0] = terrain->transform[1][1] = terrain->transform[2][2] = 40.f;
@@ -202,9 +202,9 @@ namespace dxe {
 
 
 
-		auto f = [&](const glm::mat3 triangle)->bool {
+		auto f = [&](glm::mat3 triangle)->bool {
 			glm::vec3 intersection{ 0.f };
-			if (RayToTriangleCollision(camera->position + glm::vec3{ 0.f, -10.f, 0.f }, glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
+			if (RayToTriangleCollision(camera->position, glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
 
 				intersection.x = camera->position.x;
 				intersection.z = camera->position.z;
@@ -215,11 +215,11 @@ namespace dxe {
 			return false;
 		};
 
-		const float grav = 5.f;
+		const float grav = 0.f;
 		camera->position.y -= grav * dt;
 		camera->setPosition(camera->position);
-
-		terrain->traverseTree(player_collider, f);
+		bool check = false;
+		// terrain->traverseTree(player_collider, f, 0, check);
 		player_collider.center = camera->position;
 
 		// temp light debug stuff for spot light
