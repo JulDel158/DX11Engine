@@ -62,7 +62,7 @@ namespace dxe {
 		glm::vec3 rotation{ 0.f };
 		float rotationSpeed{ 100.0f };
 		glm::vec3 position{ 0.f };
-		float translationSpeed{ 25.5f };
+		float translationSpeed{ 40.f };
 		bool invertView{ false };
 
 		void updateView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});

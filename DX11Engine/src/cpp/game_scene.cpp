@@ -74,17 +74,17 @@ namespace dxe {
 		
 		// terrain plane game object
 		terrain = new Terrain;
-		terrain->loadTerrain("assets/models/debug_terrain.obj", false, false); // generates bvh tree
-		//terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
+		//terrain->loadTerrain("assets/models/terrain_1.obj", false, false); // generates bvh tree
+		terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
 		terrain->object.isActive = true;
 		terrain->object.resourceId = 7;
 
 		// testing terrain stuff
-		tools::exportBVH("assets/models/debug_terrain.bvh", *terrain);
+		//tools::exportBVH("assets/models/terrain_1.bvh", *terrain);
 
 		tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
 		
-		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 20.f; // scale
+		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 10.f; // scale
 		terrain->object.transform[3][1] = -10.f;
 
 		// testing bvh resizing
@@ -153,7 +153,7 @@ namespace dxe {
 
 		// player stuff
 		player_collider.center = camera->position;
-		player_collider.extent = { 1.5f, 2.5f, 1.5f };
+		player_collider.extent = { 2.5f, 10.0f, 2.5f };
 	}
 
 	GameScene::~GameScene() {}
@@ -201,24 +201,25 @@ namespace dxe {
 		}
 
 		// copying the position of the camera into the skybox
-		
-
 
 
 		auto f = [&](glm::mat3 triangle)->bool {
 			glm::vec3 intersection{ 0.f };
-			if (RayToTriangleCollision(camera->position, glm::vec3{ 0.f, -1.f, 0.f }, triangle, intersection)) {
+			glm::vec3 tempPos = camera->position;
+			const float groundOffset = 8.f;
+			tempPos.y -= groundOffset;
+			if (RayToTriangleCollision(tempPos, glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
 
 				intersection.x = camera->position.x;
 				intersection.z = camera->position.z;
-				intersection.y += 4.f;
+				intersection.y += groundOffset;
 				camera->setPosition(intersection);
 				return true;
 			}
 			return false;
 		};
 
-		const float grav = 5.f;
+		const float grav = 60.f;
 		camera->position.y -= grav * dt;
 		camera->setPosition(camera->position);
 		bool check = false;
@@ -284,7 +285,7 @@ namespace dxe {
 		if (input::KeyDown('S')) { translate.z -= camera->translationSpeed * dt; } // BACKWARDS
 		if (input::KeyDown('D')) { translate.x += camera->translationSpeed * dt; } // RIGHT
 		if (input::KeyDown('A')) { translate.x -= camera->translationSpeed * dt; } // LEFT
-		if (input::KeyDown('Q')) { translate.y += camera->translationSpeed * dt; } // UP
+		if (input::KeyDown('Q')) { translate.y += camera->translationSpeed * dt * 5.f; } // UP
 		if (input::KeyDown('E')) { translate.y -= camera->translationSpeed * dt; } // DOWN
 //#endif // _DEBUG
 		static bool released0 = true;
