@@ -74,7 +74,12 @@ namespace dxe {
 		ID3D11RasterizerState*		rasterState[RASTER_STATE::COUNT]{};
 
 		ID3D11Buffer*				vertexBuffer[VERTEX_BUFFER::COUNT]{};
-		std::vector<ObjVertex>		vBuffer;
+
+		ObjVertex*					vBuffer;
+
+		const int					vBufferSize{ 40000 };
+
+
 		std::vector<Particle> pvBuffer;
 
 		ID3D11Buffer*				indexBuffer[INDEX_BUFFER::COUNT]{};

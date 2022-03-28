@@ -134,6 +134,9 @@ namespace dxe {
 		safe_release(swapChain);
 
 		safe_release(device);
+
+		// clearing buffers
+		delete[] vBuffer;
 	}
 
 	void pipeline::present(unsigned int vsync) {
@@ -204,8 +207,10 @@ namespace dxe {
 		// SETTING BUFFERS
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
 
-		vBuffer = obj.vertices; // we must first copy the data into the buffer
-		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
+		//vBuffer = obj.vertices; // we must first copy the data into the buffer
+		ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+		memcpy(vBuffer, obj.vertices.data(), obj.vertices.size() * sizeof(ObjVertex));
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
 
 		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_50000], DXGI_FORMAT_R32_UINT, 0);
 
@@ -259,8 +264,10 @@ namespace dxe {
 		Object_cb scb;
 		scb.modeling = glm::mat4{ 1.f };
 
-		vBuffer = skybox->model.vertices;
-		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
+		//vBuffer = skybox->model.vertices;
+		ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+		memcpy(vBuffer, skybox->model.vertices.data(), skybox->model.vertices.size() * sizeof(ObjVertex));
+		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
 		iBuffer = skybox->model.indices;
 		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
@@ -304,8 +311,10 @@ namespace dxe {
 		for (size_t i = 0; i < size; ++i) {
 			if (!gameObjects[i].isActive) { continue; }
 
-			vBuffer = gameObjects[i].model.vertices;
-			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer.data(), 0, 0);
+			//vBuffer = gameObjects[i].model.vertices;
+			ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+			memcpy(vBuffer, gameObjects[i].model.vertices.data(), gameObjects[i].model.vertices.size() * sizeof(ObjVertex));
+			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
 			iBuffer = gameObjects[i].model.indices;
 			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
@@ -726,9 +735,9 @@ namespace dxe {
 			static_cast<UINT>(sizeof(ObjVertex) * 40000),
 			D3D11_BIND_VERTEX_BUFFER);
 
-		vBuffer.reserve(40000); // allocating buffer memory
+		vBuffer = new ObjVertex[vBufferSize]; // allocating buffer memory
 		D3D11_SUBRESOURCE_DATA srd2 = { 0 };
-		srd2.pSysMem = vBuffer.data();
+		srd2.pSysMem = vBuffer;
 
 		hr = device->CreateBuffer(&desc2, &srd2, &vertexBuffer[VERTEX_BUFFER::OBJ_40000]);
 		assert(!FAILED(hr) && "failed to create obj vertex buffer");
