@@ -136,7 +136,14 @@ namespace dxe {
 		safe_release(device);
 
 		// clearing buffers
-		delete[] vBuffer;
+		if (vBuffer)
+			delete[] vBuffer;
+
+		if (iBuffer)
+			delete[] iBuffer;
+
+		if (pvBuffer)
+			delete[] pvBuffer;
 	}
 
 	void pipeline::present(unsigned int vsync) {
@@ -208,14 +215,16 @@ namespace dxe {
 		context->IASetVertexBuffers(0, 1, &vertexBuffer[VERTEX_BUFFER::OBJ_40000], &stride, &offset);
 
 		//vBuffer = obj.vertices; // we must first copy the data into the buffer
-		ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+		//ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
 		memcpy(vBuffer, obj.vertices.data(), obj.vertices.size() * sizeof(ObjVertex));
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0); /*TODO PUT OBJECT VERTEX BUFFER DATA HERE*/
 
 		context->IASetIndexBuffer(indexBuffer[INDEX_BUFFER::OBJ_50000], DXGI_FORMAT_R32_UINT, 0);
 
-		iBuffer = obj.indices;
-		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
+		//iBuffer = obj.indices;
+		//ZeroMemory(iBuffer, iBufferSize * sizeof(uint32_t)); // since we index only the size of indices, clearing the buffer may not be neccessary
+		memcpy(iBuffer, obj.indices.data(), obj.indices.size() * sizeof(uint32_t));
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer, 0, 0); /*TODO PUT OBJECT INDEX BUFFER DATA HERE*/
 
 		Object_cb cb;
 		cb.modeling = glm::mat4{ 1.f };
@@ -265,12 +274,14 @@ namespace dxe {
 		scb.modeling = glm::mat4{ 1.f };
 
 		//vBuffer = skybox->model.vertices;
-		ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+		//ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
 		memcpy(vBuffer, skybox->model.vertices.data(), skybox->model.vertices.size() * sizeof(ObjVertex));
 		context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
-		iBuffer = skybox->model.indices;
-		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
+		//iBuffer = skybox->model.indices;
+		//ZeroMemory(iBuffer, iBufferSize * sizeof(uint32_t));
+		memcpy(iBuffer, skybox->model.indices.data(), skybox->model.indices.size() * sizeof(uint32_t));
+		context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer, 0, 0);
 
 		scb.modeling = skybox->transform;
 		context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &scb, 0, 0);
@@ -312,12 +323,14 @@ namespace dxe {
 			if (!gameObjects[i].isActive) { continue; }
 
 			//vBuffer = gameObjects[i].model.vertices;
-			ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+			//ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
 			memcpy(vBuffer, gameObjects[i].model.vertices.data(), gameObjects[i].model.vertices.size() * sizeof(ObjVertex));
 			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
-			iBuffer = gameObjects[i].model.indices;
-			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer.data(), 0, 0);
+			//iBuffer = gameObjects[i].model.indices;
+			//ZeroMemory(iBuffer, iBufferSize * sizeof(uint32_t));
+			memcpy(iBuffer, gameObjects[i].model.indices.data(), gameObjects[i].model.indices.size() * sizeof(uint32_t));
+			context->UpdateSubresource(indexBuffer[INDEX_BUFFER::OBJ_50000], 0, NULL, iBuffer, 0, 0);
 
 			ocb.modeling = gameObjects[i].transform;
 			context->UpdateSubresource(constantBuffer[CONSTANT_BUFFER::OBJECT_CB], 0, NULL, &ocb, 0, 0);
@@ -732,7 +745,7 @@ namespace dxe {
 
 		// object vertex buffer
 		CD3D11_BUFFER_DESC desc2 = CD3D11_BUFFER_DESC(
-			static_cast<UINT>(sizeof(ObjVertex) * 40000),
+			static_cast<UINT>(sizeof(ObjVertex) * vBufferSize),
 			D3D11_BIND_VERTEX_BUFFER);
 
 		vBuffer = new ObjVertex[vBufferSize]; // allocating buffer memory
@@ -743,26 +756,28 @@ namespace dxe {
 		assert(!FAILED(hr) && "failed to create obj vertex buffer");
 
 		// particles vertex buffer
-		CD3D11_BUFFER_DESC desc3 = CD3D11_BUFFER_DESC(
-			static_cast<UINT>(sizeof(Particle) * 10),
-			D3D11_BIND_VERTEX_BUFFER);
+		if (pvBufferSize) {
+			CD3D11_BUFFER_DESC desc3 = CD3D11_BUFFER_DESC(
+				static_cast<UINT>(sizeof(Particle) * pvBufferSize),
+				D3D11_BIND_VERTEX_BUFFER);
 
-		pvBuffer.reserve(1000);
-		D3D11_SUBRESOURCE_DATA srd3 = { 0 };
-		srd3.pSysMem = pvBuffer.data();
+			pvBuffer = new Particle[pvBufferSize];
+			D3D11_SUBRESOURCE_DATA srd3 = { 0 };
+			srd3.pSysMem = pvBuffer;
 
-		hr = device->CreateBuffer(&desc3, &srd3, &vertexBuffer[VERTEX_BUFFER::PARTICLES]);
-		assert(!FAILED(hr) && "failed to create particle vertex buffer");
+			hr = device->CreateBuffer(&desc3, &srd3, &vertexBuffer[VERTEX_BUFFER::PARTICLES]);
+			assert(!FAILED(hr) && "failed to create particle vertex buffer");
+		}
 
 		// index buffer
 		CD3D11_BUFFER_DESC idesc = CD3D11_BUFFER_DESC(
-			sizeof(uint32_t) * 50000,
+			sizeof(uint32_t) * iBufferSize,
 			D3D11_BIND_INDEX_BUFFER);
 
 
-		iBuffer.reserve(40000); // allocating buffer memory
+		iBuffer = new uint32_t[iBufferSize]; // allocating buffer memory
 		D3D11_SUBRESOURCE_DATA isrd = { 0 };
-		isrd.pSysMem = iBuffer.data();
+		isrd.pSysMem = iBuffer;
 
 
 		hr = device->CreateBuffer(&idesc, &isrd, &indexBuffer[INDEX_BUFFER::OBJ_50000]);

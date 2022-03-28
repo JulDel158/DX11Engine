@@ -75,15 +75,19 @@ namespace dxe {
 
 		ID3D11Buffer*				vertexBuffer[VERTEX_BUFFER::COUNT]{};
 
-		ObjVertex*					vBuffer;
+		ObjVertex*					vBuffer{ 0 };
 
 		const int					vBufferSize{ 40000 };
 
+		Particle*					pvBuffer{ 0 };
 
-		std::vector<Particle> pvBuffer;
+		const int					pvBufferSize{0};
 
 		ID3D11Buffer*				indexBuffer[INDEX_BUFFER::COUNT]{};
-		std::vector<uint32_t>		iBuffer;
+
+		uint32_t*					iBuffer{ 0 };
+
+		const int					iBufferSize{ 50000 };
 
 		ID3D11InputLayout*			inputLayout[INPUT_LAYOUT::COUNT]{};
 		 
