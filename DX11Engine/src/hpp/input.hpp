@@ -1,6 +1,8 @@
 #pragma once
 
 // this class will handle all game inputs
+#define NOMINMAX
+#include <Windows.h>
 
 namespace dxe {
 
@@ -15,6 +17,9 @@ namespace dxe {
 		// updates the key map
 		static void Update();
 
+		// 
+		static void Listen(UINT message, LPARAM lParam, HWND hwnd);
+
 		// returns true when a key is pressed once
 		static bool KeyPressed(int i);
 
@@ -23,6 +28,21 @@ namespace dxe {
 
 		// returns true once a pressed key is released
 		static bool KeyUp(int i);
+
+		// returns true when a mouse button is pressed 0 left, 1 right, 2 middle
+		static bool MouseButtonPressed(int i);
+
+		// returns true while a mouse button is being held down 0 left, 1 right, 2 middle
+		static bool MouseButtonDown(int i);
+
+		// returns true once a held down mouse button is released 0 left, 1 right, 2 middle
+		static bool MouseButtonUp(int i);
+
+		static POINT GetMouseWCoord();
+
+		static POINT GetMouseCcoord();
+
+		static void SetCursonPosition(int x, int y);
 
 	private:
 

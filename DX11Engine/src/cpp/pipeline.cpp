@@ -749,6 +749,7 @@ namespace dxe {
 			D3D11_BIND_VERTEX_BUFFER);
 
 		vBuffer = new ObjVertex[vBufferSize]; // allocating buffer memory
+		ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
 		D3D11_SUBRESOURCE_DATA srd2 = { 0 };
 		srd2.pSysMem = vBuffer;
 
@@ -762,6 +763,7 @@ namespace dxe {
 				D3D11_BIND_VERTEX_BUFFER);
 
 			pvBuffer = new Particle[pvBufferSize];
+			ZeroMemory(pvBuffer, pvBufferSize * sizeof(Particle));
 			D3D11_SUBRESOURCE_DATA srd3 = { 0 };
 			srd3.pSysMem = pvBuffer;
 
@@ -776,6 +778,7 @@ namespace dxe {
 
 
 		iBuffer = new uint32_t[iBufferSize]; // allocating buffer memory
+		ZeroMemory(iBuffer, iBufferSize * sizeof(uint32_t));
 		D3D11_SUBRESOURCE_DATA isrd = { 0 };
 		isrd.pSysMem = iBuffer;
 

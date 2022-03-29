@@ -160,7 +160,7 @@ namespace dxe {
 
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
-
+		//input::SetCursonPosition(1280 / 2, 720 / 2); keep cursor in a constant place for certain first person mouse stuff
 		if (!audioEngine->Update())
 		{
 			// No audio device is active
