@@ -7,33 +7,27 @@
 #include "collision.hpp"
 #include "object_data.hpp"
 
-namespace dxe {
+namespace dxe::debug_lines {
 
-	struct debug_lines {
-		debug_lines() = delete;
-		~debug_lines() = delete;
-		debug_lines(const debug_lines&) = delete;
-		debug_lines& operator=(const debug_lines&) = delete;
+		void clearLines();
 
-		static void clearLines();
+		void addLine(const glm::vec3 apos, const glm::vec3 bpos, const glm::vec4 acolor, const glm::vec4 bcolor);
 
-		static void addLine(const glm::vec3& apos, const glm::vec3& bpos, const glm::vec4& acolor, const glm::vec4& bcolor);
+		void addLine(const glm::vec3 apos, const glm::vec3 bpos, const glm::vec4 color);
 
-		inline static void addLine(const glm::vec3& apos, const glm::vec3& bpos, const glm::vec4& color) { addLine(apos, bpos, color, color); }
+		const ColoredVertex* getLineVerts();
 
-		static const ColoredVertex* getLineVerts();
+		size_t getLineVertCount();
 
-		static size_t getLineVertCount();
+		size_t getLineVertCapacity();
 
-		static size_t getLineVertCapacity();
+		void addGrid();
 
-		static void addGrid();
+		void addDebugCube(glm::vec3 pos = glm::vec3{ 0.f, 0.f, 0.f }, float offset = 0.5f, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
 
-		static void addDebugCube(glm::vec3 pos = glm::vec3{ 0.f, 0.f, 0.f }, float offset = 0.5f, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
+		void addAabb(const aabb_t& box, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
 
-		static void addAabb(const aabb_t& box, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
+		void rainbowUpdate(const float dt);
+	
 
-		static void rainbowUpdate(const float dt);
-	};
-
-} // namespace dxe
+} // namespace dxe::debug::lines

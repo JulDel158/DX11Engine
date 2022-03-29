@@ -26,11 +26,11 @@ namespace {
     float currTime = 0.f;
 }
 
-namespace dxe {
+namespace dxe::debug_lines {
 
-	void debug_lines::clearLines() { lineVertCount = 0; }
+	void clearLines() { lineVertCount = 0; }
 
-	void debug_lines::addLine(const glm::vec3& apos, const glm::vec3& bpos, const glm::vec4& acolor, const glm::vec4& bcolor) {
+	void addLine(const glm::vec3 apos, const glm::vec3 bpos, const glm::vec4 acolor, const glm::vec4 bcolor) {
         if (lineVertCount + 2 >= MAX_LINE_VERTS) { return; } // prevent going out of bounds
 		lineVerts[lineVertCount].pos = apos;
 		lineVerts[lineVertCount++].color = acolor;
@@ -38,13 +38,18 @@ namespace dxe {
 		lineVerts[lineVertCount++].color = bcolor;
 	}
 
-	const ColoredVertex* debug_lines::getLineVerts() { return lineVerts.data(); }
+    void addLine(const glm::vec3 apos, const glm::vec3 bpos, const glm::vec4 color) {
+        //addLine(apos, bpos, color, color);
+        addLine(apos, bpos, color, color);
+    }
 
-	size_t debug_lines::getLineVertCount() { return lineVertCount; }
+	const ColoredVertex* getLineVerts() { return lineVerts.data(); }
 
-	size_t debug_lines::getLineVertCapacity() { return MAX_LINE_VERTS; }
+	size_t getLineVertCount() { return lineVertCount; }
 
-	void debug_lines::addGrid() {
+	size_t getLineVertCapacity() { return MAX_LINE_VERTS; }
+
+	void addGrid() {
         const float size = 50;
         const float spacing = 1;
         const float lines = size / spacing;
@@ -81,7 +86,7 @@ namespace dxe {
             glm::vec4(0.0, 0.2f, 1.0f, 1.0f));  // color for both
 	}
 
-    void debug_lines::addDebugCube(glm::vec3 pos, float offset, glm::vec4 color) {
+    void addDebugCube(glm::vec3 pos, float offset, glm::vec4 color) {
 
         // bottom
         glm::vec3 p1;
@@ -120,7 +125,7 @@ namespace dxe {
         addLine(p8, p7, color);
     }
 
-    void debug_lines::addAabb(const aabb_t& box, glm::vec4 color) {
+    void addAabb(const aabb_t& box, glm::vec4 color) {
         const glm::vec3 min = (box.isMinMax) ? box.min : box.center - box.extent;
         const glm::vec3 max = (box.isMinMax) ? box.max : box.center + box.extent;
 
@@ -153,7 +158,7 @@ namespace dxe {
         addLine(p[5], max, color);
     }
 
-    void debug_lines::rainbowUpdate(const float dt) {
+    void rainbowUpdate(const float dt) {
         currTime = (currTime + dt > totalTime) ? totalTime : currTime + dt;
         const float a = glm::clamp(currTime / totalTime, 0.f, 1.f);
 
@@ -171,5 +176,8 @@ namespace dxe {
             currTime = 0;
         }
     }
+
+    
+
 
 } // namespace dxe
