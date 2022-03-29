@@ -44,6 +44,8 @@ namespace dxe {
 
 		static void SetCursonPosition(int x, int y);
 
+		static void SetWindowHandle(HWND hWnd);
+
 	private:
 
 		

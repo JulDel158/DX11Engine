@@ -16,6 +16,8 @@ namespace {
 	*  middle button 2
 	*  4 - 5 reserved for additional input support
 	* */
+
+	HWND windowHandle{ 0 };
 }
 
 namespace dxe {
@@ -98,7 +100,12 @@ namespace dxe {
 
 	void input::SetCursonPosition(int x, int y) {
 		// TODO: ONLY SET THE CURSOR IF THIS WINDOW IS ACTIVE
-		SetCursorPos(x, y);
+		if (windowHandle == GetActiveWindow())
+			SetCursorPos(x, y);
+	}
+
+	void input::SetWindowHandle(HWND hWnd) {
+		windowHandle = hWnd;
 	}
 
 } // namespace dxe

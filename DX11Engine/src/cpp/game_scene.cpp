@@ -160,7 +160,7 @@ namespace dxe {
 
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
-		//input::SetCursonPosition(1280 / 2, 720 / 2); keep cursor in a constant place for certain first person mouse stuff
+		// input::SetCursonPosition(1280 / 2, 720 / 2); //keep cursor in a constant place for certain first person mouse stuff
 		if (!audioEngine->Update())
 		{
 			// No audio device is active
@@ -271,8 +271,13 @@ namespace dxe {
 
 #ifdef _DEBUG
 		debug_lines::addAabb(player_collider, { 1.f, 1.f, 0.f, 1.f });
-#endif // _DEBUG
 
+		auto mcc = input::GetMouseCcoord();
+		auto mwc = input::GetMouseWCoord();
+
+		printf("mouse client coords: x:%d y:%d\n", mcc.x, mcc.y);
+		printf("mouse window coords: x:%d y:%d\n", mwc.x, mwc.y);
+#endif // _DEBUG
 	}
 
 	void GameScene::inputUpdate(const float dt) {

@@ -2,6 +2,7 @@
 
 #include "../hpp/dx_window.hpp"
 #include "../hpp/debug_lines.hpp"
+#include "../hpp/input.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
@@ -30,6 +31,8 @@ namespace dxe {
 #endif // _DEBUG
 
 		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
+
+		input::SetWindowHandle(dxWindow.mainHWND);
 	}
 
 	app::~app() {}
