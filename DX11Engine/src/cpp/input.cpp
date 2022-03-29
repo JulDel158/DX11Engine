@@ -8,7 +8,7 @@ namespace {
 
 	bool mouseState[5];  
 	bool prevMouseState[5];
-
+	bool updateMouse{ true }; // this prevents a mouse update on the same cycle that the message/s are sent
 	POINT mousePointW;
 	POINT mousePointC;
 	/* left button 0 
@@ -21,14 +21,17 @@ namespace {
 namespace dxe {
 
 	void input::Update() {
+		memcpy(&prevKeyboardState, &keyboardState, 256 * sizeof(unsigned char));
+		if (updateMouse) { memcpy(&prevMouseState, &mouseState, 5 * sizeof(bool)); }
 		auto b = GetKeyboardState(keyboardState);
 		if (!b) {
 			//error
 		}
+		updateMouse = true;
 	}
 
 	void input::Listen(UINT message, LPARAM lParam, HWND hwnd) {
-
+		updateMouse = false;
 		switch (message)
 		{
 		case WM_MOUSEMOVE:
@@ -63,13 +66,10 @@ namespace dxe {
 		default:
 			break;
 		}
-		
 	}
 
 	bool input::KeyPressed(int i) {
-		const bool result = (keyboardState[i] & 0x80) && (keyboardState[i] != prevKeyboardState[i]);
-		if (result) { prevKeyboardState[i] = keyboardState[i]; }
-		return result;
+		return (keyboardState[i] & 0x80) && (keyboardState[i] != prevKeyboardState[i]);
 	}
 
 	bool input::KeyDown(int i) {
@@ -77,15 +77,11 @@ namespace dxe {
 	}
 
 	bool input::KeyUp(int i) {
-		const bool result = !(keyboardState[i] & 0x80) && keyboardState[i] != prevKeyboardState[i];
-		if (result) { prevKeyboardState[i] = keyboardState[i]; }
-		return result;
+		return !(keyboardState[i] & 0x80) && keyboardState[i] != prevKeyboardState[i];
 	}
 
 	bool input::MouseButtonPressed(int i) {
-		const bool result = (mouseState[i] && mouseState[i] != prevMouseState[i]);
-		if (result) { prevMouseState[i] = mouseState[i]; }
-		return result;
+		return mouseState[i] && mouseState[i] != prevMouseState[i];
 	}
 
 	bool input::MouseButtonDown(int i) {
@@ -93,9 +89,7 @@ namespace dxe {
 	}
 
 	bool input::MouseButtonUp(int i) {
-		const bool result = !mouseState[i] && mouseState[i] != prevMouseState[i];
-		if (result) { prevKeyboardState[i] = mouseState[i]; }
-		return result;
+		return !mouseState[i] && mouseState[i] != prevMouseState[i];
 	}
 
 	POINT input::GetMouseWCoord() { return mousePointW; }

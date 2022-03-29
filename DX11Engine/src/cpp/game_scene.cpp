@@ -305,6 +305,22 @@ namespace dxe {
 		if (input::KeyDown(VK_UP)) { camera->rotation.x -= camera->rotationSpeed * dt; } // look up
 		if (input::KeyDown(VK_DOWN)) { camera->rotation.x += camera->rotationSpeed * dt; } // look down
 
+		// input debbuging
+		//if (input::KeyUp('G')) { std::cout << "G was released\n"; }
+
+		//if (input::MouseButtonPressed(0)) { std::cout << "l click pressed" << std::endl; }
+		//if (input::MouseButtonPressed(1)) { std::cout << "r click pressed" << std::endl; }
+		//if (input::MouseButtonPressed(2)) { std::cout << "m click pressed" << std::endl; }
+
+		//if (input::MouseButtonDown(0)) { std::cout << "l click held" << std::endl; }
+		//if (input::MouseButtonDown(1)) { std::cout << "r click held" << std::endl; }
+		//if (input::MouseButtonDown(2)) { std::cout << "m click held" << std::endl; }
+
+		//if (input::MouseButtonUp(0)) { std::cout << "l click released" << std::endl; }
+		//if (input::MouseButtonUp(1)) { std::cout << "r click released" << std::endl; }
+		//if (input::MouseButtonUp(2)) { std::cout << "m click released" << std::endl; }
+
+
 //#ifndef _DEBUG
 //		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
 //#endif // !_DEBUG
