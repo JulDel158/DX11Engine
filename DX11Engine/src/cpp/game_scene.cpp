@@ -154,13 +154,15 @@ namespace dxe {
 		// player stuff
 		player_collider.center = camera->position;
 		player_collider.extent = { 2.5f, 10.0f, 2.5f };
+
+		
 	}
 
 	GameScene::~GameScene() {}
 
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
-		// input::SetCursonPosition(1280 / 2, 720 / 2); //keep cursor in a constant place for certain first person mouse stuff
+		
 		if (!audioEngine->Update())
 		{
 			// No audio device is active
@@ -222,8 +224,7 @@ namespace dxe {
 		const float grav = 60.f;
 		camera->position.y -= grav * dt;
 		camera->setPosition(camera->position);
-		bool check = false;
-		terrain->traverseTree(player_collider, f, 0, check);
+		terrain->traverseTree(player_collider, f);
 
 		player_collider.center = camera->position;
 		skybox->transform[3] = glm::vec4(camera->position, 1.f);
@@ -272,11 +273,11 @@ namespace dxe {
 #ifdef _DEBUG
 		debug_lines::addAabb(player_collider, { 1.f, 1.f, 0.f, 1.f });
 
-		auto mcc = input::GetMouseCcoord();
+		/*auto mcc = input::GetMouseCcoord();
 		auto mwc = input::GetMouseWCoord();
 
 		printf("mouse client coords: x:%d y:%d\n", mcc.x, mcc.y);
-		printf("mouse window coords: x:%d y:%d\n", mwc.x, mwc.y);
+		printf("mouse window coords: x:%d y:%d\n", mwc.x, mwc.y);*/
 #endif // _DEBUG
 	}
 
@@ -305,8 +306,42 @@ namespace dxe {
 		if (input::KeyPressed('5')) { soundInstance->Play(false); }
 		if (input::KeyPressed('1')) { skybox->resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
 		if (input::KeyPressed('2')) { skybox->resourceId = 2; }
-		if (input::KeyDown(VK_LEFT)) { camera->rotation.y -= camera->rotationSpeed * dt; } // look left
-		if (input::KeyDown(VK_RIGHT)) { camera->rotation.y += camera->rotationSpeed * dt; } // look right
+
+		static bool camDebug = true;
+		if (camDebug) {
+			// more camera stuff
+			input::SetCursonPosition(100, 100, true);
+			auto tempP = input::GetMouseCcoord();
+			screenPoint.x = static_cast<float>(tempP.x);
+			screenPoint.y = static_cast<float>(tempP.y);
+			camDebug = false;
+		}
+		
+		
+		//input::SetCursonPosition(100, 100); //keep cursor in a constant place for certain first person mouse stuff
+		const auto mousePos = input::GetMouseCcoord();
+		glm::vec2 mouseDx = {  static_cast<float>(mousePos.x) - screenPoint.x, static_cast<float>(mousePos.y) - screenPoint.y };
+		/*if (mouseDx.x != 0.f) {
+			mouseDx.x /= glm::abs(mouseDx.x);
+		}
+
+		if (mouseDx.y != 0.f) {
+			mouseDx.y /= glm::abs(mouseDx.y);
+		}*/
+		camera->rotation.x += mouseDx.y * camera->rotationSpeed;
+		camera->rotation.y += mouseDx.x * camera->rotationSpeed;
+		/*printf("initial cursor position: x:%f y:%f\n", screenPoint.x, screenPoint.y);
+		printf("Current cursor position: x:%f y:%f\n", static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));*/
+		//printf("Camera rotation: x:%f y:%f\n", camera->rotation.x, camera->rotation.y);
+		//printf("Rotation delta: x:%f y%f\n", mouseDx.x, mouseDx.y);
+		//debug mouse delta from raw input
+		auto riMouseDelta = input::GetMouseDelta();
+		printf("Raw Input mouse delta: x:%ld y%ld\n", riMouseDelta.x, riMouseDelta.y);
+
+		
+
+		if (input::KeyDown(VK_LEFT)) { camera->rotation.y += -1.f * camera->rotationSpeed * dt; } // look left
+		if (input::KeyDown(VK_RIGHT)) { camera->rotation.y += 1.f * camera->rotationSpeed * dt; } // look right
 		if (input::KeyDown(VK_UP)) { camera->rotation.x -= camera->rotationSpeed * dt; } // look up
 		if (input::KeyDown(VK_DOWN)) { camera->rotation.x += camera->rotationSpeed * dt; } // look down
 
@@ -327,13 +362,15 @@ namespace dxe {
 
 
 //#ifndef _DEBUG
-//		camera.rotation.x = glm::clamp(camera.rotation.x, -90.f, 0.f); // camera can only look up
+		camera->rotation.x = glm::clamp(camera->rotation.x, -89.9f, 89.9f); // camera can only look up
 //#endif // !_DEBUG
 
 
 		camera->updateView(translate);
+		//camera->setRotation();
+		//camera->setPosition(glm::vec3(translate.x, translate.y, translate.z) + camera->position);
 
-		if (input::KeyPressed(VK_SPACE)) { // here we check collision with active objects
+		if (input::KeyPressed(VK_RBUTTON)) { // here we check collision with active objects
 			enemy* finalTarget = nullptr;
 			float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
 			float castTime{ 0.f };
@@ -361,21 +398,5 @@ namespace dxe {
 			soundData->Play();
 		} 
 	}
-
-	/*const GameObject* GameScene::GetSceneObjects() const { return gameObjects.data(); }
-
-	const GameObject* GameScene::GetSkyBox() const { return &skyBox; }
-
-	const uint32_t GameScene::GetObjectTotal() const { return static_cast<uint32_t>(gameObjects.size()); }
-
-	const Scene_cb& GameScene::GetSceneBuffer() const { return scb; }
-
-	const View_t& GameScene::GetView() const { return camera; }
-
-	const Textwrap* GameScene::GetTextUI() const { return textui.data(); }
-
-	const uint32_t GameScene::GetTextUITotal() const { return static_cast<uint32_t>(textui.size()); }
-
-	Emitter* GameScene::GetParticles() { return &pEmitter; }*/
 
 } // namespace dxe

@@ -56,7 +56,8 @@ namespace dxe {
 
 		aabb_t player_collider;
 
-
+		// camera stuff
+		glm::vec2 screenPoint{ 0.f };
 	};
 
 

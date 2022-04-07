@@ -11,6 +11,7 @@ namespace {
 	bool updateMouse{ true }; // this prevents a mouse update on the same cycle that the message/s are sent
 	POINT mousePointW;
 	POINT mousePointC;
+	POINT mouseDelta;
 	/* left button 0
 	*  right button 1
 	*  middle button 2
@@ -30,6 +31,10 @@ namespace dxe::input {
 			//error
 		}
 		updateMouse = true;
+
+		/*GetCursorPos(&mousePointW);
+		mousePointC = mousePointW;
+		ScreenToClient(windowHandle, &mousePointC);*/
 	}
 
 	void Listen(UINT message, LPARAM lParam, HWND hwnd) {
@@ -37,9 +42,7 @@ namespace dxe::input {
 		switch (message)
 		{
 		case WM_MOUSEMOVE:
-			mousePointW.x = mousePointC.x = GET_X_LPARAM(lParam);
-			mousePointW.y = mousePointC.y = GET_Y_LPARAM(lParam);
-			ScreenToClient(hwnd, &mousePointC);
+			
 			break;
 		case WM_LBUTTONDOWN:
 			mouseState[0] = true;
@@ -94,18 +97,41 @@ namespace dxe::input {
 		return !mouseState[i] && mouseState[i] != prevMouseState[i];
 	}
 
-	POINT GetMouseWCoord() { return mousePointW; }
+	POINT GetMouseWCoord() { 
+		GetCursorPos(&mousePointW);
+		return mousePointW; 
+	}
 
-	POINT GetMouseCcoord() { return mousePointC; }
+	POINT GetMouseCcoord() { 
+		GetCursorPos(&mousePointC);
+		ScreenToClient(windowHandle, &mousePointC);
+		return mousePointC; }
 
-	void SetCursonPosition(int x, int y) {
+	void SetCursonPosition(int x, int y, bool ignore) {
 		// TODO: ONLY SET THE CURSOR IF THIS WINDOW IS ACTIVE
-		if (windowHandle == GetActiveWindow())
+		if (windowHandle == GetActiveWindow() || ignore)
 			SetCursorPos(x, y);
+		//mousePointW.x = mousePointC.x = GET_X_LPARAM(lParam);
+		//mousePointW.y = mousePointC.y = GET_Y_LPARAM(lParam);
+		/*GetCursorPos(&mousePointW);
+		mousePointC = mousePointW;
+		ScreenToClient(windowHandle, &mousePointC);*/
 	}
 
 	void SetWindowHandle(HWND hWnd) {
 		windowHandle = hWnd;
+	}
+
+	void SetMouseDelta(LONG x, LONG y) {
+		mouseDelta.x = x;
+		mouseDelta.y = y;
+	}
+
+	POINT GetMouseDelta()
+	{
+		POINT temp = mouseDelta;
+		mouseDelta.x = mouseDelta.y = 0;
+		return temp;
 	}
 
 } // namespace dxe::input

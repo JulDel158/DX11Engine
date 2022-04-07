@@ -35,9 +35,13 @@ namespace dxe::input {
 
 	POINT GetMouseCcoord();
 
-	void SetCursonPosition(int x, int y);
+	void SetCursonPosition(int x, int y, bool ignore = false);
 
 	void SetWindowHandle(HWND hWnd);
+
+	void SetMouseDelta(LONG x, LONG y);
+
+	POINT GetMouseDelta();
 
 	//if (GetKeyState('A') & 0x8000) {} // key is held
 	//SHORT keyState = GetKeyState(VK_CAPITAL/*(caps lock)*/);
