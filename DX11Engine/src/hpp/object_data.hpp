@@ -9,6 +9,7 @@
 // std
 #include <vector>
 #include <string>
+#include <utility>
 
 namespace dxe {
 
@@ -60,7 +61,7 @@ namespace dxe {
 		glm::mat4 view{ 1.f };
 		glm::mat4 rotationMat{ 1.f };
 		glm::vec3 rotation{ 0.f };
-		float rotationSpeed{ 100.0f };
+		float rotationSpeed{ 0.75f };
 		glm::vec3 position{ 0.f };
 		float translationSpeed{ 40.f };
 		bool invertView{ false };
@@ -68,6 +69,8 @@ namespace dxe {
 		void updateView(const glm::vec4& translation = {0.f, 0.f, 0.f, 0.f});
 
 		void setPosition(glm::vec3 pos);
+
+		void setRotation();
 
 		glm::vec3 getFoward()const;
 
@@ -197,9 +200,17 @@ namespace dxe {
 		void resizeBVH(const glm::mat4& transform);
 
 		template<typename f>
-		void traverseTree(const aabb_t& box, f&& lamda, uint32_t inx, bool& check) {
+		void traverseTree(const aabb_t& box, f&& lamda) {
+			bool check = false;
+			this->traverseRecursive(box, lamda, 0, check);
+		}
 
-			if (check) { return; } // prevents further checking once we reach
+		~Terrain() { tree.clear(); triangles.clear(); }
+
+	private:
+		template<typename f>
+		void traverseRecursive(const aabb_t& box, f&& lamda, uint32_t inx, bool& check) {
+			if (check) { return; } // prevents further checking once we reach desired target
 
 			if (AabbToAabbCollision(box, tree[inx].aabb()) == false) { return; }
 
@@ -207,7 +218,7 @@ namespace dxe {
 				// we can use id to find our triangle
 				const Triangle_i t = triangles[tree[inx].elementId()];
 
-				glm::mat3 currentTriangle{ 0.f };
+				glm::mat3 currentTriangle{ 0.f }; // we might want to pass each vertex directly as to not take more memory on the stack
 				for (int i = 0; i < 3; ++i) {
 					currentTriangle[i] = object.model.vertices[t.indx[i]].pos;
 				}
@@ -217,15 +228,9 @@ namespace dxe {
 				return;
 			}
 
-			this->traverseTree(box, lamda, tree[inx].left(), check);
-			this->traverseTree(box, lamda, tree[inx].right(), check);
+			this->traverseRecursive(box, lamda, tree[inx].left(), check);
+			this->traverseRecursive(box, lamda, tree[inx].right(), check);
 		}
-
-		~Terrain() { tree.clear(); triangles.clear(); }
-
-	private:
-		/*template<typename f>
-		bool traverseRecurse(const aabb_t& box, uint32_t inx, f &lamda, bool& check);*/
 
 	};
 

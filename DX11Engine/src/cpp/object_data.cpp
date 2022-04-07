@@ -58,6 +58,7 @@ namespace dxe {
 		view[3][2] = position.z;
 
 		invertView = true;
+		//rotation = glm::vec3{ 0.f };
 	}
 
 	void View_t::setPosition(glm::vec3 pos) {
@@ -65,6 +66,15 @@ namespace dxe {
 		view[3][0] = position.x;
 		view[3][1] = position.y;
 		view[3][2] = position.z;
+	}
+
+	void View_t::setRotation() {
+		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
+		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
+		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
+		view = rotationMat;
+		
+		rotation = glm::vec3{ 0.f };
 	}
 
 	glm::vec3 View_t::getFoward() const {

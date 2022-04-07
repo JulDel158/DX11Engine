@@ -79,18 +79,18 @@ namespace dxe {
 	}
 
     void dx_window::createConsole() {
-	#ifndef NDEBUG
+	//#ifndef NDEBUG
 		AllocConsole();
 		FILE* new_std_in_out;
 		freopen_s(&new_std_in_out, "CONOUT$", "w", stdout);
 		freopen_s(&new_std_in_out, "CONIN$", "r", stdin);
 		std::cout << "Debug Console Opened.\n";
-	#endif
+	//#endif
     }
 
 
     void dx_window::destroyConsole(int exitCode) {
-	#ifndef NDEBUG
+	//#ifndef NDEBUG
 		if (exitCode) {
 			std::cout << "Exit Code: " << exitCode << "\n";
 			std::cout << "Press any key to continue...";
@@ -98,7 +98,7 @@ namespace dxe {
 		}
 
 		FreeConsole();
-	#endif
+	//#endif
     }
 
 } // namespace dxe

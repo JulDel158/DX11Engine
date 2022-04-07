@@ -55,9 +55,6 @@ namespace dxe {
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance2;
 
 		aabb_t player_collider;
-
-		// camera stuff
-		glm::vec2 screenPoint{ 0.f };
 	};
 
 

@@ -4,6 +4,7 @@
 #include "../hpp/app.hpp"
 
 // std
+#include <iostream>
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
@@ -25,8 +26,10 @@ int CALLBACK WinMain(
 	rid.usUsage = 0x02; // mouse usage
 	rid.dwFlags = 0;
 	rid.hwndTarget = nullptr; // no specific window target
-
-	assert(RegisterRawInputDevices(&rid, 1, sizeof(rid)) == TRUE &&
+	
+	// remember assert is your enemy
+	BOOL br = RegisterRawInputDevices(&rid, 1, sizeof(rid));
+	assert(br == TRUE &&
 		"failed to register mouse raw input device!\n");
 	
 	msg = app.run();
@@ -64,10 +67,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		auto& ri = reinterpret_cast<const RAWINPUT&>(*buffer);
 		if (ri.header.dwType == RIM_TYPEMOUSE) {
 			dxe::input::SetMouseDelta(ri.data.mouse.lLastX, ri.data.mouse.lLastY);
-			
 		}
-
-
+		
 		delete[] buffer;
 		break;
 	}
@@ -77,6 +78,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	}
 	default:
 	{
+		std::cout << "default\n";
 		//if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) { // mouse message
 		//	dxe::input::Listen(message, lParam, hWnd);
 		//}

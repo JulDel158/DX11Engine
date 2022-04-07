@@ -36,7 +36,7 @@ namespace dxe {
 		textui[0].position = glm::vec2(0.f, 0.f);
 		textui[0].rotation = 0.f;
 		textui[0].scale = glm::vec2(1.f, 1.f);
-		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
+		textui[0].text = std::wstring(L"MOUSE DELTA: " + std::to_wstring(score));
 
 		// temp crosshair ui
 		textui[1].color = glm::vec4(1.f, 0.f, 0.f, 1.f);
@@ -173,7 +173,7 @@ namespace dxe {
 		}
 
 		// updating the text ui
-		textui[0].text = std::wstring(L"SCORE: " + std::to_wstring(score));
+		
 
 		// updating enemies
 		for (int i = 0; i < MAX_ENEMIES; ++i) {
@@ -272,105 +272,40 @@ namespace dxe {
 
 #ifdef _DEBUG
 		debug_lines::addAabb(player_collider, { 1.f, 1.f, 0.f, 1.f });
-
-		/*auto mcc = input::GetMouseCcoord();
-		auto mwc = input::GetMouseWCoord();
-
-		printf("mouse client coords: x:%d y:%d\n", mcc.x, mcc.y);
-		printf("mouse window coords: x:%d y:%d\n", mwc.x, mwc.y);*/
 #endif // _DEBUG
 	}
 
 	void GameScene::inputUpdate(const float dt) {
-		// in our demo the player will be unable to move and will be fixated at one point on the screen
-		// he will however be able to rotate the camera
 		
 		glm::vec4 translate{ 0.f };
-//#ifdef _DEBUG
 		if (input::KeyDown('W')) { translate.z += camera->translationSpeed * dt; } // FOWARD
 		if (input::KeyDown('S')) { translate.z -= camera->translationSpeed * dt; } // BACKWARDS
 		if (input::KeyDown('D')) { translate.x += camera->translationSpeed * dt; } // RIGHT
 		if (input::KeyDown('A')) { translate.x -= camera->translationSpeed * dt; } // LEFT
 		if (input::KeyDown('Q')) { translate.y += camera->translationSpeed * dt * 5.f; } // UP
 		if (input::KeyDown('E')) { translate.y -= camera->translationSpeed * dt; } // DOWN
-//#endif // _DEBUG
-		static bool released0 = true;
-		if (input::KeyPressed('0') && released0) { 
-			particleEmitters->updated = !particleEmitters->updated;
-			released0 = false; 
-		} else {
-			released0 = true;
-		}
-		if (input::KeyPressed('8')) { soundInstance2->Stop(); }
-		if (input::KeyPressed('7')) { soundInstance2->Play(true); }
-		if (input::KeyPressed('5')) { soundInstance->Play(false); }
-		if (input::KeyPressed('1')) { skybox->resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
-		if (input::KeyPressed('2')) { skybox->resourceId = 2; }
-
-		static bool camDebug = true;
-		if (camDebug) {
-			// more camera stuff
-			input::SetCursonPosition(100, 100, true);
-			auto tempP = input::GetMouseCcoord();
-			screenPoint.x = static_cast<float>(tempP.x);
-			screenPoint.y = static_cast<float>(tempP.y);
-			camDebug = false;
-		}
 		
 		
 		//input::SetCursonPosition(100, 100); //keep cursor in a constant place for certain first person mouse stuff
-		const auto mousePos = input::GetMouseCcoord();
-		glm::vec2 mouseDx = {  static_cast<float>(mousePos.x) - screenPoint.x, static_cast<float>(mousePos.y) - screenPoint.y };
-		/*if (mouseDx.x != 0.f) {
-			mouseDx.x /= glm::abs(mouseDx.x);
-		}
-
-		if (mouseDx.y != 0.f) {
-			mouseDx.y /= glm::abs(mouseDx.y);
-		}*/
+		const auto mousePos = input::GetMouseDelta();
+		glm::vec2 mouseDx = {  static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)};
 		camera->rotation.x += mouseDx.y * camera->rotationSpeed;
 		camera->rotation.y += mouseDx.x * camera->rotationSpeed;
-		/*printf("initial cursor position: x:%f y:%f\n", screenPoint.x, screenPoint.y);
-		printf("Current cursor position: x:%f y:%f\n", static_cast<float>(mousePos.x), static_cast<float>(mousePos.y));*/
-		//printf("Camera rotation: x:%f y:%f\n", camera->rotation.x, camera->rotation.y);
-		//printf("Rotation delta: x:%f y%f\n", mouseDx.x, mouseDx.y);
+	
 		//debug mouse delta from raw input
-		auto riMouseDelta = input::GetMouseDelta();
-		printf("Raw Input mouse delta: x:%ld y%ld\n", riMouseDelta.x, riMouseDelta.y);
+		//printf("Raw Input mouse delta: x:%f y%f\n", mouseDx.x, mouseDx.y);
+		textui[0].text = std::wstring(L"MOUSE DELTA: x:" + std::to_wstring(mousePos.x) + L" y:" + std::to_wstring(mousePos.y));
 
-		
+		//if (input::KeyDown(VK_LEFT)) { camera->rotation.y += -1.f * camera->rotationSpeed * dt; } // look left
+		//if (input::KeyDown(VK_RIGHT)) { camera->rotation.y += 1.f * camera->rotationSpeed * dt; } // look right
+		//if (input::KeyDown(VK_UP)) { camera->rotation.x -= camera->rotationSpeed * dt; } // look up
+		//if (input::KeyDown(VK_DOWN)) { camera->rotation.x += camera->rotationSpeed * dt; } // look down
 
-		if (input::KeyDown(VK_LEFT)) { camera->rotation.y += -1.f * camera->rotationSpeed * dt; } // look left
-		if (input::KeyDown(VK_RIGHT)) { camera->rotation.y += 1.f * camera->rotationSpeed * dt; } // look right
-		if (input::KeyDown(VK_UP)) { camera->rotation.x -= camera->rotationSpeed * dt; } // look up
-		if (input::KeyDown(VK_DOWN)) { camera->rotation.x += camera->rotationSpeed * dt; } // look down
-
-		// input debbuging
-		//if (input::KeyUp('G')) { std::cout << "G was released\n"; }
-
-		//if (input::MouseButtonPressed(0)) { std::cout << "l click pressed" << std::endl; }
-		//if (input::MouseButtonPressed(1)) { std::cout << "r click pressed" << std::endl; }
-		//if (input::MouseButtonPressed(2)) { std::cout << "m click pressed" << std::endl; }
-
-		//if (input::MouseButtonDown(0)) { std::cout << "l click held" << std::endl; }
-		//if (input::MouseButtonDown(1)) { std::cout << "r click held" << std::endl; }
-		//if (input::MouseButtonDown(2)) { std::cout << "m click held" << std::endl; }
-
-		//if (input::MouseButtonUp(0)) { std::cout << "l click released" << std::endl; }
-		//if (input::MouseButtonUp(1)) { std::cout << "r click released" << std::endl; }
-		//if (input::MouseButtonUp(2)) { std::cout << "m click released" << std::endl; }
-
-
-//#ifndef _DEBUG
 		camera->rotation.x = glm::clamp(camera->rotation.x, -89.9f, 89.9f); // camera can only look up
-//#endif // !_DEBUG
-
 
 		camera->updateView(translate);
-		//camera->setRotation();
-		//camera->setPosition(glm::vec3(translate.x, translate.y, translate.z) + camera->position);
 
-		if (input::KeyPressed(VK_RBUTTON)) { // here we check collision with active objects
+		if (input::KeyPressed(VK_LBUTTON)) { // here we check collision with active objects
 			enemy* finalTarget = nullptr;
 			float pTime = std::numeric_limits<float>::infinity();//{ -1.f };
 			float castTime{ 0.f };
@@ -397,6 +332,18 @@ namespace dxe {
 			//PLAY SOUND EFFECT
 			soundData->Play();
 		} 
+
+		// debug tests
+		if (input::KeyPressed('8')) { soundInstance2->Stop(); }
+		if (input::KeyPressed('7')) { soundInstance2->Play(true); }
+		if (input::KeyPressed('5')) { soundInstance->Play(false); }
+
+		if (input::KeyPressed('1')) { skybox->resourceId = 0; } // WARNING: THIS WILL THROW AN ERROR FROM THE RENDERER AS THIS SUB RESOURCE IS NOT A CUBEMAP BUT A TEXTURE2D
+		if (input::KeyPressed('2')) { skybox->resourceId = 2; }
+
+		if (input::KeyPressed('0')) {
+			particleEmitters->updated = !particleEmitters->updated;
+		}
 	}
 
 } // namespace dxe

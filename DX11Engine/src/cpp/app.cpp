@@ -33,9 +33,12 @@ namespace dxe {
 		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
 
 		input::SetWindowHandle(dxWindow.mainHWND);
+		input::ToggleCursor(false);
 	}
 
-	app::~app() {}
+	app::~app() {
+		input::ToggleCursor(true);
+	}
 
 	MSG app::run() {
 		MSG msg;
