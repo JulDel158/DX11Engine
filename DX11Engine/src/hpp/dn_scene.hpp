@@ -4,7 +4,7 @@
 
 namespace dxe {
 
-	class dn_scene : public scene {
+	class nk_scene : public scene {
 
 	};
 
