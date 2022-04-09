@@ -15,7 +15,7 @@
 
 namespace dxe {
 
-	GameScene::GameScene() {
+	GameScene::GameScene(std::shared_ptr<DirectX::AudioEngine> _audioEngine) {
 		std::srand(static_cast<unsigned int>(std::time(0)));
 
 		// camera initialization
@@ -125,13 +125,7 @@ namespace dxe {
 		scb->spotLight.focus = 100.f;
 
 		// sound stuff
-		DirectX::AUDIO_ENGINE_FLAGS eflags = DirectX::AudioEngine_Default;
-
-	#ifdef _DEBUG
-		eflags = eflags | DirectX::AudioEngine_Debug;
-	#endif // _DEBUG
-
-		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
+		audioEngine = _audioEngine;
 
 		soundData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\8bit_gunloop_explosion.wav");
 		songData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\mc_theme.wav");

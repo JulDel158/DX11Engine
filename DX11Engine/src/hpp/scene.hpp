@@ -24,9 +24,9 @@ namespace dxe {
 
 		inline const GameObject* getSceneObjects() const { return gameObjects; }
 
-		inline const GameObject* getSceneObjAt(uint32_t inx) { if (inx < gobjSize) { return &gameObjects[inx]; } return nullptr; }
+		inline const GameObject* getSceneObjAt(uint64_t inx) { if (inx < gObjSize) { return &gameObjects[inx]; } return nullptr; }
 
-		inline const uint32_t getObjCount() const { return gobjSize; }
+		inline const uint64_t getObjCount() const { return gObjSize; }
 
 		inline const Terrain* getTerrain() const { return terrain; }
 
@@ -36,15 +36,15 @@ namespace dxe {
 
 		inline Emitter* getEmitters() const { return particleEmitters; }
 
-		inline Emitter* getEmitterAt(uint32_t inx) { if (inx < emitterCount) { return &particleEmitters[inx]; } return nullptr; }
+		inline Emitter* getEmitterAt(uint64_t inx) { if (inx < emitterCount) { return &particleEmitters[inx]; } return nullptr; }
 
-		inline const uint32_t getEmitterCount() const { return emitterCount; }
+		inline const uint64_t getEmitterCount() const { return emitterCount; }
 
 		inline const Textwrap* GetTextUI() const { return textui; }
 
-		inline const Textwrap* GetTextUIAt(uint32_t inx) const { if (inx < textUiCount) { return &textui[inx]; } return nullptr; }
+		inline const Textwrap* GetTextUIAt(uint64_t inx) const { if (inx < textUiCount) { return &textui[inx]; } return nullptr; }
 
-		inline const uint32_t GetTextUITotal() const { return textUiCount; }
+		inline const uint64_t GetTextUITotal() const { return textUiCount; }
 
 	protected:
 
@@ -53,7 +53,7 @@ namespace dxe {
 		// all the game objects in this scene, to be dynamically allocated
 		GameObject* gameObjects{ nullptr };
 
-		uint32_t gobjSize{ 0 };
+		uint64_t gObjSize{ 0 };
 
 		Terrain* terrain{ nullptr };
 
@@ -63,24 +63,24 @@ namespace dxe {
 
 		Emitter* particleEmitters{ nullptr };
 
-		uint32_t emitterCount{ 0 };
+		long long emitterCount{ 0 };
 
 		// may change
 		std::unique_ptr<DirectX::SoundEffectInstance[]> soundInstances;
 
-		uint32_t sInstancesCount{ 0 };
+		uint64_t sInstancesCount{ 0 };
 
 		Textwrap* textui{ nullptr };
 
-		uint32_t textUiCount{ 0 };
+		uint64_t textUiCount{ 0 };
 
 	protected:
 
-		void allocateGameObjs(uint32_t size);
+		void allocateGameObjs(uint64_t size);
 
-		void allocateEmitters(uint32_t size);
+		void allocateEmitters(uint64_t size);
 
-		void allocateTextwraps(uint32_t size);
+		void allocateTextwraps(uint64_t size);
 	};
 
 

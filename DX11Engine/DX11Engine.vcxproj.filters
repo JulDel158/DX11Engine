@@ -54,7 +54,7 @@
     <ClCompile Include="src\cpp\scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\cpp\dn_scene.cpp">
+    <ClCompile Include="src\cpp\nk_scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,7 +101,7 @@
     <ClInclude Include="src\hpp\bvh_node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\hpp\dn_scene.hpp">
+    <ClInclude Include="src\hpp\nk_scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

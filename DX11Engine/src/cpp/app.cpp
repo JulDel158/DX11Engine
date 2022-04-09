@@ -3,6 +3,7 @@
 #include "../hpp/dx_window.hpp"
 #include "../hpp/debug_lines.hpp"
 #include "../hpp/input.hpp"
+#include "../hpp/game_scene.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
@@ -30,14 +31,17 @@ namespace dxe {
 		eflags = eflags | DirectX::AudioEngine_Debug;
 #endif // _DEBUG
 
-		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
+		audioEngine = std::make_shared<DirectX::AudioEngine>(eflags);
 
 		input::SetWindowHandle(dxWindow.mainHWND);
 		input::ToggleCursor(false);
+
+		gameScene = new GameScene(audioEngine);
 	}
 
 	app::~app() {
 		input::ToggleCursor(true);
+		delete gameScene;
 	}
 
 	MSG app::run() {
@@ -60,13 +64,9 @@ namespace dxe {
 				timer.Signal();
 				input::Update(); // updating global input
 				const float dt = static_cast<float>(timer.Delta());
-				scene1.update(dt);
+				gameScene->update(dt);
 
 #ifdef _DEBUG
-				/*if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
-				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
-				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }*/
-
 				/*std::cout << "---------------------TIME DATA----------------------\n";
 				std::cout << "Timer total: " << timer.TotalTime() << "\n";
 				std::cout << "Timer total exact: " << timer.TotalTimeExact() << "\n";
@@ -79,7 +79,7 @@ namespace dxe {
 				// debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
-				dxRenderer.draw(&scene1, dt);
+				dxRenderer.draw(gameScene, dt);
 			}
 		}
 
