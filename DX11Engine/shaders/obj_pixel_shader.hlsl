@@ -44,7 +44,7 @@ struct SpotLight
 
 cbuffer Scene_cb : register(b3)
 {
-    PointLight plight;
+    PointLight plight[10];
     DirectionalLight dlight;
     SpotLight slight;
     float4 ambientLightColor;
@@ -120,9 +120,12 @@ float4 CreateSpotLight(float4 color, float3 lightpos, float outerRatio, float in
 float4 main(VS_OUT input) : SV_Target
 {
     float4 finalColor = (float4)0;
-    finalColor += CreateDirectionalLight(dlight.color, dlight.direction, input.nrm) +
-    CreatePointLight(plight.color, plight.pos, plight.radius, input.worldPos, input.nrm) +
-    CreateSpotLight(slight.color, slight.pos, slight.outerRatio, slight.innerRatio, 
+    finalColor += CreateDirectionalLight(dlight.color, dlight.direction, input.nrm);
+    for (int i = 0; i < 10; ++i)
+    {
+        finalColor += CreatePointLight(plight[i].color, plight[i].pos, plight[i].radius, input.worldPos, input.nrm);
+    }
+    finalColor += CreateSpotLight(slight.color, slight.pos, slight.outerRatio, slight.innerRatio,
                     slight.falloff, slight.direction, slight.range, slight.focus,
                     input.worldPos, input.nrm) +
     float4(ambientLightColor.xyz * ambientLightColor.a, 1);

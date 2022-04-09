@@ -124,10 +124,23 @@ namespace dxe {
 	};
 
 	struct alignas(16)Scene_cb{
-		PointLight pointLight;		// 32 BYTES
+		PointLight pointLight[10];  // 32 * 10 BYTES
 		DirLight dirLight;			// 32 BYTES
 		SpotLight spotLight;		// 64 BYTES
-		glm::vec4 ambient{ 0.f };	// 16 BYTES TOTAL: 144 BYTES X-X
+		glm::vec4 ambient{ 0.f };	// 16 BYTES
+	};
+
+	struct alignas(16)PointLights_cb { // TODO SET UP CONTANT BUFFER IN PIPELINE
+		PointLight pointLights[20];
+	};
+
+	struct alignas(16)SpotLights_cb { // TODO SET UP CONTANT BUFFER IN PIPELINE
+		SpotLight spotLight[5];
+	};
+
+	struct alignas(16)GScene_cb		{ // TODO SET UP CONTANT BUFFER IN PIPELINE
+		DirLight directionalLight[5];
+		glm::vec4 ambient{ 0.f };
 	};
 
 	struct Textwrap {
@@ -137,6 +150,7 @@ namespace dxe {
 		glm::vec2 scale{0.f};
 		float rotation{0.f};
 		float layer{0.f};			// 16
+		bool active{ false };
 		std::wstring text;
 		// TODO: ADD FONT TYPE ONCE WE ADD MORE FONTS INTO THE PROJECT
 	};
@@ -161,7 +175,8 @@ namespace dxe {
 
 	struct Emitter {
 		glm::vec3 pos{ 0.f };
-		bool updated{ false };
+		bool updated{ false }; // if false, gpu will handle particle updates
+		bool active{ false };
 		ParticleFlyWeight flyweigth;
 		std::vector<Particle> particles;
 	};

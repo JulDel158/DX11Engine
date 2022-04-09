@@ -36,6 +36,7 @@ namespace dxe {
 		textui[0].position = glm::vec2(0.f, 0.f);
 		textui[0].rotation = 0.f;
 		textui[0].scale = glm::vec2(1.f, 1.f);
+		textui[0].active = true;
 		textui[0].text = std::wstring(L"MOUSE DELTA: " + std::to_wstring(score));
 
 		// temp crosshair ui
@@ -45,6 +46,7 @@ namespace dxe {
 		textui[1].position = glm::vec2(610, 300);
 		textui[1].rotation = 0.f;
 		textui[1].scale = glm::vec2(2.5f, 2.5f);
+		textui[1].active = true;
 		textui[1].text = std::wstring(L"+");
 
 
@@ -110,9 +112,9 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		scb->pointLight.color = { 1.f, 0.40f, 0.f, 1.f };
-		scb->pointLight.pos = { 0.f, 0.f, 12.f };
-		scb->pointLight.radius = 40.f;
+		scb->pointLight[0].color = { 1.f, 0.40f, 0.f, 1.f };
+		scb->pointLight[0].pos = { 0.f, 10.f, 0.f };
+		scb->pointLight[0].radius = 100.f;
 
 		scb->spotLight.color = { 0.f, 0.f, 0.f, 1.f };
 

@@ -346,6 +346,7 @@ namespace dxe {
 		spriteBatch->Begin();
 
 		for (uint32_t i = 0; i < size; ++i) {
+			if (!set[i].active) { continue; }
 			spriteFont->DrawString(spriteBatch.get(),
 				set[i].text.c_str(), // wide string text to draw
 				DirectX::XMFLOAT2{ set[i].position.x, set[i].position.y }, // position
