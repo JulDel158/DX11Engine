@@ -63,7 +63,7 @@ namespace dxe {
 
 		Emitter* particleEmitters{ nullptr };
 
-		long long emitterCount{ 0 };
+		uint64_t emitterCount{ 0 };
 
 		// may change
 		std::unique_ptr<DirectX::SoundEffectInstance[]> soundInstances;

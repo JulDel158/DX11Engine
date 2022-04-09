@@ -46,9 +46,9 @@ namespace dxe {
 
 		void drawSkybox(const GameObject* skybox);
 
-		void drawGameObjects(const GameObject* gameObjects, uint32_t size);
+		void drawGameObjects(const GameObject* gameObjects, uint64_t size);
 
-		void drawText(const Textwrap* set, const uint32_t size);
+		void drawText(const Textwrap* set, const uint64_t size);
 
 		void drawParticle(const Emitter* particleEmitter);
 

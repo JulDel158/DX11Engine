@@ -295,7 +295,7 @@ namespace dxe {
 		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
-	void pipeline::drawGameObjects(const GameObject* gameObjects, uint32_t size) {
+	void pipeline::drawGameObjects(const GameObject* gameObjects, uint64_t size) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
@@ -342,7 +342,7 @@ namespace dxe {
 		}
 	}
 
-	void pipeline::drawText(const Textwrap* set, const uint32_t size) {
+	void pipeline::drawText(const Textwrap* set, const uint64_t size) {
 		spriteBatch->Begin();
 
 		for (uint32_t i = 0; i < size; ++i) {

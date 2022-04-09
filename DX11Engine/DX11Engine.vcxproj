@@ -188,6 +188,7 @@
     <ClInclude Include="src\hpp\collision.hpp" />
     <ClInclude Include="src\hpp\debug_lines.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
+    <ClInclude Include="src\hpp\entity.hpp" />
     <ClInclude Include="src\hpp\file_reader.hpp" />
     <ClInclude Include="src\hpp\game_scene.hpp" />
     <ClInclude Include="src\hpp\input.hpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="src\hpp\object_data.hpp" />
     <ClInclude Include="src\hpp\pipeline.hpp" />
     <ClInclude Include="src\hpp\pipeline_properties.hpp" />
+    <ClInclude Include="src\hpp\player.hpp" />
     <ClInclude Include="src\hpp\renderer.hpp" />
     <ClInclude Include="src\hpp\scene.hpp" />
     <ClInclude Include="src\hpp\XTime.hpp" />
