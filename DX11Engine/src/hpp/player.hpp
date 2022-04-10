@@ -26,6 +26,8 @@ public:
 	void translate(glm::vec3 translation, bool yAxisMovement = false);
 	void FPControls(glm::vec3 translation, float dx, float dy);
 	void resizeCollider(glm::vec3 extent);
+	void addForce(float yForce);
+	void applyForce();
 	
 private:
 	dxe::GameObject* gameObject{ nullptr };
@@ -35,6 +37,7 @@ private:
 	bool crouched{ false };
 	bool running{ false };
 	float cameraSensitivity{ 0.75f };
+	float yAcceleration{ 0.f };
 
 public:
 	float speed{ 1.f };
@@ -91,4 +94,13 @@ inline void Player::resizeCollider(glm::vec3 extent) {
 	boxCollider.extent = extent;
 	boxCollider.center = pos;
 	boxCollider.isMinMax = false;
+}
+
+inline void Player::addForce(float yForce) {
+	yAcceleration += yForce;
+}
+
+inline void Player::applyForce() {
+	pos.y += yAcceleration;
+	yAcceleration = 0.f;
 }

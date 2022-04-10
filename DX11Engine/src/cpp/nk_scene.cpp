@@ -65,7 +65,7 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		player = Player(100, 0, 30.f, 40.f, 10.f, 5.f, 10.f);
+		player = Player(100, 0, 30.f, 60.f, 10.f, 5.f, 10.f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
 	}
 
@@ -89,8 +89,10 @@ namespace dxe {
 		};
 
 		// applying gravity force to player
-		player.setPosition(player.getPosition() - glm::vec3{ 0.f, gravity * dt, 0.f });
-
+		//player.setPosition(player.getPosition() - glm::vec3{ 0.f, gravity * dt, 0.f });
+		player.addForce(-gravity * dt);
+		player.applyForce();
+		player.setPosition(player.getPosition());
 		terrain->traverseTree(player.getBox(), groundClamp);
 
 
@@ -103,6 +105,12 @@ namespace dxe {
 
 	void nk_scene::inputUpdate(const float dt){
 		glm::vec4 translate{ 0.f };
+		const auto mousePos = input::GetMouseDelta();
+
+		if (input::KeyPressed(VK_LSHIFT) || input::KeyUp(VK_LSHIFT)) { player.toggleRun(); }
+		if (input::KeyPressed(VK_LCONTROL)) { player.toggleCrouch(); }
+		if (input::KeyPressed(VK_SPACE)) { player.addForce(player.jumpForce); }
+
 		// movement
 		if (input::KeyDown('W')) { translate.z += player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // FOWARD
 		if (input::KeyDown('S')) { translate.z -= player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // BACKWARDS
@@ -112,8 +120,6 @@ namespace dxe {
 		if (input::KeyDown('E')) { translate.y -= player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // DOWN
 
 		// camera rotation
-		const auto mousePos = input::GetMouseDelta();
-		//glm::vec2 mouseDx = { static_cast<float>(mousePos.x), static_cast<float>(mousePos.y) };
 		player.FPControls(translate, static_cast<float>(mousePos.y), static_cast<float>(mousePos.x));
 		camera->rotation = player.getRotation();
 		camera->position.x = player.getPosition().x;
