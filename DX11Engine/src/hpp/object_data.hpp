@@ -70,7 +70,7 @@ namespace dxe {
 
 		void setPosition(glm::vec3 pos);
 
-		void setRotation();
+		//void setRotation();
 
 		glm::vec3 getFoward()const;
 

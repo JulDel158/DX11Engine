@@ -4,6 +4,7 @@
 #include "../hpp/debug_lines.hpp"
 #include "../hpp/input.hpp"
 #include "../hpp/game_scene.hpp"
+#include "../hpp/nk_scene.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
@@ -34,9 +35,10 @@ namespace dxe {
 		audioEngine = std::make_shared<DirectX::AudioEngine>(eflags);
 
 		input::SetWindowHandle(dxWindow.mainHWND);
-		input::ToggleCursor(false);
+		//input::ToggleCursor(false);
 
-		gameScene = new GameScene(audioEngine);
+		gameScene = new nk_scene(audioEngine);
+		//gameScene = new GameScene(audioEngine);
 	}
 
 	app::~app() {
@@ -63,6 +65,11 @@ namespace dxe {
 			else { // do updates and render down here
 				timer.Signal();
 				input::Update(); // updating global input
+				if (!audioEngine->Update()) {
+					if (audioEngine->IsCriticalError()) { // No audio device is active
+						// x-x
+					}
+				}
 				const float dt = static_cast<float>(timer.Delta());
 				gameScene->update(dt);
 

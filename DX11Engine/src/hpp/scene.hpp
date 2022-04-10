@@ -11,7 +11,6 @@ namespace dxe {
 
 	class scene {
 	public:
-
 		scene(const scene&) = delete;
 		scene& operator=(const scene&) = delete;
 		scene();
@@ -20,7 +19,7 @@ namespace dxe {
 		virtual void update(const float dt) = 0;
 
 		// getters
-		inline const View_t* getView() const { return camera.get(); }
+		inline const View_t* getView() const { return camera; }
 		inline const GameObject* getSceneObjects() const { return gameObjects; }
 		inline const GameObject* getSceneObjAt(uint64_t inx) { if (inx < gObjSize) { return &gameObjects[inx]; } return nullptr; }
 		inline const uint64_t getObjCount() const { return gObjSize; }
@@ -35,31 +34,17 @@ namespace dxe {
 		inline const uint64_t GetTextUITotal() const { return textUiCount; }
 
 	protected:
-
-		std::unique_ptr<View_t> camera;
-
-		// all the game objects in this scene, to be dynamically allocated
+		View_t* camera{ nullptr };
 		GameObject* gameObjects{ nullptr };
-
 		uint64_t gObjSize{ 0 };
-
 		Terrain* terrain{ nullptr };
-
 		GameObject* skybox{ nullptr };
-
 		Scene_cb* scb{ nullptr };
-
 		Emitter* particleEmitters{ nullptr }; // TODO: CHANGE RENDERER PARTICLE FUNCTIONS TO PROCESS ALL EMITTERS IN A SCENE
-
 		uint64_t emitterCount{ 0 };
-
-		// may change
 		std::unique_ptr<DirectX::SoundEffectInstance[]> soundInstances;
-
 		uint64_t sInstancesCount{ 0 };
-
 		Textwrap* textui{ nullptr };
-
 		uint64_t textUiCount{ 0 };
 
 	protected:

@@ -25,7 +25,7 @@ namespace dxe {
 
 		std::shared_ptr<DirectX::AudioEngine> audioEngine;
 		Player player;
-		float gravity = 1.f;
+		float gravity = 60.f;
 		uint32_t level = 0;
 		GAME_STATE currentState = GAME_STATE::DEBUG;
 		DIFFICULTY difficulty = DIFFICULTY::DEBUG;

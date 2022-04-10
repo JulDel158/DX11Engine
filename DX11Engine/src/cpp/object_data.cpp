@@ -47,9 +47,7 @@ namespace dxe {
 		
 		const glm::vec4 moveDir = rotationMat * translation;
 
-		position.x += moveDir.x;
-		position.y += moveDir.y;
-		position.z += moveDir.z;
+		position += glm::vec3(moveDir);
 
 		view = rotationMat;
 
@@ -68,14 +66,14 @@ namespace dxe {
 		view[3][2] = position.z;
 	}
 
-	void View_t::setRotation() {
+	/*void View_t::setRotation() {
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
 		view = rotationMat;
 		
 		rotation = glm::vec3{ 0.f };
-	}
+	}*/
 
 	glm::vec3 View_t::getFoward() const {
 		return glm::normalize(glm::vec3{view[2].x, view[2].y, view[2].z});

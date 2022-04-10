@@ -37,7 +37,9 @@ namespace dxe {
 			textui = nullptr;
 		}
 
-		camera.release();
+		if (camera) {
+			delete camera;
+		}
 	}
 
 	void scene::allocateGameObjs(uint64_t size) {

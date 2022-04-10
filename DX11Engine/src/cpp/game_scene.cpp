@@ -19,7 +19,7 @@ namespace dxe {
 		std::srand(static_cast<unsigned int>(std::time(0)));
 
 		// camera initialization
-		camera = std::make_unique<View_t>();
+		camera = new View_t();
 		camera->position = glm::vec3(0.f, 0.f, 0.f);
 		camera->updateView();
 
@@ -158,15 +158,6 @@ namespace dxe {
 
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
-		
-		if (!audioEngine->Update())
-		{
-			// No audio device is active
-			if (audioEngine->IsCriticalError())
-			{
-				// x-x
-			}
-		}
 
 		// updating the text ui
 		
