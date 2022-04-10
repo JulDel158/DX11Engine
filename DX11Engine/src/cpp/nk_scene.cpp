@@ -81,7 +81,7 @@ namespace dxe {
 			//glm::vec3 tempPos = player.pos;
 			if (RayToTriangleCollision(player.getPosition(), glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
 				player.setPosition(intersection);
-				intersection.y += player.isCrouched() ? player.cOffsetY : player.sOffsetY;
+				intersection.y += player.currentOffset;
 				camera->setPosition(intersection);
 				return true;
 			}
@@ -93,6 +93,7 @@ namespace dxe {
 		player.addForce(-gravity * dt);
 		player.applyForce();
 		player.setPosition(player.getPosition());
+		player.update(dt);
 		terrain->traverseTree(player.getBox(), groundClamp);
 
 

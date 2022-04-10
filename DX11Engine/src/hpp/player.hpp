@@ -18,7 +18,9 @@ public:
 	bool isCrouched() const;
 	bool isRunning() const;
 	void toggleCrouch();
+	void setCrouch(bool crouch);
 	void toggleRun();
+	void setRun(bool run);
 	glm::vec3 getPosition() const;
 	glm::vec3 getRotation() const;
 	dxe::aabb_t getBox() const;
@@ -28,6 +30,7 @@ public:
 	void resizeCollider(glm::vec3 extent);
 	void addForce(float yForce);
 	void applyForce();
+	void update(float dt);
 	
 private:
 	dxe::GameObject* gameObject{ nullptr };
@@ -42,8 +45,10 @@ private:
 public:
 	float speed{ 1.f };
 	float runSpeed{ 1.f };
-	float sOffsetY{ 1.f };
-	float cOffsetY{ 1.f };
+	float standingOffset{ 1.f };
+	float crouchingOffset{ 1.f };
+	float currentOffset{ 1.f }; // We should interpolate from offsets when transitioning from crouch to standing
+	float crouchSpeed{ 1.f };
 	float jumpForce{ 1.f };
 };
 
@@ -55,22 +60,27 @@ inline Player::Player(int maxHealth, int id, float speed, float runSpeed, float 
 	rotation(0.f),
 	crouched(false),
 	running(false),
+	cameraSensitivity( 0.75f),
 	speed(speed),
 	runSpeed(runSpeed),
-	sOffsetY(standOffset),
-	cOffsetY(crouchOffset),
+	standingOffset(standOffset),
+	crouchingOffset(crouchOffset),
+	currentOffset(standOffset),
+	crouchSpeed(50.f),
 	jumpForce(jumpForce) {}
 
 inline bool Player::isCrouched() const{ return crouched; }
 inline bool Player::isRunning() const{ return running; }
 inline void Player::toggleCrouch() { crouched = !crouched; }
+inline void Player::setCrouch(bool crouch) { crouched = crouch; }
 inline void Player::toggleRun() { running = !running; }
+inline void Player::setRun(bool run) { running = run; }
 inline glm::vec3 Player::getPosition() const{ return pos; }
 inline glm::vec3 Player::getRotation() const { return rotation; }
 inline dxe::aabb_t Player::getBox() const { return boxCollider; }
 inline void Player::setPosition(glm::vec3 position) { 
 	pos = boxCollider.center = position;
-	boxCollider.center.y += crouched ? cOffsetY : sOffsetY;
+	boxCollider.center.y += crouched ? crouchingOffset : standingOffset;
 	if (gameObject) gameObject->setPosition(position);
 }
 inline void Player::translate(glm::vec3 translation, bool yAxisMovement) {
@@ -103,4 +113,14 @@ inline void Player::addForce(float yForce) {
 inline void Player::applyForce() {
 	pos.y += yAcceleration;
 	yAcceleration = 0.f;
+}
+
+inline void Player::update(float dt) {
+	if (crouched) {
+		currentOffset -= crouchSpeed * dt;
+	} else {
+		currentOffset += crouchSpeed * dt;
+	}
+
+	currentOffset = glm::clamp(currentOffset, crouchingOffset, standingOffset);
 }
