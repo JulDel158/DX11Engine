@@ -4,6 +4,10 @@
 #include "entity.hpp"
 #include "object_data.hpp"
 
+//std
+#include <iostream>
+#include <limits>
+
 // lib
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -28,33 +32,48 @@ public:
 	void translate(glm::vec3 translation, bool yAxisMovement = false);
 	void FPControls(glm::vec3 translation, float dx, float dy);
 	void resizeCollider(glm::vec3 extent);
-	void addForce(float yForce);
-	void applyForce();
+	void addGravityConstantForce(float gravity, float dt);
+	//void applyForce();
 	void update(float dt);
+	void jump();
 	
 private:
 	dxe::GameObject* gameObject{ nullptr };
 	dxe::aabb_t boxCollider;
 	glm::vec3 pos{ 0.f };
 	glm::vec3 rotation{ 0.f };
-	bool crouched{ false };
-	bool running{ false };
 	float cameraSensitivity{ 0.75f };
-	float yAcceleration{ 0.f };
+	
+	
 
 public:
+	// run stuff
 	float speed{ 1.f };
 	float runSpeed{ 1.f };
+	bool running{ false };
+
+	// crouch stuff
 	float standingOffset{ 1.f };
 	float crouchingOffset{ 1.f };
-	float currentOffset{ 1.f }; // We should interpolate from offsets when transitioning from crouch to standing
+	float currentOffset{ 1.f };
 	float crouchSpeed{ 1.f };
-	float jumpForce{ 1.f };
+	bool crouched{ false };
+
+	// jump stuff?!
+	float jumpHeight{ 5.f }; // constant jump velocity
+	float jumpAcceleration{ 500.f };
+	float currentAcceleration{ -100.f };
+	float yVelocity{ 0.f };
+	float gravity{ -100.f };
+	float currentJump{ std::numeric_limits<float>::min() };
+	//float yAcceleration{ 0.f };
+	//float gravity{ -60.f }; // constant gravity force
+	//bool isGrounded{ false };
 };
 
 inline Player::Player() : entity(100, 100, 0, ENT_TYPE::PLAYER) {}
 inline Player::Player(int maxHealth, int id) : entity(maxHealth, maxHealth, id, ENT_TYPE::PLAYER) {}
-inline Player::Player(int maxHealth, int id, float speed, float runSpeed, float standOffset, float crouchOffset, float jumpForce) :
+inline Player::Player(int maxHealth, int id, float speed, float runSpeed, float standOffset, float crouchOffset, float jumpHeight) :
 	entity(maxHealth, maxHealth, id, ENT_TYPE::PLAYER),
 	pos(0.f),
 	rotation(0.f),
@@ -67,7 +86,7 @@ inline Player::Player(int maxHealth, int id, float speed, float runSpeed, float 
 	crouchingOffset(crouchOffset),
 	currentOffset(standOffset),
 	crouchSpeed(50.f),
-	jumpForce(jumpForce) {}
+	jumpHeight(jumpHeight) {}
 
 inline bool Player::isCrouched() const{ return crouched; }
 inline bool Player::isRunning() const{ return running; }
@@ -106,21 +125,49 @@ inline void Player::resizeCollider(glm::vec3 extent) {
 	boxCollider.isMinMax = false;
 }
 
-inline void Player::addForce(float yForce) {
-	yAcceleration += yForce;
-}
-
-inline void Player::applyForce() {
-	pos.y += yAcceleration;
-	yAcceleration = 0.f;
+inline void Player::addGravityConstantForce(float gravity, float dt) {
+	/*yAcceleration += gravity * dt;
+	yAcceleration = glm::clamp(yAcceleration, gravity, jumpHeight);
+	std::cout << "accelaration: " << yAcceleration << std::endl;*/
 }
 
 inline void Player::update(float dt) {
-	if (crouched) {
+	//================== crouch update ==================
+	if (crouched) { 
 		currentOffset -= crouchSpeed * dt;
 	} else {
 		currentOffset += crouchSpeed * dt;
 	}
-
 	currentOffset = glm::clamp(currentOffset, crouchingOffset, standingOffset);
+
+	//================== velocity update ==================
+	
+	//std::cout << "velocity: " << yVelocity << std::endl;
+	/*pos.y += yVelocity * dt + 0.5f * yAcceleration * dt * dt;
+	yVelocity += yAcceleration * dt;
+	boxCollider.center = pos;
+	boxCollider.center.y += (crouched) ? crouchingOffset : standingOffset;*/
+	//std::cout << "position y: " << pos.y << std::endl;
+
+	pos.y += yVelocity * dt + 0.5f * currentAcceleration * dt * dt;
+	
+	float newAcc = jumpAcceleration;
+	if (pos.y >= currentJump) {
+		newAcc = gravity;
+		currentJump = std::numeric_limits<float>::lowest();
+	}
+	yVelocity += 0.5f * (currentAcceleration + newAcc) * dt;
+	currentAcceleration = newAcc;
+
+	boxCollider.center = pos;
+	boxCollider.center.y += (crouched) ? crouchingOffset : standingOffset;
+}
+
+inline void Player::jump() {
+	/*if (isGrounded) {
+		
+	}*/
+
+
+	currentJump = pos.y + jumpHeight;
 }

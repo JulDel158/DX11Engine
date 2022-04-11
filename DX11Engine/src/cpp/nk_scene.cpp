@@ -65,7 +65,7 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		player = Player(100, 0, 30.f, 60.f, 10.f, 5.f, 10.f);
+		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 1.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
 	}
 
@@ -81,21 +81,21 @@ namespace dxe {
 			//glm::vec3 tempPos = player.pos;
 			if (RayToTriangleCollision(player.getPosition(), glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
 				player.setPosition(intersection);
-				intersection.y += player.currentOffset;
-				camera->setPosition(intersection);
+				//player.isGrounded = true;
+				player.yVelocity = 0.f;
+				//player.yAcceleration = 0.f;
 				return true;
 			}
+			//player.isGrounded = false;
 			return false;
 		};
 
 		// applying gravity force to player
 		//player.setPosition(player.getPosition() - glm::vec3{ 0.f, gravity * dt, 0.f });
-		player.addForce(-gravity * dt);
-		player.applyForce();
-		player.setPosition(player.getPosition());
+		//player.addGravityConstantForce(-gravity, dt);
 		player.update(dt);
 		terrain->traverseTree(player.getBox(), groundClamp);
-
+		camera->setPosition(player.getPosition() + glm::vec3(0.f, player.currentOffset, 0.f));
 
 		skybox->transform[3] = glm::vec4(camera->position, 1.f); // positioning skybox at camera location
 
@@ -110,7 +110,7 @@ namespace dxe {
 
 		if (input::KeyPressed(VK_LSHIFT) || input::KeyUp(VK_LSHIFT)) { player.toggleRun(); }
 		if (input::KeyPressed(VK_LCONTROL)) { player.toggleCrouch(); }
-		if (input::KeyPressed(VK_SPACE)) { player.addForce(player.jumpForce); }
+		if (input::KeyPressed(VK_SPACE)) { player.jump(); }
 
 		// movement
 		if (input::KeyDown('W')) { translate.z += player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // FOWARD
@@ -123,9 +123,9 @@ namespace dxe {
 		// camera rotation
 		player.FPControls(translate, static_cast<float>(mousePos.y), static_cast<float>(mousePos.x));
 		camera->rotation = player.getRotation();
-		camera->position.x = player.getPosition().x;
+		/*camera->position.x = player.getPosition().x;
 		camera->position.y = player.getPosition().y;
-		camera->position.z = player.getPosition().z;
+		camera->position.z = player.getPosition().z;*/
 		camera->updateView(glm::vec4(0.f));
 	}
 
