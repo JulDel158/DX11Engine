@@ -62,13 +62,13 @@ public:
 	// jump stuff?!
 	float jumpHeight{ 5.f }; // constant jump velocity
 	float jumpAcceleration{ 500.f };
-	float currentAcceleration{ -100.f };
+	float currentAcceleration{ -500.f };
 	float yVelocity{ 0.f };
-	float gravity{ -100.f };
+	float gravity{ -500.f };
 	float currentJump{ std::numeric_limits<float>::min() };
 	//float yAcceleration{ 0.f };
 	//float gravity{ -60.f }; // constant gravity force
-	//bool isGrounded{ false };
+	bool isGrounded{ false };
 };
 
 inline Player::Player() : entity(100, 100, 0, ENT_TYPE::PLAYER) {}
@@ -164,10 +164,7 @@ inline void Player::update(float dt) {
 }
 
 inline void Player::jump() {
-	/*if (isGrounded) {
-		
-	}*/
-
-
-	currentJump = pos.y + jumpHeight;
+	if (isGrounded) {
+		currentJump = pos.y + jumpHeight;
+	}
 }

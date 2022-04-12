@@ -65,7 +65,7 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 1.5f);
+		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 5.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
 	}
 
@@ -80,13 +80,16 @@ namespace dxe {
 			glm::vec3 intersection{ 0.f };
 			//glm::vec3 tempPos = player.pos;
 			if (RayToTriangleCollision(player.getPosition(), glm::vec3{ 0.f, 1.f, 0.f }, triangle, intersection)) {
-				player.setPosition(intersection);
-				//player.isGrounded = true;
-				player.yVelocity = 0.f;
+				if (player.getPosition().y >= player.currentJump) {
+					player.setPosition(intersection);
+					player.yVelocity = 0.f;
+				}
+				player.isGrounded = true;
+				
 				//player.yAcceleration = 0.f;
 				return true;
 			}
-			//player.isGrounded = false;
+			player.isGrounded = false;
 			return false;
 		};
 
@@ -107,18 +110,19 @@ namespace dxe {
 	void nk_scene::inputUpdate(const float dt){
 		glm::vec4 translate{ 0.f };
 		const auto mousePos = input::GetMouseDelta();
+		const bool canRun = player.isRunning() && !player.isCrouched();
 
-		if (input::KeyPressed(VK_LSHIFT) || input::KeyUp(VK_LSHIFT)) { player.toggleRun(); }
+		if (input::KeyDown(VK_LSHIFT)) { player.setRun(true); } else { player.setRun(false); }
 		if (input::KeyPressed(VK_LCONTROL)) { player.toggleCrouch(); }
-		if (input::KeyPressed(VK_SPACE)) { player.jump(); }
+		if (input::KeyDown(VK_SPACE)) { player.jump(); }
 
 		// movement
-		if (input::KeyDown('W')) { translate.z += player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // FOWARD
-		if (input::KeyDown('S')) { translate.z -= player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // BACKWARDS
-		if (input::KeyDown('D')) { translate.x += player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // RIGHT
-		if (input::KeyDown('A')) { translate.x -= player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // LEFT
-		if (input::KeyDown('Q')) { translate.y += player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // UP
-		if (input::KeyDown('E')) { translate.y -= player.isRunning() ? player.runSpeed * dt : player.speed * dt; } // DOWN
+		if (input::KeyDown('W')) { translate.z += canRun ? player.runSpeed * dt : player.speed * dt; } // FOWARD
+		if (input::KeyDown('S')) { translate.z -= canRun ? player.runSpeed * dt : player.speed * dt; } // BACKWARDS
+		if (input::KeyDown('D')) { translate.x += canRun ? player.runSpeed * dt : player.speed * dt; } // RIGHT
+		if (input::KeyDown('A')) { translate.x -= canRun ? player.runSpeed * dt : player.speed * dt; } // LEFT
+		if (input::KeyDown('Q')) { translate.y += canRun ? player.runSpeed * dt : player.speed * dt; } // UP
+		if (input::KeyDown('E')) { translate.y -= canRun ? player.runSpeed * dt : player.speed * dt; } // DOWN
 
 		// camera rotation
 		player.FPControls(translate, static_cast<float>(mousePos.y), static_cast<float>(mousePos.x));
