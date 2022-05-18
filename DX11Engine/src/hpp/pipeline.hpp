@@ -9,6 +9,8 @@
 
 // std
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "debug_lines.hpp"
 #include "pipeline_properties.hpp"
@@ -57,6 +59,8 @@ namespace dxe {
 		void UpdateParticles(Emitter* const emitter, const float dt);
 
 		void setRenderTargetView();
+
+		uint32_t loadTextures(std::vector<std::wstring> filePaths, ID3D11ShaderResourceView**& SRVs);
 
 	private:
 		HWND hwnd;

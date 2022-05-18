@@ -362,9 +362,9 @@ namespace dxe {
 		} // for each triangle
 
 		// shuffling all triangles to prepare for tree generation
-		//std::random_device randDevice; // used to seed engine
-		//std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
-		//std::shuffle(tInds.begin(), tInds.end(), randEngine);
+		std::random_device randDevice; // used to seed engine
+		std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
+		std::shuffle(tInds.begin(), tInds.end(), randEngine);
 
 		// ===================== generating bvh tree =====================
 		bvh_node root = bvh_node(triangles[tInds[0]].box, tInds[0]);

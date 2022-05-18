@@ -859,6 +859,21 @@ namespace dxe {
 		
 	}
 
+	uint32_t pipeline::loadTextures(std::vector<std::wstring> filePaths, ID3D11ShaderResourceView**& SRVs)
+	{
+		const uint32_t size = filePaths.size();
+		SRVs = new ID3D11ShaderResourceView*[size];
+		HRESULT hr;
+		for (size_t i = 0; i < size; ++i) {
+			hr = DirectX::CreateDDSTextureFromFile(device, filePaths[i].data(), nullptr, &SRVs[i]);
+			if (FAILED(hr)) {
+				throw std::runtime_error("could not load texture file!");
+			}
+		}
+
+		return size;
+	}
+
 	void pipeline::createSResourceView(const wchar_t* filename, const uint32_t index) {
 		HRESULT hr = DirectX::CreateDDSTextureFromFile(device, filename, nullptr, &sResourceView[index]);
 

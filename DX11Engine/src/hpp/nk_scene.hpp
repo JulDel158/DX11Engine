@@ -9,7 +9,7 @@ namespace dxe {
 		DEBUG = -1, NORMAL = 0, DIFFICULT = 1
 	};
 
-	enum class GAME_STATE {
+	enum class GAME_STATE { // TODO: CREATE A FINITE STATE MACHINE TO HANDLE GAME STATES
 		DEBUG = -1, MAIN_MENU = 0, OPTIONS = 1, CREDITS = 2, GAME = 3, PAUSE = 4, LOADING = 5, EXIT = 6
 	};
 

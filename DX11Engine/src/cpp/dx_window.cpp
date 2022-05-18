@@ -8,8 +8,8 @@
 
 namespace dxe {
 	dx_window::dx_window(HINSTANCE& hInst, WNDPROC winProc, int nCmdShow, MSG& ms, unsigned int w, unsigned int h) :
-		windowClass{ L"Potato Engine" }, 
-		title{ L"First Game" }, 
+		windowClass{ L"DirectX11 Engine" }, 
+		title{ L"Nightmare Keep" }, 
 		msg{ ms },
 		hInstance{ hInst }, 
 		mainHWND{ NULL },

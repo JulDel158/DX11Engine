@@ -40,6 +40,15 @@ namespace dxe {
 		if (camera) {
 			delete camera;
 		}
+
+		if (textureResourcesData) {
+			for (uint64_t i = 0; i < textureRDCount; ++i) {
+				if (textureResourcesData[i])
+					textureResourcesData[i]->Release();
+			}
+
+			delete[] textureResourcesData;
+		}
 	}
 
 	void scene::allocateGameObjs(uint64_t size) {
