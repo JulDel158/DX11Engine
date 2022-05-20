@@ -32,13 +32,15 @@ namespace dxe {
 		std::vector<ObjVertex> vertices;
 		std::vector<uint32_t> indices;
 
-		void loadObject(const char* filepath, bool invertY = false);
-
-		void dMakeCube(float offset);
-
-		void dMakePlane();
-
 		~Objectdata() { vertices.clear(); indices.clear(); }
+
+		void loadObject(const char* filepath, bool invertY = false);
+		void dMakeCube(float offset);
+		void dMakePlane();
+		void MakeFloorPlane(float width, float lenght);
+		void addMesh(Objectdata& other);
+
+		
 	};
 
 	struct GameObject {
