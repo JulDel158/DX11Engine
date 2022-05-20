@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <DirectXMath.h>
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 // std
 #include <cassert>
@@ -57,9 +60,23 @@ namespace dxe {
 
 		spriteBatch = std::make_unique<DirectX::SpriteBatch>(context);
 		spriteFont = std::make_unique<DirectX::SpriteFont>(device, L"assets\\fonts\\Comic_Sans_MS_16.spritefont");
+
+
+		// initializing Imgui
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		ImGui_ImplDX11_Init(device, context);
+		ImGui_ImplWin32_Init(&windowHandle);
+		ImGui::GetIO().ImeWindowHandle = &windowHandle;
+
+		
 	}
 
 	pipeline::~pipeline() {
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 
 		for (auto& ptr : blendState) {
 			safe_release(ptr);

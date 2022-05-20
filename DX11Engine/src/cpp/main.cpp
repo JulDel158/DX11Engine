@@ -8,8 +8,14 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+
 #include "../hpp/input.hpp"
 
+// lib
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int CALLBACK WinMain(
@@ -38,7 +44,8 @@ int CALLBACK WinMain(
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-
+	ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam);
+	
 	switch (message)
 	{
 	case WM_INPUT: {// raw input

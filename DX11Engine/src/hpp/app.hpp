@@ -14,6 +14,9 @@
 // std
 #include <vector>
 
+// lib
+#include <imgui.h>
+
 namespace dxe {
 
 	class app {

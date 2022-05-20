@@ -16,6 +16,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{fb068dd8-984e-452f-852f-20cf2b4419f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{a138a912-5467-4b13-9658-f38c37c5bb87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\Imgui">
+      <UniqueIdentifier>{73667d71-e6c0-44c0-91e8-00e4a52fa4e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\cpp\main.cpp">
@@ -53,6 +59,27 @@
     </ClCompile>
     <ClCompile Include="src\cpp\scene.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\backends\imgui_impl_dx11.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_demo.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_draw.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_tables.cpp">
+      <Filter>Libraries\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_widgets.cpp">
+      <Filter>Libraries\Imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
