@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +168,13 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libraries\Imgui_lib\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_demo.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libraries\Imgui_lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\cpp\app.cpp" />
     <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
