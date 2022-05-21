@@ -60,10 +60,6 @@
     <ClCompile Include="src\cpp\scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="src\cpp\nk_scene.cpp">
-      <Filter>Source Files</Filter>
-=======
     <ClCompile Include="libraries\Imgui_lib\imgui\backends\imgui_impl_dx11.cpp">
       <Filter>Libraries\Imgui</Filter>
     </ClCompile>
@@ -84,7 +80,6 @@
     </ClCompile>
     <ClCompile Include="libraries\Imgui_lib\imgui\imgui_widgets.cpp">
       <Filter>Libraries\Imgui</Filter>
->>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,15 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\hpp\bvh_node.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\hpp\nk_scene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\hpp\player.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\hpp\entity.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
