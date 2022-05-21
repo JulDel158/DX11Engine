@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
+#include <imconfig.h>
+#include <imgui_internal.h>
 
 // std
 #include <cassert>
@@ -64,13 +66,13 @@ namespace dxe {
 
 		// initializing Imgui
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		ImGui_ImplDX11_Init(device, context);
-		ImGui_ImplWin32_Init(&windowHandle);
-		ImGui::GetIO().ImeWindowHandle = &windowHandle;
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
+		io.IniFilename = NULL;
+		ImGui_ImplWin32_Init(windowHandle);
+		ImGui::GetIO().ImeWindowHandle = windowHandle;
 
-		
 	}
 
 	pipeline::~pipeline() {

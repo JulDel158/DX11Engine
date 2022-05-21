@@ -2,6 +2,9 @@
 
 #include "../hpp/debug_lines.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+
 namespace dxe {
 
 	renderer::renderer(HWND windowHandle, Window_cb& wcb) : 
@@ -114,6 +117,10 @@ namespace dxe {
 		if (scene->GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene->GetTextUI(), scene->GetTextUITotal());
 		}
+
+		// ImGui Draw calls
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 		implementation.present(0);
 	}

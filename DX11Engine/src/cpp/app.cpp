@@ -6,14 +6,18 @@
 #include "../hpp/game_scene.hpp"
 #include "../hpp/nk_scene.hpp"
 
+// lib
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 // std
 #ifdef _DEBUG
 #include <iostream>
 #endif
 #include <utility>
+#include <string>
 
 namespace dxe {
 	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : 
@@ -65,6 +69,18 @@ namespace dxe {
 			else { // do updates and render down here
 				timer.Signal();
 				input::Update(); // updating global input
+
+				/*ImGuiIO& io = ImGui::GetIO();
+				POINT mousePos = input::GetMouseWCoord();
+				io.MousePos.x = mousePos.x;
+				io.MousePos.y = mousePos.y;
+				io.DisplaySize.x = 1280;
+				io.DisplaySize.y = 720;*/
+
+				ImGui_ImplWin32_NewFrame();
+				ImGui_ImplDX11_NewFrame();
+				ImGui::NewFrame();
+				
 				if (!audioEngine->Update()) {
 					if (audioEngine->IsCriticalError()) { // No audio device is active
 						// x-x
@@ -72,6 +88,24 @@ namespace dxe {
 				}
 				const float dt = static_cast<float>(timer.Delta());
 				gameScene->update(dt);
+
+				bool tempbool = true;
+				ImGui::ShowDemoWindow(&tempbool);
+
+				{
+					/*const int popup_flag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+
+					ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Always);
+					ImGui::SetNextWindowSize({ 100, 1000 }, ImGuiCond_Always);
+
+					ImGui::Begin("Pause Window", 0, popup_flag);
+
+					std::string ptext = "TEST";
+					ImGui::SetWindowFontScale(10.f);
+					ImGui::Text(ptext.c_str());
+					ImGui::End();*/
+
+				}
 
 #ifdef _DEBUG
 				/*std::cout << "---------------------TIME DATA----------------------\n";
@@ -86,7 +120,9 @@ namespace dxe {
 				// debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
+				ImGui::EndFrame();
 				dxRenderer.draw(gameScene, dt);
+				
 			}
 		}
 

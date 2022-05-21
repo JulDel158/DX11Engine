@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories);$(ProjectDir)libraries\Imgui_lib\Imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
