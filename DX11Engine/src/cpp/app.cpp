@@ -70,13 +70,6 @@ namespace dxe {
 				timer.Signal();
 				input::Update(); // updating global input
 
-				/*ImGuiIO& io = ImGui::GetIO();
-				POINT mousePos = input::GetMouseWCoord();
-				io.MousePos.x = mousePos.x;
-				io.MousePos.y = mousePos.y;
-				io.DisplaySize.x = 1280;
-				io.DisplaySize.y = 720;*/
-
 				ImGui_ImplWin32_NewFrame();
 				ImGui_ImplDX11_NewFrame();
 				ImGui::NewFrame();
@@ -90,22 +83,7 @@ namespace dxe {
 				gameScene->update(dt);
 
 				bool tempbool = true;
-				ImGui::ShowDemoWindow(&tempbool);
-
-				{
-					/*const int popup_flag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
-
-					ImGui::SetNextWindowPos({ 10, 10 }, ImGuiCond_Always);
-					ImGui::SetNextWindowSize({ 100, 1000 }, ImGuiCond_Always);
-
-					ImGui::Begin("Pause Window", 0, popup_flag);
-
-					std::string ptext = "TEST";
-					ImGui::SetWindowFontScale(10.f);
-					ImGui::Text(ptext.c_str());
-					ImGui::End();*/
-
-				}
+				//ImGui::ShowDemoWindow(&tempbool);
 
 #ifdef _DEBUG
 				/*std::cout << "---------------------TIME DATA----------------------\n";

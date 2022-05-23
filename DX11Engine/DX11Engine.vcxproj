@@ -179,6 +179,7 @@
     <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\file_reader.cpp" />
+    <ClCompile Include="src\cpp\game_map.cpp" />
     <ClCompile Include="src\cpp\game_scene.cpp" />
     <ClCompile Include="src\cpp\input.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="src\hpp\dx_window.hpp" />
     <ClInclude Include="src\hpp\entity.hpp" />
     <ClInclude Include="src\hpp\file_reader.hpp" />
+    <ClInclude Include="src\hpp\game_map.hpp" />
     <ClInclude Include="src\hpp\game_scene.hpp" />
     <ClInclude Include="src\hpp\input.hpp" />
     <ClInclude Include="src\hpp\nk_scene.hpp" />
