@@ -2,6 +2,7 @@
 
 #include "../hpp/file_reader.hpp"
 #include "../hpp/debug_lines.hpp"
+#include "../hpp/game_map.hpp"
 
 // std
 #include <Windows.h>
@@ -14,9 +15,9 @@
 #include <glm/gtc/random.hpp>
 
 namespace dxe {
-
+	// REMINDED, WE ARE NOT CURRENTLY WORKING INSIDE THIS FILE
 	GameScene::GameScene(std::shared_ptr<DirectX::AudioEngine> _audioEngine) {
-		std::srand(static_cast<unsigned int>(std::time(0)));
+		
 
 		// camera initialization
 		camera = new View_t();

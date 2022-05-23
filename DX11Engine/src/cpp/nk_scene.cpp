@@ -3,9 +3,15 @@
 #include "../hpp/debug_lines.hpp"
 #include "../hpp/file_reader.hpp"
 #include "../hpp/input.hpp"
+#include "../hpp/game_map.hpp"
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine) {
+		std::srand(static_cast<unsigned int>(std::time(0)));
+		game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
+		map.printMapData();
+		int debug = 0;
+
 		// camera initialization
 		camera = new View_t();
 		camera->position = glm::vec3(0.f, 0.f, 0.f);
