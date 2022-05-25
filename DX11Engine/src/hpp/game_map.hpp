@@ -20,6 +20,7 @@ namespace dxe {
 		ROOM_TYPE type{ ROOM_TYPE::DEBUG };
 		static constexpr int MAX_NEIGHBOR_COUNT = 4;
 		NEIGHBOR neightbors[MAX_NEIGHBOR_COUNT] = { NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE };
+		glm::mat4 pos{ 1.f };
 		// TODO:: add list of game objects to render
 
 		inline void clear() { active = false; type = ROOM_TYPE::DEBUG; };
@@ -33,6 +34,7 @@ namespace dxe {
 		~game_map();
 
 		void clearFloor(int floor);
+		void clearSmallestFloor();
 		void generateNextFloor(); // clears the oldest floor and generates a new one within the same block of memory
 		void printMapData();
 

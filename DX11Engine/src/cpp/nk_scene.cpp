@@ -4,11 +4,18 @@
 #include "../hpp/file_reader.hpp"
 #include "../hpp/input.hpp"
 #include "../hpp/game_map.hpp"
+#include "../hpp/mesh_data.hpp"
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine) {
 		std::srand(static_cast<unsigned int>(std::time(0)));
 		game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
+		map.printMapData();
+		map.clearSmallestFloor();
+		map.generateNextFloor();
+		map.printMapData();
+		map.clearFloor(3);
+		map.generateNextFloor();
 		map.printMapData();
 		int debug = 0;
 
@@ -73,6 +80,12 @@ namespace dxe {
 
 		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 5.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
+
+		allocateGameObjs(1);
+		MakePlane(gameObjects[0].model, 10.f, 10.f);
+		gameObjects[0].isActive = true;
+		gameObjects[0].transform[3][1] = 15.f;
+		gameObjects[0].resourceId = 1;
 	}
 
 	nk_scene::~nk_scene(){

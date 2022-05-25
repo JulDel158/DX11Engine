@@ -38,9 +38,7 @@ namespace dxe {
 		void dMakeCube(float offset);
 		void dMakePlane();
 		void MakeFloorPlane(float width, float lenght);
-		void addMesh(Objectdata& other);
 
-		
 	};
 
 	struct GameObject {

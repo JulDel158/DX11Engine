@@ -358,10 +358,6 @@ namespace dxe {
 		indices.push_back(4);
 	}
 
-	void Objectdata::addMesh(Objectdata& other) {
-
-	}
-
 	void Terrain::loadTerrain(const char* filepath, const bool invertY, const bool minMaxFormat) {
 		// 1. Load Mesh data
 		// 2. Generate Triangle data

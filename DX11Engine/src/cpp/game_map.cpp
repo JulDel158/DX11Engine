@@ -34,8 +34,6 @@ namespace dxe {
 		}
 
 		generateDungeon();
-
-		//std::srand(time(0));
 	}
 
 	game_map::~game_map() {
@@ -75,6 +73,29 @@ namespace dxe {
 		floorIds[index] = -1;
 	}
 
+	void game_map::clearSmallestFloor() {
+		if (maxFloorCount <= 0) { return; }
+
+		int index = 0;
+		int minFloor = floorIds[0];
+		int r, c;
+
+		for (r = 0; r < maxFloorCount; ++r) {
+			if (floorIds[r] < minFloor) {
+				minFloor = floorIds[r];
+				index = r;
+			}
+		}
+
+		for (r = 0; r < height; ++r) {
+			for (c = 0; c < width; ++c) {
+				map[index][r][c].clear();
+			}
+		}
+
+		floorIds[index] = -1;
+	}
+
 	void game_map::generateNextFloor() {
 		int i = 0;
 		int index = 0;
@@ -88,10 +109,9 @@ namespace dxe {
 				index = i;
 			}
 		}
+
 		floorIds[index] = ++nextFloorId;
-
-		randomWalkGeneration(map[i]);
-
+		randomWalkGeneration(map[index]);
 	}
 
 	void game_map::printMapData() {

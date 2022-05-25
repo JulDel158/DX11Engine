@@ -201,6 +201,7 @@
     <ClInclude Include="src\hpp\game_map.hpp" />
     <ClInclude Include="src\hpp\game_scene.hpp" />
     <ClInclude Include="src\hpp\input.hpp" />
+    <ClInclude Include="src\hpp\mesh_data.hpp" />
     <ClInclude Include="src\hpp\nk_scene.hpp" />
     <ClInclude Include="src\hpp\object_data.hpp" />
     <ClInclude Include="src\hpp\pipeline.hpp" />

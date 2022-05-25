@@ -24,7 +24,7 @@ namespace dxe {
 
 	void renderer::update(const View_t& camera) {
 #ifdef _DEBUG
-		/*debug_lines::addGrid();
+		debug_lines::addGrid();
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f }, 1.f, glm::vec4{1.f, 1.f, 1.f, 1.f});
 
@@ -32,7 +32,7 @@ namespace dxe {
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 5.f, 0.f }, 0.5f, glm::vec4{ 0.f, 1.f, 0.f, 1.f });
 
-		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });*/
+		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });
 
 #endif // DEBUG
 		frameCbuffer.view = camera.view;
