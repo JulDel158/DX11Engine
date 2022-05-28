@@ -349,13 +349,13 @@ namespace dxe {
 		vertices.push_back(p3);
 		vertices.push_back(p4);
 
+		indices.push_back(0);
 		indices.push_back(1);
 		indices.push_back(2);
-		indices.push_back(3);
 
-		indices.push_back(3);
 		indices.push_back(2);
-		indices.push_back(4);
+		indices.push_back(1);
+		indices.push_back(3);
 	}
 
 	void Terrain::loadTerrain(const char* filepath, const bool invertY, const bool minMaxFormat) {
@@ -474,6 +474,19 @@ namespace dxe {
 		}
 
 
+	}
+
+	void Terrain::expandBVHRootSize(glm::vec3 size) {
+		if (tree.empty()) { return; }
+		auto& root = tree[0];
+		const bool mm = root.aabb().isMinMax;
+
+		if (!mm) { swapFormat(root.aabb()); }
+
+		root.aabb().min -= size / 2.f;
+		root.aabb().max += size / 2.f;
+
+		if (!mm) { swapFormat(root.aabb()); }
 	}
 
 	//template<typename f>

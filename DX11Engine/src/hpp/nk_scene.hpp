@@ -2,6 +2,7 @@
 
 #include "scene.hpp"
 #include "player.hpp"
+#include "game_map.hpp"
 
 namespace dxe {
 
@@ -29,6 +30,7 @@ namespace dxe {
 		uint32_t level = 0;
 		GAME_STATE currentState = GAME_STATE::DEBUG;
 		DIFFICULTY difficulty = DIFFICULTY::DEBUG;
+		game_map map;
 	};
 
 } // namespace dxe

@@ -3,13 +3,14 @@
 #include "../hpp/debug_lines.hpp"
 #include "../hpp/file_reader.hpp"
 #include "../hpp/input.hpp"
-#include "../hpp/game_map.hpp"
+
 #include "../hpp/mesh_data.hpp"
 
 namespace dxe {
-	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine) {
+	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine),
+	map(game_map(3, 3, 1, 1, glm::vec2(10.f, 10.f))){
 		std::srand(static_cast<unsigned int>(std::time(0)));
-		game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
+		//game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
 		map.printMapData();
 		map.clearSmallestFloor();
 		map.generateNextFloor();
@@ -17,6 +18,8 @@ namespace dxe {
 		map.clearFloor(3);
 		map.generateNextFloor();
 		map.printMapData();
+		
+		
 		int debug = 0;
 
 		// camera initialization
@@ -57,11 +60,13 @@ namespace dxe {
 		terrain = new Terrain;
 		terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
 		tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
+		//terrain->loadTerrain("assets/models/quad.obj", false, false);
 		terrain->object.isActive = true;
 		terrain->object.resourceId = 7;
-		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 10.f; // scale
-		terrain->object.transform[3][1] = -10.f;
+		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 5.f; // scale
+		terrain->object.transform[3][1] = -20.f;
 		terrain->resizeBVH(terrain->object.transform); // resizing bvh and model
+		//terrain->expandBVHRootSize(glm::vec3(2.f, 10.f, 2.f));
 		terrain->object.transform = glm::mat4{ 1.f };
 		//=============================================================
 
@@ -81,11 +86,12 @@ namespace dxe {
 		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 5.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
 
-		allocateGameObjs(1);
-		MakePlane(gameObjects[0].model, 10.f, 10.f);
+		allocateGameObjs(map.getRequiredMeshCount());
+		map.generateRoomMeshes(gameObjects, 0, gObjSize);
+		/*MakePlane(gameObjects[0].model, 10.f, 10.f);
 		gameObjects[0].isActive = true;
-		gameObjects[0].transform[3][1] = 15.f;
 		gameObjects[0].resourceId = 1;
+		gameObjects[0].setPosition(glm::vec3(0.f, 15.f, 0.f));*/
 	}
 
 	nk_scene::~nk_scene(){
@@ -104,7 +110,10 @@ namespace dxe {
 					player.yVelocity = 0.f;
 				}
 				player.isGrounded = true;
-				
+//#ifdef _DEBUG
+				std::cout << "Player Collided with terrai aabb\n";
+//#endif // _DEBUG
+
 				//player.yAcceleration = 0.f;
 				return true;
 			}

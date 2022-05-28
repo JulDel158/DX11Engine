@@ -213,6 +213,7 @@ namespace dxe {
 		void loadTerrain(const char* filepath, const bool invertY = true, const bool minMaxFormat = false);
 
 		void resizeBVH(const glm::mat4& transform);
+		void expandBVHRootSize(glm::vec3 size);
 
 		template<typename f>
 		void traverseTree(const aabb_t& box, f&& lamda) {

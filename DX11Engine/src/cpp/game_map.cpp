@@ -6,7 +6,7 @@
 
 namespace dxe {
 
-	game_map::game_map(int width, int height, int maxFloorCount, int startingMinimunRoomCount, glm::vec2 cellDimension) :
+	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 cellDimension) :
 		width(width),
 		height(height),
 		maxFloorCount(maxFloorCount),
@@ -21,24 +21,27 @@ namespace dxe {
 
 		// allocating floor id array
 		floorIds = new int[maxFloorCount];
-
-		int floor, row;
+		
+		uint64_t floor, row;
 		for (floor = 0; floor < maxFloorCount; ++floor) { // for every floor
 			map[floor] = new map_room * [height]; // all possible rows for this floor
 
 			for (row = 0; row < height; ++row) { // for every row in this floor
 				map[floor][row] = new map_room[width]; // all possible columns for this floor
+				
 			}
 
 			floorIds[floor] = floor + 1; // assigning initial floor ids
 		}
 
+		initializeMidPoints();
+
 		generateDungeon();
 	}
 
 	game_map::~game_map() {
+		uint64_t floor, row;
 		if (map) {
-			int floor, row;
 			for (floor = 0; floor < maxFloorCount; ++floor) {
 				if (map[floor]) {
 					for (row = 0; row < height; ++row) {
@@ -53,11 +56,18 @@ namespace dxe {
 		if (floorIds) {
 			delete[] floorIds;
 		}
+
+		if (midpoints) {
+			for (row = 0; row < height; ++row) {
+				if (midpoints[row]) { delete[] midpoints[row]; }
+			}
+			delete[] midpoints;
+		}
 	}
 
-	void game_map::clearFloor(int floor) {
-		int index = 0;
-		int r, c;
+	void game_map::clearFloor(uint64_t floor) {
+		uint64_t index = 0;
+		uint64_t r, c;
 		for (r = 0; r < maxFloorCount; ++r) {
 			if (floor == floorIds[r]) {
 				index = r;
@@ -76,9 +86,9 @@ namespace dxe {
 	void game_map::clearSmallestFloor() {
 		if (maxFloorCount <= 0) { return; }
 
-		int index = 0;
-		int minFloor = floorIds[0];
-		int r, c;
+		uint64_t index = 0;
+		uint64_t minFloor = floorIds[0];
+		uint64_t r, c;
 
 		for (r = 0; r < maxFloorCount; ++r) {
 			if (floorIds[r] < minFloor) {
@@ -97,8 +107,8 @@ namespace dxe {
 	}
 
 	void game_map::generateNextFloor() {
-		int i = 0;
-		int index = 0;
+		uint64_t i = 0;
+		uint64_t index = 0;
 		int nextFloorId = floorIds[0];
 		for (i = 0; i < maxFloorCount; ++i) { // finding a clear floor and the next id number
 			if (floorIds[i] > nextFloorId) {
@@ -142,14 +152,56 @@ namespace dxe {
 		}
 	}
 
+	void game_map::generateRoomMeshes(GameObject*& buffer, uint64_t startPos, uint64_t size) {
+		uint64_t col = 0, row = 0, floor = 0, currMesh = startPos;
+
+		if (size - startPos < getRequiredMeshCount()) {
+			// ERROR
+			return;
+		}
+
+		for (floor = 0; floor < maxFloorCount; ++floor) {
+			for (row = 0; row < height; ++row) {
+				for (col = 0; col < width; ++col) {
+					auto& currentRoom = map[floor][row][col];
+
+					currentRoom.roomObjs.resize(6, nullptr);
+					glm::vec3 currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
+					for (auto& ptr : currentRoom.roomObjs) {
+						ptr = &buffer[currMesh++];
+						
+						ptr->model.MakeFloorPlane(cellDimension.x, cellDimension.y);
+						ptr->setPosition(currPos);
+						ptr->resourceId = 1;
+						ptr->isActive = true;
+					} // assigning allocated gameObjs
+						
+				}
+			}
+		}
+	}
+
+	uint64_t game_map::getRequiredMeshCount()
+	{
+		uint64_t count = 0;
+		const uint64_t MESH_PER_ROOM_COUNT = 6;
+
+		// the total count would be every possible room count, so just multiply the dimmensions of the dungeon with the room count
+
+		count = maxFloorCount * width * height * MESH_PER_ROOM_COUNT;
+
+		return count;
+	}
+
 	void game_map::generateDungeon() {
 		for (int i = 0; i < maxFloorCount; ++i) {
 			randomWalkGeneration(map[i]);
 		}
 	}
+
 	void game_map::randomWalkGeneration(map_room**& floor) {
-		int currX = width >> 1; // half
-		int currY = height >> 1;
+		int currX = static_cast<int>(width >> 1); // half
+		int currY = static_cast<int>(height >> 1);
 
 		int prevX = -1;
 		int prevY = -1;
@@ -161,6 +213,7 @@ namespace dxe {
 
 		if (width * height <= minRoomCount) {
 			// error
+			return;
 		}
 
 		while (roomCount < minRoomCount) {
@@ -231,7 +284,7 @@ namespace dxe {
 			if (floor[currY][currX].active) { continue; }
 
 			++roomCount;
-			floor[currY][currX].active = true;
+			floor[currY][currX].activate();
 			floor[currY][currX].addNeighbor(oppositeDirection);
 
 			if (prevX != -1 && prevY != -1) {
@@ -240,5 +293,24 @@ namespace dxe {
 		}
 
 		// you could increase minimum room count here for next levels to be more long or complex
+	}
+
+	void game_map::initializeMidPoints() {
+		int row = 0, col = 0;
+		float xpos = 0.f, zpos = 0.f;
+		midpoints = new glm::mat4 * [height];
+		for (row = 0; row < height; ++row) {
+			midpoints[row] = new glm::mat4[width];
+		}
+
+		for (row = 0; row < height; ++row) {
+			for (col = 0, xpos = 0; col < width; ++col) {
+				midpoints[row][col] = glm::mat4{ 1.f };
+				midpoints[row][col][3][0] = xpos;
+				midpoints[row][col][3][2] = zpos;
+				xpos += cellDimension.x;
+			}
+			zpos += cellDimension.y;
+		}
 	}
 }
