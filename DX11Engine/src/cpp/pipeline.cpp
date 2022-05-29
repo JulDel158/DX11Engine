@@ -343,6 +343,7 @@ namespace dxe {
 
 			//vBuffer = gameObjects[i].model.vertices;
 			//ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+			//vBuffer[0] = *gameObjects[i].model.vertices.data();
 			memcpy(vBuffer, gameObjects[i].model.vertices.data(), gameObjects[i].model.vertices.size() * sizeof(ObjVertex));
 			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
@@ -358,6 +359,7 @@ namespace dxe {
 			context->PSSetShaderResources(0, 1, &sResourceView[inx]);
 
 			context->DrawIndexed(static_cast<UINT>(gameObjects[i].model.indices.size()), 0, 0);
+			
 		}
 	}
 

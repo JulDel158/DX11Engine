@@ -8,7 +8,7 @@
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine),
-	map(game_map(3, 3, 1, 1, glm::vec2(10.f, 10.f))){
+	map(game_map(10, 10, 3, 5, glm::vec2(1.f, 1.f))){
 		std::srand(static_cast<unsigned int>(std::time(0)));
 		//game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
 		map.printMapData();
@@ -58,16 +58,17 @@ namespace dxe {
 
 		//====================== Terrain Loading ======================
 		terrain = new Terrain;
-		terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
-		tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
-		//terrain->loadTerrain("assets/models/quad.obj", false, false);
-		terrain->object.isActive = true;
-		terrain->object.resourceId = 7;
-		terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 5.f; // scale
-		terrain->object.transform[3][1] = -20.f;
-		terrain->resizeBVH(terrain->object.transform); // resizing bvh and model
-		//terrain->expandBVHRootSize(glm::vec3(2.f, 10.f, 2.f));
-		terrain->object.transform = glm::mat4{ 1.f };
+		terrain->generateWalkPlane();
+		//terrain->object.model.loadObject("assets/models/debug_terrain.obj", false);
+		//tools::file_reader::loadBVH("assets/models/debug_terrain.bvh", *terrain);
+		////terrain->loadTerrain("assets/models/quad.obj", false, false);
+		//terrain->object.isActive = true;
+		//terrain->object.resourceId = 7;
+		//terrain->object.transform[0][0] = terrain->object.transform[1][1] = terrain->object.transform[2][2] = 5.f; // scale
+		//terrain->object.transform[3][1] = -20.f;
+		//terrain->resizeBVH(terrain->object.transform); // resizing bvh and model
+		////terrain->expandBVHRootSize(glm::vec3(2.f, 10.f, 2.f));
+		//terrain->object.transform = glm::mat4{ 1.f };
 		//=============================================================
 
 		//========================== skybox ===========================
@@ -111,7 +112,7 @@ namespace dxe {
 				}
 				player.isGrounded = true;
 //#ifdef _DEBUG
-				std::cout << "Player Collided with terrai aabb\n";
+				//std::cout << "Player Collided with terrai aabb\n";
 //#endif // _DEBUG
 
 				//player.yAcceleration = 0.f;

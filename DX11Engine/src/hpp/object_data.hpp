@@ -214,6 +214,7 @@ namespace dxe {
 
 		void resizeBVH(const glm::mat4& transform);
 		void expandBVHRootSize(glm::vec3 size);
+		void generateWalkPlane();
 
 		template<typename f>
 		void traverseTree(const aabb_t& box, f&& lamda) {

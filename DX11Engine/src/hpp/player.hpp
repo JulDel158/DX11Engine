@@ -64,7 +64,7 @@ public:
 	float jumpAcceleration{ 500.f };
 	float currentAcceleration{ -500.f };
 	float yVelocity{ 0.f };
-	float gravity{ -25.f };
+	float gravity{ -500.f };
 	float currentJump{ std::numeric_limits<float>::min() };
 	//float yAcceleration{ 0.f };
 	//float gravity{ -60.f }; // constant gravity force

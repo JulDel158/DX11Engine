@@ -221,6 +221,9 @@ namespace dxe {
 				indices.push_back(uniqueVertices[vertex]);
 			}
 		} // end for loops
+
+		vertices.shrink_to_fit();
+		indices.shrink_to_fit();
 	}
 
 	void Objectdata::dMakeCube(float offset) {
@@ -365,7 +368,11 @@ namespace dxe {
 
 
 		// getting the object model for terrain
-		object.model.loadObject(filepath, invertY);
+		if (filepath) {
+			object.model.vertices.clear();
+			object.model.indices.clear();
+			object.model.loadObject(filepath, invertY);
+		}
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
 		const int triangleCount = static_cast<int>(object.model.indices.size()) / 3;
@@ -487,6 +494,19 @@ namespace dxe {
 		root.aabb().max += size / 2.f;
 
 		if (!mm) { swapFormat(root.aabb()); }
+	}
+
+	void Terrain::generateWalkPlane() {
+		object.model.MakeFloorPlane(100000000.f, 100000000.f);
+
+		loadTerrain(nullptr, false, false);
+
+		for (auto& node : tree) {
+			node.aabb().extent.y = std::numeric_limits<float>::max() - 1.f;
+		}
+
+		object.resourceId = 0;
+		object.isActive = false;
 	}
 
 	//template<typename f>
