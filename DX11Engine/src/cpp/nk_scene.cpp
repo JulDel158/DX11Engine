@@ -8,7 +8,7 @@
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine),
-	map(game_map(10, 10, 3, 5, glm::vec2(1.f, 1.f))){
+	map(game_map(10, 10, 3, 5, glm::vec2(100.0f, 100.f))){
 		std::srand(static_cast<unsigned int>(std::time(0)));
 		//game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
 		map.printMapData();

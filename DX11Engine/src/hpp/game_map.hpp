@@ -25,6 +25,7 @@ namespace dxe {
 		NEIGHBOR neightbors[MAX_NEIGHBOR_COUNT] = { NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE };
 		//glm::mat4 pos{ 1.f };
 		// TODO:: add list of game objects to render each room will have a pointer to the meshes that represent their floor, walls, and celing 
+		
 		std::vector<GameObject*> roomObjs;
 
 		inline void clear() { active = false; type = ROOM_TYPE::DEBUG; };
@@ -51,6 +52,7 @@ namespace dxe {
 		void randomWalkGeneration(map_room**& floor);
 		void initializeMidPoints();
 
+		static constexpr uint64_t MESH_PER_ROOM_COUNT = 1;
 		uint64_t width{ 0 };
 		uint64_t height{ 0 };
 		uint64_t maxFloorCount{ 0 };

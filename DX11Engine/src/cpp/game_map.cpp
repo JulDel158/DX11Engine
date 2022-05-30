@@ -165,14 +165,14 @@ namespace dxe {
 				for (col = 0; col < width; ++col) {
 					auto& currentRoom = map[floor][row][col];
 
-					currentRoom.roomObjs.resize(1, nullptr);
+					currentRoom.roomObjs.resize(MESH_PER_ROOM_COUNT, nullptr);
 					glm::vec3 currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
 					for (auto& ptr : currentRoom.roomObjs) {
 						ptr = &buffer[currMesh++];
 						
 						ptr->model.MakeFloorPlane(cellDimension.x, cellDimension.y);
 						ptr->setPosition(currPos);
-						ptr->resourceId = 1;
+						ptr->resourceId = 7;
 						ptr->isActive = currentRoom.active;
 					} // assigning allocated gameObjs
 						
@@ -184,10 +184,9 @@ namespace dxe {
 	uint64_t game_map::getRequiredMeshCount()
 	{
 		uint64_t count = 0;
-		const uint64_t MESH_PER_ROOM_COUNT = 1;
 
 		// the total count would be every possible room count, so just multiply the dimmensions of the dungeon with the room count
-
+		
 		count = maxFloorCount * width * height * MESH_PER_ROOM_COUNT;
 
 		return count;
