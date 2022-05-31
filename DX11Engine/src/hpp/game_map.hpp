@@ -21,22 +21,20 @@ namespace dxe {
 	struct map_room {
 		bool active{ false };
 		ROOM_TYPE type{ ROOM_TYPE::DEBUG };
+		glm::vec2 roomSize{ 0.f }; // may be changed to a vec 3 later to handle the celing 
 		static constexpr int MAX_NEIGHBOR_COUNT = 4;
-		NEIGHBOR neightbors[MAX_NEIGHBOR_COUNT] = { NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE };
-		//glm::mat4 pos{ 1.f };
-		// TODO:: add list of game objects to render each room will have a pointer to the meshes that represent their floor, walls, and celing 
-		
+		NEIGHBOR neightbors[MAX_NEIGHBOR_COUNT] = { NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE }; 
 		std::vector<GameObject*> roomObjs;
 
-		inline void clear() { active = false; type = ROOM_TYPE::DEBUG; };
-		inline void addNeighbor(NEIGHBOR n) { for (int i = 0; i < MAX_NEIGHBOR_COUNT; ++i) { if (neightbors[i] == NEIGHBOR::NONE || neightbors[i] == n) { neightbors[i] = n; return; } } }
-		inline void activate() { active = true; }
+		void clear();
+		void addNeighbor(NEIGHBOR n);
+		void activate(glm::vec2 minSize, glm::vec2 maxSize, glm::vec3 position);
 	};
 
 	class game_map
 	{
 	public:
-		game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 cellDimension);
+		game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset);
 		~game_map();
 
 		void clearFloor(uint64_t floor);
@@ -45,22 +43,32 @@ namespace dxe {
 		void printMapData();
 		void generateRoomMeshes(GameObject*& buffer, uint64_t startPos, uint64_t size);
 		uint64_t getRequiredMeshCount(); // returns the number of meshes required to form each potential room
-		
+	
+		void generateDungeon();
 
 	private:
-		void generateDungeon();
 		void randomWalkGeneration(map_room**& floor);
 		void initializeMidPoints();
+		void generateHallwayMeshes();
 
 		static constexpr uint64_t MESH_PER_ROOM_COUNT = 1;
-		uint64_t width{ 0 };
-		uint64_t height{ 0 };
+		uint64_t gridWidth{ 0 };
+		uint64_t gridHeight{ 0 };
 		uint64_t maxFloorCount{ 0 };
 		uint64_t minRoomCount{ 0 };
-		glm::vec2 cellDimension{ 0.f };
+		glm::vec2 maxCellDimension{ 0.f };
+		glm::vec2 minCellDimension{ 0.f };
+		float roomOffset{ 0.f };
 		int* floorIds{ nullptr };
 		map_room*** map{ nullptr };
+		GameObject** hallways{ nullptr };
 		glm::mat4** midpoints{ nullptr };
 	};
 
 } // namespace dxe
+
+// map must have an offset distance which is the minimun space between 2 rooms
+// midpoints must be calculated based on offset
+// every room now stores its own size (this will be used to determine the cull planes used to render the hallways)
+// a set of hallways is generated based on the dimensions of the grid and max space
+// a minimun room dimmension size is used as the width of all the hallways

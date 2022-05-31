@@ -4,16 +4,21 @@
 #include <time.h>
 #include <iostream>
 
+#include <glm/gtc/random.hpp>
+
 namespace dxe {
 
-	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 cellDimension) :
-		width(width),
-		height(height),
+	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset) :
+		gridWidth(width),
+		gridHeight(height),
 		maxFloorCount(maxFloorCount),
 		minRoomCount(startingMinimunRoomCount),
-		cellDimension(cellDimension) {
+		maxCellDimension(maxCellDimension),
+		minCellDimension(minCellDimension),
+		roomOffset(offset){
 
-		if (maxFloorCount <= 0 || height <= 0 || width <= 0 || cellDimension.x <= 0.f || cellDimension.y <= 0.f) {
+		if (maxFloorCount <= 0 || height <= 0 || width <= 0 || maxCellDimension.x <= 0.f || maxCellDimension.y <= 0.f || minCellDimension.x <= 0.f || minCellDimension.y <= 0.f ||
+			maxCellDimension.x < minCellDimension.x || maxCellDimension.y < minCellDimension.y) {
 			// error
 			//assert(false && "!!!Invalid game map parameters!!!");
 		}
@@ -33,10 +38,13 @@ namespace dxe {
 
 			floorIds[floor] = floor + 1; // assigning initial floor ids
 		}
+		// 0 to height - 1 = all hallways going across the x axis
+		// from height to width - 1 = all hallways going across the z axis
+		hallways = new GameObject * [width + height]{ nullptr };
 
 		initializeMidPoints();
 
-		generateDungeon();
+		//generateDungeon();
 	}
 
 	game_map::~game_map() {
@@ -44,7 +52,7 @@ namespace dxe {
 		if (map) {
 			for (floor = 0; floor < maxFloorCount; ++floor) {
 				if (map[floor]) {
-					for (row = 0; row < height; ++row) {
+					for (row = 0; row < gridHeight; ++row) {
 						if (map[floor][row]) { delete[] map[floor][row]; } // deleting column
 					}
 					delete[] map[floor]; // deleting row
@@ -58,7 +66,7 @@ namespace dxe {
 		}
 
 		if (midpoints) {
-			for (row = 0; row < height; ++row) {
+			for (row = 0; row < gridHeight; ++row) {
 				if (midpoints[row]) { delete[] midpoints[row]; }
 			}
 			delete[] midpoints;
@@ -75,8 +83,8 @@ namespace dxe {
 			}
 		}
 
-		for (r = 0; r < height; ++r) {
-			for (c = 0; c < width; ++c) {
+		for (r = 0; r < gridHeight; ++r) {
+			for (c = 0; c < gridWidth; ++c) {
 				map[index][r][c].clear();
 			}
 		}
@@ -97,8 +105,8 @@ namespace dxe {
 			}
 		}
 
-		for (r = 0; r < height; ++r) {
-			for (c = 0; c < width; ++c) {
+		for (r = 0; r < gridHeight; ++r) {
+			for (c = 0; c < gridWidth; ++c) {
 				map[index][r][c].clear();
 			}
 		}
@@ -131,12 +139,12 @@ namespace dxe {
 			for (int i = 0; i < maxFloorCount; ++i) {
 				std::cout << "\n================= Floor: " << floorIds[i] << " =================\n";
 
-				for (int r = 0; r < height; ++r) {
+				for (int r = 0; r < gridHeight; ++r) {
 					if (!map[i][r]) {
 						std::cout << "INVALID ROW DATA!!!\n";
 						continue;
 					}
-					for (int c = 0; c < width; ++c) {
+					for (int c = 0; c < gridWidth; ++c) {
 						if (map[i][r][c].active) {
 							std::cout << "X";
 						}
@@ -161,8 +169,8 @@ namespace dxe {
 		}
 
 		for (floor = 0; floor < maxFloorCount; ++floor) {
-			for (row = 0; row < height; ++row) {
-				for (col = 0; col < width; ++col) {
+			for (row = 0; row < gridHeight; ++row) {
+				for (col = 0; col < gridWidth; ++col) {
 					auto& currentRoom = map[floor][row][col];
 
 					currentRoom.roomObjs.resize(MESH_PER_ROOM_COUNT, nullptr);
@@ -170,24 +178,31 @@ namespace dxe {
 					for (auto& ptr : currentRoom.roomObjs) {
 						ptr = &buffer[currMesh++];
 						
-						ptr->model.MakeFloorPlane(cellDimension.x, cellDimension.y);
+						// most of this code should be move to room activate function
+						/*ptr->model.MakeFloorPlane(maxCellDimension.x, maxCellDimension.y);
 						ptr->setPosition(currPos);
 						ptr->resourceId = 7;
-						ptr->isActive = currentRoom.active;
-					} // assigning allocated gameObjs
-						
+						ptr->isActive = currentRoom.active;*/
+					} // assigning allocated gameObjs	
 				}
 			}
 		}
+
+		for (floor = 0; floor < gridWidth + gridHeight; ++floor) {
+			hallways[floor] = &buffer[currMesh++];
+		}
+
+		generateHallwayMeshes();
 	}
 
 	uint64_t game_map::getRequiredMeshCount()
 	{
 		uint64_t count = 0;
 
-		// the total count would be every possible room count, so just multiply the dimmensions of the dungeon with the room count
+		// the total count is every possible room count, so just multiply the dimmensions of the dungeon with the amount of meshes needed per room
+		// + every hallway mesh that needs to be made (1 for each row and column)
 		
-		count = maxFloorCount * width * height * MESH_PER_ROOM_COUNT;
+		count = (maxFloorCount * gridWidth * gridHeight * MESH_PER_ROOM_COUNT) + gridWidth + gridHeight;
 
 		return count;
 	}
@@ -199,8 +214,8 @@ namespace dxe {
 	}
 
 	void game_map::randomWalkGeneration(map_room**& floor) {
-		int currX = static_cast<int>(width >> 1); // half
-		int currY = static_cast<int>(height >> 1);
+		int currX = static_cast<int>(gridWidth >> 1); // half
+		int currY = static_cast<int>(gridHeight >> 1);
 
 		int prevX = -1;
 		int prevY = -1;
@@ -210,7 +225,9 @@ namespace dxe {
 		NEIGHBOR currDirection = NEIGHBOR::NONE;
 		NEIGHBOR oppositeDirection = NEIGHBOR::NONE;
 
-		if (width * height <= minRoomCount) {
+		glm::vec3 currPos{ 0.f };
+
+		if (gridWidth * gridHeight <= minRoomCount) {
 			// error
 			return;
 		}
@@ -259,7 +276,7 @@ namespace dxe {
 			}
 
 			// checking if we went out of bounds
-			if (currX >= width) {
+			if (currX >= gridWidth) {
 				--currX;
 				continue;
 			}
@@ -269,7 +286,7 @@ namespace dxe {
 				continue;
 			}
 
-			if (currY >= height) {
+			if (currY >= gridHeight) {
 				--currY;
 				continue;
 			}
@@ -282,11 +299,13 @@ namespace dxe {
 
 			if (floor[currY][currX].active) { continue; }
 
+			currPos = glm::vec3(midpoints[currY][currX][3][0], midpoints[currY][currX][3][1], midpoints[currY][currX][3][2]);
+
 			++roomCount;
-			floor[currY][currX].activate();
+			floor[currY][currX].activate(minCellDimension, maxCellDimension, currPos);
 			floor[currY][currX].addNeighbor(oppositeDirection);
 
-			if (prevX != -1 && prevY != -1) {
+			if (prevX != -1 && prevY != -1 && (prevX != currX || prevY != currY)) {
 				floor[prevY][prevX].addNeighbor(currDirection);
 			}
 		}
@@ -297,19 +316,65 @@ namespace dxe {
 	void game_map::initializeMidPoints() {
 		int row = 0, col = 0;
 		float xpos = 0.f, zpos = 0.f;
-		midpoints = new glm::mat4 * [height];
-		for (row = 0; row < height; ++row) {
-			midpoints[row] = new glm::mat4[width];
+		midpoints = new glm::mat4 * [gridHeight];
+		for (row = 0; row < gridHeight; ++row) {
+			midpoints[row] = new glm::mat4[gridWidth];
 		}
 
-		for (row = 0; row < height; ++row) {
-			for (col = 0, xpos = 0; col < width; ++col) {
+		for (row = 0; row < gridHeight; ++row) {
+			for (col = 0, xpos = 0; col < gridWidth; ++col) {
 				midpoints[row][col] = glm::mat4{ 1.f };
 				midpoints[row][col][3][0] = xpos;
 				midpoints[row][col][3][2] = zpos;
-				xpos += cellDimension.x;
+				xpos += maxCellDimension.x + roomOffset;
 			}
-			zpos += cellDimension.y;
+			zpos += maxCellDimension.y + roomOffset;
 		}
+	}
+
+	void game_map::generateHallwayMeshes() {
+		// TODO: create the static mesh for the hallways
+
+
+
+	}
+
+	void map_room::clear() {
+		active = false; 
+		type = ROOM_TYPE::DEBUG;
+
+		for (auto& n : neightbors) {
+			n == NEIGHBOR::NONE;
+		}
+
+		if (roomObjs.empty() || !roomObjs.front()) {
+			return;
+		}
+
+		auto& ptr = roomObjs.front();
+		ptr->isActive = false;
+	}
+
+	void map_room::addNeighbor(NEIGHBOR n) {
+		for (auto& m : neightbors) { 
+			if (m == NEIGHBOR::NONE || m == n) { 
+				m = n; 
+				return; 
+			} 
+		}
+	}
+
+	void map_room::activate(glm::vec2 minSize, glm::vec2 maxSize, glm::vec3 position) {
+		active = true;
+		roomSize = glm::linearRand(minSize, maxSize);
+
+		if (roomObjs.empty() || !roomObjs.front()) {
+			return;
+		}
+		auto& ptr = roomObjs.front();
+		ptr->model.MakeFloorPlane(roomSize.x, roomSize.y);
+		ptr->setPosition(position);
+		ptr->resourceId = 7;
+		ptr->isActive = true;
 	}
 }

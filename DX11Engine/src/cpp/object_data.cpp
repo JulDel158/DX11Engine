@@ -322,6 +322,9 @@ namespace dxe {
 	}
 
 	void Objectdata::MakeFloorPlane(float width, float lenght) {
+		vertices.clear();
+		indices.clear();
+
 		// width determines the size in the x axis, and lenght in the z axis
 		ObjVertex p1;
 		ObjVertex p2;
