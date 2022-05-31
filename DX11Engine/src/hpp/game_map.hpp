@@ -44,6 +44,7 @@ namespace dxe {
 		void generateRoomMeshes(GameObject*& buffer, uint64_t startPos, uint64_t size);
 		uint64_t getRequiredMeshCount(); // returns the number of meshes required to form each potential room
 		void generateDungeon();
+		void generateDebugDungeon();
 		glm::vec3 getRandomActiveRoomPos();
 
 	private:

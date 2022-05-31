@@ -213,6 +213,15 @@ namespace dxe {
 		}
 	}
 
+	void game_map::generateDebugDungeon() {
+		for (int row = 0; row < gridHeight; ++row) {
+			for (int col = 0; col < gridWidth; ++col) {
+				auto currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
+				map[0][row][col].activate(maxCellDimension, minCellDimension, currPos);
+			}
+		}
+	}
+
 	glm::vec3 game_map::getRandomActiveRoomPos()
 	{
 		if (!map) {
@@ -251,6 +260,9 @@ namespace dxe {
 		}
 
 		while (roomCount < minRoomCount) {
+
+			// BUG: index values going far out of scope
+
 			int direction = std::rand() % 4 + 1;
 			// number for 1 to 4
 			// 1 = up
@@ -385,16 +397,18 @@ namespace dxe {
 			auto& h = hallways[row];
 			h->model = xAxisHall;
 			h->isActive = true;
-			xCenter.z += maxCellDimension.y + roomOffset;
 			h->setPosition(xCenter);
+			h->resourceId = 3;
+			xCenter.z += maxCellDimension.y + roomOffset;
 		}
 
 		for (col = gridHeight; col < gridHeight + gridWidth; ++col) {
 			auto& h = hallways[col];
 			h->model = zAxisHall;
 			h->isActive = true;
-			zCenter.x += maxCellDimension.x + roomOffset;
 			h->setPosition(zCenter);
+			h->resourceId = 2;
+			zCenter.x += maxCellDimension.x + roomOffset;
 		}
 	}
 
