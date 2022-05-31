@@ -92,6 +92,7 @@ namespace dxe {
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
 		map.generateDungeon();
 		//map.generateDebugDungeon();
+		map.printMapData();
 
 		player.setPosition(map.getRandomActiveRoomPos());
 		/*MakePlane(gameObjects[0].model, 10.f, 10.f);

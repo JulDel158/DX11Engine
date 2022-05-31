@@ -307,23 +307,23 @@ namespace dxe {
 
 			// checking if we went out of bounds
 			if (currX >= gridWidth) {
-				--currX;
-				continue;
+				currX = static_cast<int>(gridWidth) - 1;
+				//continue;
 			}
 
 			if (currX < 0) {
-				++currX;
-				continue;
+				currX = 0;
+				//continue;
 			}
 
 			if (currY >= gridHeight) {
-				--currY;
-				continue;
+				currY = static_cast<int>(gridHeight) - 1;
+				//continue;
 			}
 
 			if (currY < 0) {
-				++currY;
-				continue;
+				currY = 0;
+				//continue;
 			}
 
 
