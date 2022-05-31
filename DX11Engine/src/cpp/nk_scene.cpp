@@ -86,10 +86,13 @@ namespace dxe {
 
 		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 5.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
+		
 
 		allocateGameObjs(map.getRequiredMeshCount());
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
 		map.generateDungeon();
+
+		player.setPosition(map.getRandomActiveRoomPos());
 		/*MakePlane(gameObjects[0].model, 10.f, 10.f);
 		gameObjects[0].isActive = true;
 		gameObjects[0].resourceId = 1;

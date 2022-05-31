@@ -36,7 +36,7 @@ namespace dxe {
 				
 			}
 
-			floorIds[floor] = floor + 1; // assigning initial floor ids
+			floorIds[floor] = (int)floor + 1; // assigning initial floor ids
 		}
 		// 0 to height - 1 = all hallways going across the x axis
 		// from height to width - 1 = all hallways going across the z axis
@@ -213,6 +213,24 @@ namespace dxe {
 		}
 	}
 
+	glm::vec3 game_map::getRandomActiveRoomPos()
+	{
+		if (!map) {
+			return glm::vec3(0.f);
+		}
+		uint64_t row, col;
+		
+		for (row = 0; row < gridHeight; ++row) {
+			for (col = 0; col < gridWidth; ++col) {
+				if (map[0][row][col].active) {
+					return glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
+				}
+			}
+		}
+
+		return glm::vec3(0.f);
+	}
+
 	void game_map::randomWalkGeneration(map_room**& floor) {
 		int currX = static_cast<int>(gridWidth >> 1); // half
 		int currY = static_cast<int>(gridHeight >> 1);
@@ -335,8 +353,49 @@ namespace dxe {
 	void game_map::generateHallwayMeshes() {
 		// TODO: create the static mesh for the hallways
 
+		Objectdata xAxisHall, zAxisHall;
 
+		glm::vec3 xCenter{ 0.f }, zCenter{ 0.f };
+		float xLenght{ 0.f }, zLenght{ 0.f };
+		float cWidth = static_cast<float>(gridWidth);
+		float cHeight = static_cast<float>(gridHeight);
 
+		uint64_t col = 0, row = 0;
+
+		for (; row < gridHeight; ++row) {
+			zCenter += glm::vec3(midpoints[row][0][3][0], midpoints[row][0][3][1] - 0.25f, midpoints[row][0][3][2]);
+		}
+		zCenter /= cHeight;
+
+		for (; col < gridWidth; ++col) {
+			xCenter += glm::vec3(midpoints[0][col][3][0], midpoints[0][col][3][1] - 0.25f, midpoints[0][col][3][2]);
+		}
+		xCenter /= cWidth;
+
+		xLenght = (maxCellDimension.x * cWidth) + roomOffset * (cWidth - 1.f);
+		zLenght = (maxCellDimension.y * cHeight) + roomOffset * (cHeight - 1.f);
+
+		xAxisHall.MakeFloorPlane(xLenght, roomOffset);
+		zAxisHall.MakeFloorPlane(roomOffset, zLenght);
+
+		// 0 to height - 1 = all hallways going across the x axis
+		// from height to width - 1 = all hallways going across the z axis
+
+		for (row = 0; row < gridHeight; ++row) {
+			auto& h = hallways[row];
+			h->model = xAxisHall;
+			h->isActive = true;
+			xCenter.z += maxCellDimension.y + roomOffset;
+			h->setPosition(xCenter);
+		}
+
+		for (col = gridHeight; col < gridHeight + gridWidth; ++col) {
+			auto& h = hallways[col];
+			h->model = zAxisHall;
+			h->isActive = true;
+			zCenter.x += maxCellDimension.x + roomOffset;
+			h->setPosition(zCenter);
+		}
 	}
 
 	void map_room::clear() {
@@ -344,7 +403,7 @@ namespace dxe {
 		type = ROOM_TYPE::DEBUG;
 
 		for (auto& n : neightbors) {
-			n == NEIGHBOR::NONE;
+			n = NEIGHBOR::NONE;
 		}
 
 		if (roomObjs.empty() || !roomObjs.front()) {

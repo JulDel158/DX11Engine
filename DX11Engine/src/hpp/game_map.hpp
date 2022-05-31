@@ -43,8 +43,8 @@ namespace dxe {
 		void printMapData();
 		void generateRoomMeshes(GameObject*& buffer, uint64_t startPos, uint64_t size);
 		uint64_t getRequiredMeshCount(); // returns the number of meshes required to form each potential room
-	
 		void generateDungeon();
+		glm::vec3 getRandomActiveRoomPos();
 
 	private:
 		void randomWalkGeneration(map_room**& floor);
@@ -61,6 +61,8 @@ namespace dxe {
 		float roomOffset{ 0.f };
 		int* floorIds{ nullptr };
 		map_room*** map{ nullptr };
+		// 0 to height - 1 = all hallways going across the x axis
+		// from height to width - 1 = all hallways going across the z axis
 		GameObject** hallways{ nullptr };
 		glm::mat4** midpoints{ nullptr };
 	};
