@@ -50,8 +50,9 @@ namespace dxe {
 	private:
 		void randomWalkGeneration(map_room**& floor);
 		void initializeMidPoints();
-		void generateHallwayMeshes();
+		void generateHallwayMeshes(); // DEPRECATED
 		void generateHallwayMesh();
+		void generateRoomMesh();
 
 		static constexpr uint64_t MESH_PER_ROOM_COUNT = 1;
 		uint64_t gridWidth{ 0 };
@@ -68,8 +69,9 @@ namespace dxe {
 		map_room*** map{ nullptr };
 		// 0 to height - 1 = all hallways going across the x axis
 		// from height to width - 1 = all hallways going across the z axis
-		GameObject** hallways{ nullptr };
-		GameObject* hallway{ nullptr };
+		//GameObject** hallways{ nullptr };
+		GameObject* hallwayObj{ nullptr };
+		GameObject* roomObj{ nullptr };
 		glm::mat4** midpoints{ nullptr };
 	};
 

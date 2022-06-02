@@ -42,7 +42,7 @@ namespace dxe {
 		}
 		// 0 to height - 1 = all hallways going across the x axis
 		// from height to width - 1 = all hallways going across the z axis
-		hallways = new GameObject * [width + height]{ nullptr };
+		//hallways = new GameObject * [width + height]{ nullptr };
 		//hallway = new GameObject* { nullptr };
 
 		initializeMidPoints();
@@ -75,9 +75,9 @@ namespace dxe {
 			delete[] midpoints;
 		}
 
-		if (hallways) {
+		/*if (hallways) {
 			delete[] hallways;
-		}
+		}*/
 
 		/*if (hallway) {
 			delete hallway;
@@ -172,38 +172,38 @@ namespace dxe {
 	}
 
 	void game_map::generateRoomMeshes(GameObject*& buffer, uint64_t startPos, uint64_t size) {
-		uint64_t col = 0, row = 0, floor = 0, currMesh = startPos;
+		uint64_t /*col = 0, row = 0, floor = 0,*/ currMesh = startPos;
 
 		if (size - startPos < getRequiredMeshCount()) {
 			// ERROR
 			return;
 		}
 
-		for (floor = 0; floor < maxFloorCount; ++floor) {
-			for (row = 0; row < gridHeight; ++row) {
-				for (col = 0; col < gridWidth; ++col) {
-					auto& currentRoom = map[floor][row][col];
+		//for (floor = 0; floor < maxFloorCount; ++floor) {
+		//	for (row = 0; row < gridHeight; ++row) {
+		//		for (col = 0; col < gridWidth; ++col) {
+		//			auto& currentRoom = map[floor][row][col];
 
-					currentRoom.roomObjs.resize(MESH_PER_ROOM_COUNT, nullptr);
-					glm::vec3 currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
-					for (auto& ptr : currentRoom.roomObjs) {
-						ptr = &buffer[currMesh++];
-						
-						// most of this code should be move to room activate function
-						/*ptr->model.MakeFloorPlane(maxCellDimension.x, maxCellDimension.y);
-						ptr->setPosition(currPos);
-						ptr->resourceId = 7;
-						ptr->isActive = currentRoom.active;*/
-					} // assigning allocated gameObjs	
-				}
-			}
-		}
+		//			currentRoom.roomObjs.resize(MESH_PER_ROOM_COUNT, nullptr);
+		//			glm::vec3 currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
+		//			for (auto& ptr : currentRoom.roomObjs) {
+		//				ptr = &buffer[currMesh++];
+		//				
+		//				// most of this code should be move to room activate function
+		//				/*ptr->model.MakeFloorPlane(maxCellDimension.x, maxCellDimension.y);
+		//				ptr->setPosition(currPos);
+		//				ptr->resourceId = 7;
+		//				ptr->isActive = currentRoom.active;*/
+		//			} // assigning allocated gameObjs	
+		//		}
+		//	}
+		//}
 
 		/*for (floor = 0; floor < gridWidth + gridHeight; ++floor) {
 			hallways[floor] = &buffer[currMesh++];
 		}*/
-
-		hallway = &buffer[currMesh++];
+		roomObj = &buffer[currMesh++];
+		hallwayObj = &buffer[currMesh++];
 
 		//generateHallwayMeshes();
 		//generateHallwayMesh();
@@ -211,13 +211,12 @@ namespace dxe {
 
 	uint64_t game_map::getRequiredMeshCount()
 	{
-		uint64_t count = 0;
+		uint64_t count = 2;
 
 		// the total count is every possible room count, so just multiply the dimmensions of the dungeon with the amount of meshes needed per room
 		// + every hallway mesh that needs to be made (1 for each row and column)
 		
-		count = (maxFloorCount * gridWidth * gridHeight * MESH_PER_ROOM_COUNT) + 1;
-
+		//count = (maxFloorCount * gridWidth * gridHeight * MESH_PER_ROOM_COUNT) + 1;
 		return count;
 	}
 
@@ -226,6 +225,7 @@ namespace dxe {
 			randomWalkGeneration(map[i]);
 		}
 
+		generateRoomMesh();
 		generateHallwayMesh();
 	}
 
@@ -253,6 +253,7 @@ namespace dxe {
 			}
 		}
 
+		generateRoomMesh();
 		generateHallwayMesh();
 	}
 
@@ -370,7 +371,7 @@ namespace dxe {
 			floor[currY][currX].activate(minCellDimension, maxCellDimension, currPos);
 			
 
-			if (!firstIteration && prevX != -1 && prevY != -1 && (prevX != currX || prevY != currY)) {
+			if (!firstIteration && (prevX != currX || prevY != currY)) {
 				floor[currY][currX].addNeighbor(oppositeDirection);
 				floor[prevY][prevX].addNeighbor(currDirection);
 			}
@@ -401,69 +402,69 @@ namespace dxe {
 	}
 
 	void game_map::generateHallwayMeshes() {
-		// TODO: create the static mesh for the hallways
+		//// TODO: create the static mesh for the hallways
 
-		Objectdata xAxisHall, zAxisHall;
+		//Objectdata xAxisHall, zAxisHall;
 
-		glm::vec3 xCenter{ 0.f }, zCenter{ 0.f };
-		float xLenght{ 0.f }, zLenght{ 0.f };
-		float cWidth = static_cast<float>(gridWidth);
-		float cHeight = static_cast<float>(gridHeight);
+		//glm::vec3 xCenter{ 0.f }, zCenter{ 0.f };
+		//float xLenght{ 0.f }, zLenght{ 0.f };
+		//float cWidth = static_cast<float>(gridWidth);
+		//float cHeight = static_cast<float>(gridHeight);
 
-		uint64_t col = 0, row = 0;
+		//uint64_t col = 0, row = 0;
 
-		for (; row < gridHeight; ++row) {
-			zCenter += glm::vec3(midpoints[row][0][3][0], midpoints[row][0][3][1] - 0.25f, midpoints[row][0][3][2]);
-		}
-		zCenter /= cHeight;
+		//for (; row < gridHeight; ++row) {
+		//	zCenter += glm::vec3(midpoints[row][0][3][0], midpoints[row][0][3][1] - 0.25f, midpoints[row][0][3][2]);
+		//}
+		//zCenter /= cHeight;
 
-		for (; col < gridWidth; ++col) {
-			xCenter += glm::vec3(midpoints[0][col][3][0], midpoints[0][col][3][1] - 0.25f, midpoints[0][col][3][2]);
-		}
-		xCenter /= cWidth;
+		//for (; col < gridWidth; ++col) {
+		//	xCenter += glm::vec3(midpoints[0][col][3][0], midpoints[0][col][3][1] - 0.25f, midpoints[0][col][3][2]);
+		//}
+		//xCenter /= cWidth;
 
-		xLenght = (maxCellDimension.x * cWidth) + roomOffset * (cWidth - 1.f);
-		zLenght = (maxCellDimension.y * cHeight) + roomOffset * (cHeight - 1.f);
+		//xLenght = (maxCellDimension.x * cWidth) + roomOffset * (cWidth - 1.f);
+		//zLenght = (maxCellDimension.y * cHeight) + roomOffset * (cHeight - 1.f);
 
-		xAxisHall.MakeFloorPlane(xLenght, roomOffset);
-		zAxisHall.MakeFloorPlane(roomOffset, zLenght);
+		//xAxisHall.MakeFloorPlane(xLenght, roomOffset);
+		//zAxisHall.MakeFloorPlane(roomOffset, zLenght);
 
-		// 0 to height - 1 = all hallways going across the x axis
-		// from height to width - 1 = all hallways going across the z axis
+		//// 0 to height - 1 = all hallways going across the x axis
+		//// from height to width - 1 = all hallways going across the z axis
 
-		for (row = 0; row < gridHeight; ++row) {
-			auto& h = hallways[row];
-			h->model = xAxisHall;
-			h->isActive = true;
-			h->setPosition(xCenter);
-			h->resourceId = 3;
-			xCenter.z += maxCellDimension.y + roomOffset;
-		}
+		//for (row = 0; row < gridHeight; ++row) {
+		//	auto& h = hallways[row];
+		//	h->model = xAxisHall;
+		//	h->isActive = true;
+		//	h->setPosition(xCenter);
+		//	h->resourceId = 3;
+		//	xCenter.z += maxCellDimension.y + roomOffset;
+		//}
 
-		for (col = gridHeight; col < gridHeight + gridWidth; ++col) {
-			auto& h = hallways[col];
-			h->model = zAxisHall;
-			h->isActive = true;
-			h->setPosition(zCenter);
-			h->resourceId = 2;
-			zCenter.x += maxCellDimension.x + roomOffset;
-		}
+		//for (col = gridHeight; col < gridHeight + gridWidth; ++col) {
+		//	auto& h = hallways[col];
+		//	h->model = zAxisHall;
+		//	h->isActive = true;
+		//	h->setPosition(zCenter);
+		//	h->resourceId = 2;
+		//	zCenter.x += maxCellDimension.x + roomOffset;
+		//}
 	}
 
 	void game_map::generateHallwayMesh() {
 		// we will traverse every cell and check if we can build a neightbor to the left and up
-		hallway->model.vertices.clear();
-		hallway->model.indices.clear();
-		hallway->isActive = true;
-		hallway->resourceId = 4;
+		hallwayObj->model.vertices.clear();
+		hallwayObj->model.indices.clear();
+		hallwayObj->isActive = true;
+		hallwayObj->resourceId = 4;
 
 		// we can reserve the vertices and indices to the max possible capacity
 
 		int row = 0, col = 0;
 		bool hasUp = false, hasRight = false;
 
-		for (row = 0; row < gridHeight; ++row) {
-			for (col = 0; col < gridWidth; ++col) {
+		for (row = 0; row < static_cast<int>(gridHeight); ++row) {
+			for (col = 0; col < static_cast<int>(gridWidth); ++col) {
 				if (!map[0][row][col].active) {
 					continue;
 				}
@@ -528,53 +529,53 @@ namespace dxe {
 					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
 					// NOW WE CAN PUSH THESE POINTS
-					const int currentIndx = hallway->model.vertices.size(); // basically our 0 index
+					const int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
 
-					hallway->model.vertices.push_back(p1);
-					hallway->model.vertices.push_back(p2);
-					hallway->model.vertices.push_back(p3);
-					hallway->model.vertices.push_back(p4);
-					hallway->model.vertices.push_back(p5);
-					hallway->model.vertices.push_back(p6);
-					hallway->model.vertices.push_back(p7);
-					hallway->model.vertices.push_back(p8);
+					hallwayObj->model.vertices.push_back(p1);
+					hallwayObj->model.vertices.push_back(p2);
+					hallwayObj->model.vertices.push_back(p3);
+					hallwayObj->model.vertices.push_back(p4);
+					hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p8);
 
 					//floor 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 1);
-					hallway->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 1);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 2);
-					hallway->model.indices.push_back(currentIndx + 3);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx + 3);
 
 					// wall 1
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 7);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 7);
 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 7);
-					hallway->model.indices.push_back(currentIndx + 3);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 7);
+					hallwayObj->model.indices.push_back(currentIndx + 3);
 
 					// wall 2
-					hallway->model.indices.push_back(currentIndx + 1);
-					hallway->model.indices.push_back(currentIndx + 5);
-					hallway->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 1);
+					hallwayObj->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
 
-					hallway->model.indices.push_back(currentIndx + 1);
-					hallway->model.indices.push_back(currentIndx + 6);
-					hallway->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx + 1);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
 
 					// may be removed
 					// ceiling 
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 6);
-					hallway->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 5);
 
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 7);
-					hallway->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 7);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
 				}
 
 
@@ -622,59 +623,488 @@ namespace dxe {
 					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
 					// NOW WE CAN PUSH THESE POINTS
-					const int currentIndx = hallway->model.vertices.size(); // basically our 0 index
+					const int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
 
-					hallway->model.vertices.push_back(p1);
-					hallway->model.vertices.push_back(p2);
-					hallway->model.vertices.push_back(p3);
-					hallway->model.vertices.push_back(p4);
-					hallway->model.vertices.push_back(p5);
-					hallway->model.vertices.push_back(p6);
-					hallway->model.vertices.push_back(p7);
-					hallway->model.vertices.push_back(p8);
+					hallwayObj->model.vertices.push_back(p1);
+					hallwayObj->model.vertices.push_back(p2);
+					hallwayObj->model.vertices.push_back(p3);
+					hallwayObj->model.vertices.push_back(p4);
+					hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p8);
 
 					//floor 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 1);
-					hallway->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 1);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 2);
-					hallway->model.indices.push_back(currentIndx + 3);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx + 3);
 
 					// wall 1
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 5);
 
-					hallway->model.indices.push_back(currentIndx);
-					hallway->model.indices.push_back(currentIndx + 5);
-					hallway->model.indices.push_back(currentIndx + 1);
+					hallwayObj->model.indices.push_back(currentIndx);
+					hallwayObj->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx + 1);
 
 					// wall 2
-					hallway->model.indices.push_back(currentIndx + 3);
-					hallway->model.indices.push_back(currentIndx + 7);
-					hallway->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 3);
+					hallwayObj->model.indices.push_back(currentIndx + 7);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
 
-					hallway->model.indices.push_back(currentIndx + 3);
-					hallway->model.indices.push_back(currentIndx + 6);
-					hallway->model.indices.push_back(currentIndx + 2);
+					hallwayObj->model.indices.push_back(currentIndx + 3);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 2);
 
 					// may be removed
 					// ceiling 
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 6);
-					hallway->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 5);
 
-					hallway->model.indices.push_back(currentIndx + 4);
-					hallway->model.indices.push_back(currentIndx + 7);
-					hallway->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx + 4);
+					hallwayObj->model.indices.push_back(currentIndx + 7);
+					hallwayObj->model.indices.push_back(currentIndx + 6);
 				}
 
 
 			}
 		}
 		int debug = 0;
+	}
+
+	void game_map::generateRoomMesh() {
+		// much like the hallway generation, we will traverse to every active room
+		// and for that room we will add the floor and wall geometry into the room obj
+		roomObj->model.vertices.clear();
+		roomObj->model.indices.clear();
+		roomObj->isActive = true;
+		roomObj->resourceId = 7;
+
+		int row = 0, col = 0;
+		bool hasLeft = false, hasRight = false, hasUp = false, hasDown = false; // theses will be used to determine wheter a door or a wall should be placed
+
+		for (row = 0; row < static_cast<int>(gridHeight); ++row) {
+			for (col = 0; col < static_cast<int>(gridWidth); ++col) {
+
+				if (!map[0][row][col].active) { continue; }
+				hasLeft = false;
+				hasRight = false;
+				hasUp = false;
+				hasDown = false;
+
+				// now we check if the current room has a neighbor to it's right or up in the grid
+				for (int i = 0; i < 4; ++i) {
+					if (map[0][row][col].neightbors[i] == NEIGHBOR::RIGHT) {
+						hasRight = true;
+					}
+					else if (map[0][row][col].neightbors[i] == NEIGHBOR::UP) {
+						hasUp = true;
+					}
+					else if (map[0][row][col].neightbors[i] == NEIGHBOR::LEFT) {
+						hasLeft = true;
+					}
+					else if (map[0][row][col].neightbors[i] == NEIGHBOR::DOWN) {
+						hasDown = true;
+					}
+				}
+				
+				glm::vec3 center = GetPositionVector(midpoints[row][col]);
+
+				// we will need the main 8 vertices
+				// and the we will need 4 more vertices that will be used for doors
+
+				int currentIndx = roomObj->model.vertices.size();
+				// Floor
+				ObjVertex p1;
+				ObjVertex p2;
+				ObjVertex p3;
+				ObjVertex p4;
+
+				/*
+				p2      p3
+				  *     *
+				
+				  *     *
+				p1      p4
+				*/
+
+				p1.pos = p2.pos = p3.pos = p4.pos = center;
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
+
+				p1.pos.x = p2.pos.x = center.x - map[0][row][col].roomSize.x / 2.f;
+				p3.pos.x = p4.pos.x = center.x + map[0][row][col].roomSize.x / 2.f;
+
+				p1.pos.z = p4.pos.z = center.z - map[0][row][col].roomSize.y / 2.f;
+				p2.pos.z = p3.pos.z = center.z + map[0][row][col].roomSize.y / 2.f;
+
+
+				// TODO: ADD SYSTEM AND FUNCTION THAT RETURNS UV COORDINATES TO REPRESENT DIFFERENT TILE FROM AN IMAGE ADDING VARIETY OF FLOOR TEXTURES
+				p1.uv = { 0.f, 0.f };
+				p2.uv = { 0.f, 1.f };
+				p3.uv = { 1.f, 1.f };
+				p4.uv = { 1.f, 0.f };
+
+
+				roomObj->model.vertices.push_back(p1);
+				roomObj->model.vertices.push_back(p2);
+				roomObj->model.vertices.push_back(p3);
+				roomObj->model.vertices.push_back(p4);
+
+				roomObj->model.indices.push_back(currentIndx + 0);
+				roomObj->model.indices.push_back(currentIndx + 1);
+				roomObj->model.indices.push_back(currentIndx + 2);
+
+				roomObj->model.indices.push_back(currentIndx + 0);
+				roomObj->model.indices.push_back(currentIndx + 2);
+				roomObj->model.indices.push_back(currentIndx + 3);
+
+
+				// ceiling
+				p1.pos.y = p2.pos.y = p3.pos.y = p4.pos.y = hallwayHeight * 1.5f;
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, -1.f, 0.f };
+				// TODO: CHANGE UVS HERE 
+				currentIndx = roomObj->model.vertices.size();
+
+				roomObj->model.vertices.push_back(p1);
+				roomObj->model.vertices.push_back(p2);
+				roomObj->model.vertices.push_back(p3);
+				roomObj->model.vertices.push_back(p4);
+
+				roomObj->model.indices.push_back(currentIndx + 0);
+				roomObj->model.indices.push_back(currentIndx + 1);
+				roomObj->model.indices.push_back(currentIndx + 2);
+
+				roomObj->model.indices.push_back(currentIndx + 0);
+				roomObj->model.indices.push_back(currentIndx + 2);
+				roomObj->model.indices.push_back(currentIndx + 3);
+
+
+				// x-axis walls/doors
+				ObjVertex p5, p6, p7, p8;
+				p1.pos = p2.pos = p3.pos = p4.pos = p5.pos = p6.pos = p7.pos = p8.pos = center;
+
+				// we will calculate all the points and when it is time to add them, we will just check wheter it is a door or not
+				// to determine which vertices and indices to add
+				// all these points share the same x value but have varying y and z values
+
+				// first we will calculate all the z values
+				p1.pos.z = p2.pos.z = center.z - map[0][row][col].roomSize.y / 2.f;
+				p3.pos.z = p4.pos.z = center.z + map[0][row][col].roomSize.y / 2.f;
+
+				// the next 4 points should align with the hallway
+				p5.pos.z = p6.pos.z = center.z - hallwayWidth / 2.f;
+				p7.pos.z = p8.pos.z = center.z + hallwayWidth / 2.f;
+
+				// Now we calculate the y values
+				p1.pos.y = p5.pos.y = p8.pos.y = p4.pos.y = 0.f;
+				p2.pos.y = p3.pos.y = hallwayHeight * 1.5f;
+				p6.pos.y = p7.pos.y = hallwayHeight;
+
+				// now that all the values are where they need to be we can choose which wall we want to make, adjust the x or z values of all
+				// the points and build the wall, then repeat
+
+
+				//Left wall
+				p1.pos.x = p2.pos.x = p3.pos.x = p4.pos.x = p5.pos.x = p6.pos.x = p7.pos.x = p8.pos.x = center.x - map[0][row][col].roomSize.x / 2.f;
+				// adjusting normals
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 1.f, 0.f, 0.f };
+				// TODO CHANGE UV USING FUNCTION WHEN IMPLEMENTED
+				p1.uv = { 0.f, 0.f };
+				p2.uv = { 0.f, 1.f };
+				p3.uv = { 1.f, 1.f };
+				p4.uv = { 1.f, 0.f };
+
+				p5.uv = { 0.4f, 0.f };
+				p6.uv = { 0.4f, 0.6f };
+				p7.uv = { 0.6f, 0.6f };
+				p8.uv = { 0.6f, 0.0f };
+
+				currentIndx = roomObj->model.vertices.size();
+				if (hasLeft) {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					roomObj->model.vertices.push_back(p5);
+					roomObj->model.vertices.push_back(p6);
+					roomObj->model.vertices.push_back(p7);
+					roomObj->model.vertices.push_back(p8);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 4);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 4);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 3
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 4
+					roomObj->model.indices.push_back(currentIndx + 5);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 6);
+
+					// triangle 5
+					roomObj->model.indices.push_back(currentIndx + 6);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 7);
+
+					// triangle 6
+					roomObj->model.indices.push_back(currentIndx + 7);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				} 
+				else {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+
+				//Right wall
+				p1.pos.x = p2.pos.x = p3.pos.x = p4.pos.x = p5.pos.x = p6.pos.x = p7.pos.x = p8.pos.x = center.x + map[0][row][col].roomSize.x / 2.f;
+				// adjusting normals
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { -1.f, 0.f, 0.f };
+				currentIndx = roomObj->model.vertices.size();
+				if (hasRight) {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					roomObj->model.vertices.push_back(p5);
+					roomObj->model.vertices.push_back(p6);
+					roomObj->model.vertices.push_back(p7);
+					roomObj->model.vertices.push_back(p8);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 4);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 4);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 3
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 4
+					roomObj->model.indices.push_back(currentIndx + 5);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 6);
+
+					// triangle 5
+					roomObj->model.indices.push_back(currentIndx + 6);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 7);
+
+					// triangle 6
+					roomObj->model.indices.push_back(currentIndx + 7);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+				else {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+
+				//Up wall
+
+				// reset all points to the center
+				p1.pos = p2.pos = p3.pos = p4.pos = p5.pos = p6.pos = p7.pos = p8.pos = center;
+
+				// all these points share the same z value but have varying y and x values
+
+				// first we will calculate all the x values
+				p1.pos.x = p2.pos.x = center.x - map[0][row][col].roomSize.x / 2.f;
+				p3.pos.x = p4.pos.x = center.x + map[0][row][col].roomSize.x / 2.f;
+
+				// the next 4 points should align with the hallway
+				p5.pos.x = p6.pos.x = center.x - hallwayWidth / 2.f;
+				p7.pos.x = p8.pos.x = center.x + hallwayWidth / 2.f;
+
+				// Now we calculate the y values
+				p1.pos.y = p5.pos.y = p8.pos.y = p4.pos.y = 0.f;
+				p2.pos.y = p3.pos.y = hallwayHeight * 1.5f;
+				p6.pos.y = p7.pos.y = hallwayHeight;
+
+				p1.pos.z = p2.pos.z = p3.pos.z = p4.pos.z = p5.pos.z = p6.pos.z = p7.pos.z = p8.pos.z = center.z + map[0][row][col].roomSize.y / 2.f;
+				// adjusting normals
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, 0.f, -1.f };
+				// TODO CHANGE UV USING FUNCTION WHEN IMPLEMENTED
+				p1.uv = { 0.f, 0.f };
+				p2.uv = { 0.f, 1.f };
+				p3.uv = { 1.f, 1.f };
+				p4.uv = { 1.f, 0.f };
+
+				p5.uv = { 0.4f, 0.f };
+				p6.uv = { 0.4f, 0.6f };
+				p7.uv = { 0.6f, 0.6f };
+				p8.uv = { 0.6f, 0.0f };
+				currentIndx = roomObj->model.vertices.size();
+				if (hasUp) {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					roomObj->model.vertices.push_back(p5);
+					roomObj->model.vertices.push_back(p6);
+					roomObj->model.vertices.push_back(p7);
+					roomObj->model.vertices.push_back(p8);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 4);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 4);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 3
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 4
+					roomObj->model.indices.push_back(currentIndx + 5);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 6);
+
+					// triangle 5
+					roomObj->model.indices.push_back(currentIndx + 6);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 7);
+
+					// triangle 6
+					roomObj->model.indices.push_back(currentIndx + 7);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+				else {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+
+				// Down wall
+				p1.pos.z = p2.pos.z = p3.pos.z = p4.pos.z = p5.pos.z = p6.pos.z = p7.pos.z = p8.pos.z = center.z - map[0][row][col].roomSize.y / 2.f;
+				// adjusting normals
+				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, 0.f, 1.f };
+				currentIndx = roomObj->model.vertices.size();
+
+				if (hasDown) {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					roomObj->model.vertices.push_back(p5);
+					roomObj->model.vertices.push_back(p6);
+					roomObj->model.vertices.push_back(p7);
+					roomObj->model.vertices.push_back(p8);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 4);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 4);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 3
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 5);
+
+					// triangle 4
+					roomObj->model.indices.push_back(currentIndx + 5);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 6);
+
+					// triangle 5
+					roomObj->model.indices.push_back(currentIndx + 6);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 7);
+
+					// triangle 6
+					roomObj->model.indices.push_back(currentIndx + 7);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+				else {
+					roomObj->model.vertices.push_back(p1);
+					roomObj->model.vertices.push_back(p2);
+					roomObj->model.vertices.push_back(p3);
+					roomObj->model.vertices.push_back(p4);
+
+					// triangle 1
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 1);
+					roomObj->model.indices.push_back(currentIndx + 2);
+
+					// triangle 2
+					roomObj->model.indices.push_back(currentIndx + 0);
+					roomObj->model.indices.push_back(currentIndx + 2);
+					roomObj->model.indices.push_back(currentIndx + 3);
+				}
+			}
+		}
+
 	}
 
 	void map_room::clear() {
@@ -706,13 +1136,13 @@ namespace dxe {
 		active = true;
 		roomSize = glm::linearRand(minSize, maxSize);
 
-		if (roomObjs.empty() || !roomObjs.front()) {
+		/*if (roomObjs.empty() || !roomObjs.front()) {
 			return;
 		}
 		auto& ptr = roomObjs.front();
 		ptr->model.MakeFloorPlane(roomSize.x, roomSize.y);
 		ptr->setPosition(position);
 		ptr->resourceId = 7;
-		ptr->isActive = true;
+		ptr->isActive = true;*/
 	}
 }
