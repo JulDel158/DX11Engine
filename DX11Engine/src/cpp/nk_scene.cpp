@@ -8,7 +8,7 @@
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine),
-	map(game_map(10, 10, 1, 15, glm::vec2(100.f, 100.f), glm::vec2(50.f, 50.f), 10.f)){
+	map(game_map(5, 5, 1, 5, glm::vec2(200.f, 200.f), glm::vec2(50.f, 50.f), 20.f)){
 		std::srand(static_cast<unsigned int>(std::time(0)));
 		//game_map map = game_map(20, 20, 3, 15, glm::vec2(1.f, 1.f));
 		//map.printMapData();
@@ -90,8 +90,8 @@ namespace dxe {
 
 		allocateGameObjs(map.getRequiredMeshCount());
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
-		map.generateDungeon();
-		//map.generateDebugDungeon();
+		//map.generateDungeon();
+		map.generateDebugDungeon();
 		map.printMapData();
 
 		player.setPosition(map.getRandomActiveRoomPos());

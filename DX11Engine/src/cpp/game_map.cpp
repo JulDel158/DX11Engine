@@ -41,6 +41,7 @@ namespace dxe {
 		// 0 to height - 1 = all hallways going across the x axis
 		// from height to width - 1 = all hallways going across the z axis
 		hallways = new GameObject * [width + height]{ nullptr };
+		//hallway = new GameObject* { nullptr };
 
 		initializeMidPoints();
 
@@ -71,6 +72,14 @@ namespace dxe {
 			}
 			delete[] midpoints;
 		}
+
+		if (hallways) {
+			delete[] hallways;
+		}
+
+		/*if (hallway) {
+			delete hallway;
+		}*/
 	}
 
 	void game_map::clearFloor(uint64_t floor) {
@@ -188,11 +197,14 @@ namespace dxe {
 			}
 		}
 
-		for (floor = 0; floor < gridWidth + gridHeight; ++floor) {
+		/*for (floor = 0; floor < gridWidth + gridHeight; ++floor) {
 			hallways[floor] = &buffer[currMesh++];
-		}
+		}*/
 
-		generateHallwayMeshes();
+		hallway = &buffer[currMesh++];
+
+		//generateHallwayMeshes();
+		//generateHallwayMesh();
 	}
 
 	uint64_t game_map::getRequiredMeshCount()
@@ -202,7 +214,7 @@ namespace dxe {
 		// the total count is every possible room count, so just multiply the dimmensions of the dungeon with the amount of meshes needed per room
 		// + every hallway mesh that needs to be made (1 for each row and column)
 		
-		count = (maxFloorCount * gridWidth * gridHeight * MESH_PER_ROOM_COUNT) + gridWidth + gridHeight;
+		count = (maxFloorCount * gridWidth * gridHeight * MESH_PER_ROOM_COUNT) + 1;
 
 		return count;
 	}
@@ -211,6 +223,8 @@ namespace dxe {
 		for (int i = 0; i < maxFloorCount; ++i) {
 			randomWalkGeneration(map[i]);
 		}
+
+		generateHallwayMesh();
 	}
 
 	void game_map::generateDebugDungeon() {
@@ -218,8 +232,26 @@ namespace dxe {
 			for (int col = 0; col < gridWidth; ++col) {
 				auto currPos = glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
 				map[0][row][col].activate(maxCellDimension, minCellDimension, currPos);
+
+				if (row != 0) {
+					map[0][row][col].addNeighbor(NEIGHBOR::DOWN);
+				}
+
+				if (row != gridHeight - 1) {
+					map[0][row][col].addNeighbor(NEIGHBOR::UP);
+				}
+
+				if (col != 0) {
+					map[0][row][col].addNeighbor(NEIGHBOR::LEFT);
+				}
+
+				if (col != gridWidth - 1) {
+					map[0][row][col].addNeighbor(NEIGHBOR::RIGHT);
+				}
 			}
 		}
+
+		generateHallwayMesh();
 	}
 
 	glm::vec3 game_map::getRandomActiveRoomPos()
@@ -412,6 +444,144 @@ namespace dxe {
 		}
 	}
 
+	void game_map::generateHallwayMesh() {
+		// we will traverse every cell and check if we can build a neightbor to the left and up
+		hallway->model.vertices.clear();
+		hallway->model.indices.clear();
+		hallway->isActive = true;
+		hallway->resourceId = 3;
+
+		// we can reserve the vertices and indices to the max possible capacity
+
+		int row = 0, col = 0;
+		bool hasUp = false, hasRight = false;
+
+		for (row = 0; row < gridHeight; ++row) {
+			for (col = 0; col < gridWidth; ++col) {
+				if (!map[0][row][col].active) {
+					continue;
+				}
+				hasUp = false;
+				hasRight = false;
+
+				// now we check if the current room has a neighbor to it's right or up in the grid
+				for (int i = 0; i < 4; ++i ) {
+					if (map[0][row][col].neightbors[i] == NEIGHBOR::RIGHT) {
+						hasRight = true;
+					} else if (map[0][row][col].neightbors[i] == NEIGHBOR::UP) {
+						hasUp = true;
+					}
+				}
+
+
+				// now we contruct each hallway
+
+				if (hasRight) { // x axis hall
+					glm::vec3 startPos = GetPositionVector(midpoints[row][col]);
+					startPos.x += map[0][row][col].roomSize.x / 2.f;
+					glm::vec3 endPos = GetPositionVector(midpoints[row][col + 1]);
+					endPos.x -= map[0][row][col + 1].roomSize.x / 2.f;
+
+
+
+					/*
+					   p2/6    p3/7
+						*       *
+						
+					  sp*      en*
+
+					   p1/5    p4/8
+						*       * 
+						
+					*/
+					ObjVertex p1;
+					ObjVertex p2;
+					ObjVertex p3;
+					ObjVertex p4;
+
+					ObjVertex p5;
+					ObjVertex p6;
+					ObjVertex p7;
+					ObjVertex p8;
+
+					/*p1.uv = p5.uv = { 0.f, 0.f };
+					p2.uv = p6.uv = { 0.f, 1.f };
+
+					p3.uv = p7.uv = { 1.f, 1.f };
+					p4.uv = p8.uv = { 1.f, 0.f };*/
+
+					p1.pos = p2.pos = p5.pos = p6.pos = startPos;
+					p3.pos = p4.pos = p7.pos = p8.pos =endPos;
+
+					p1.pos.z -= 20.f / 2.f;
+					p2.pos.z += 20.f / 2.f;
+
+					p5.pos.z = p4.pos.z = p8.pos.z = p1.pos.z;
+					p6.pos.z = p3.pos.z = p7.pos.z = p2.pos.z;
+
+					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = 15.f; // TODO: CHANGE BACK TO hallwayHeight; AFTER TEST
+
+					// NOW WE CAN PUSH THESE POINTS
+					const int currentIndx = hallway->model.vertices.size(); // basically our 0 index
+
+					hallway->model.vertices.push_back(p1);
+					hallway->model.vertices.push_back(p2);
+					hallway->model.vertices.push_back(p3);
+					hallway->model.vertices.push_back(p4);
+					hallway->model.vertices.push_back(p5);
+					hallway->model.vertices.push_back(p6);
+					hallway->model.vertices.push_back(p7);
+					hallway->model.vertices.push_back(p8);
+
+					//floor 
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 1);
+					hallway->model.indices.push_back(currentIndx + 2);
+
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 2);
+					hallway->model.indices.push_back(currentIndx + 3);
+
+					// wall 1
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 7);
+
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 7);
+					hallway->model.indices.push_back(currentIndx + 3);
+
+					// wall 2
+					hallway->model.indices.push_back(currentIndx + 1);
+					hallway->model.indices.push_back(currentIndx + 5);
+					hallway->model.indices.push_back(currentIndx + 6);
+
+					hallway->model.indices.push_back(currentIndx + 1);
+					hallway->model.indices.push_back(currentIndx + 6);
+					hallway->model.indices.push_back(currentIndx + 2);
+
+					// may be removed
+					// ceiling 
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 6);
+					hallway->model.indices.push_back(currentIndx + 5);
+
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 7);
+					hallway->model.indices.push_back(currentIndx + 6);
+				}
+
+
+				if (hasUp) { // z axis hall
+
+				}
+
+
+			}
+		}
+		int debug = 0;
+	}
+
 	void map_room::clear() {
 		active = false; 
 		type = ROOM_TYPE::DEBUG;
@@ -429,9 +599,9 @@ namespace dxe {
 	}
 
 	void map_room::addNeighbor(NEIGHBOR n) {
-		for (auto& m : neightbors) { 
-			if (m == NEIGHBOR::NONE || m == n) { 
-				m = n; 
+		for (int i = 0; i < 4; ++i) {
+			if (neightbors[i] == NEIGHBOR::NONE || neightbors[i] == n) {
+				neightbors[i] = n;
 				return; 
 			} 
 		}

@@ -251,4 +251,8 @@ namespace dxe {
 
 	};
 
+	inline glm::vec3 GetPositionVector(glm::mat4 transform) {
+		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
+	}
+
 } // namespace dxe
