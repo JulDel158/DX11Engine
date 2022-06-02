@@ -34,7 +34,7 @@ namespace dxe {
 	class game_map
 	{
 	public:
-		game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset);
+		game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset, float hallWidth, float hallHeight);
 		~game_map();
 
 		void clearFloor(uint64_t floor);

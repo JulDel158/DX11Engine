@@ -8,14 +8,16 @@
 
 namespace dxe {
 
-	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset) :
+	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset, float hallWidth, float hallHeight) :
 		gridWidth(width),
 		gridHeight(height),
 		maxFloorCount(maxFloorCount),
 		minRoomCount(startingMinimunRoomCount),
 		maxCellDimension(maxCellDimension),
 		minCellDimension(minCellDimension),
-		roomOffset(offset){
+		roomOffset(offset),
+		hallwayWidth(hallWidth),
+		hallwayHeight(hallHeight){
 
 		if (maxFloorCount <= 0 || height <= 0 || width <= 0 || maxCellDimension.x <= 0.f || maxCellDimension.y <= 0.f || minCellDimension.x <= 0.f || minCellDimension.y <= 0.f ||
 			maxCellDimension.x < minCellDimension.x || maxCellDimension.y < minCellDimension.y) {
@@ -291,6 +293,7 @@ namespace dxe {
 			return;
 		}
 
+		bool firstIteration = true;
 		while (roomCount < minRoomCount) {
 
 			// BUG: index values going far out of scope
@@ -338,7 +341,7 @@ namespace dxe {
 			}
 
 			// checking if we went out of bounds
-			if (currX >= gridWidth) {
+			if (currX >= static_cast<int>(gridWidth)) {
 				currX = static_cast<int>(gridWidth) - 1;
 				//continue;
 			}
@@ -348,7 +351,7 @@ namespace dxe {
 				//continue;
 			}
 
-			if (currY >= gridHeight) {
+			if (currY >= static_cast<int>(gridHeight)) {
 				currY = static_cast<int>(gridHeight) - 1;
 				//continue;
 			}
@@ -365,11 +368,14 @@ namespace dxe {
 
 			++roomCount;
 			floor[currY][currX].activate(minCellDimension, maxCellDimension, currPos);
-			floor[currY][currX].addNeighbor(oppositeDirection);
+			
 
-			if (prevX != -1 && prevY != -1 && (prevX != currX || prevY != currY)) {
+			if (!firstIteration && prevX != -1 && prevY != -1 && (prevX != currX || prevY != currY)) {
+				floor[currY][currX].addNeighbor(oppositeDirection);
 				floor[prevY][prevX].addNeighbor(currDirection);
 			}
+
+			firstIteration = false;
 		}
 
 		// you could increase minimum room count here for next levels to be more long or complex
@@ -449,7 +455,7 @@ namespace dxe {
 		hallway->model.vertices.clear();
 		hallway->model.indices.clear();
 		hallway->isActive = true;
-		hallway->resourceId = 3;
+		hallway->resourceId = 4;
 
 		// we can reserve the vertices and indices to the max possible capacity
 
@@ -511,15 +517,15 @@ namespace dxe {
 					p4.uv = p8.uv = { 1.f, 0.f };*/
 
 					p1.pos = p2.pos = p5.pos = p6.pos = startPos;
-					p3.pos = p4.pos = p7.pos = p8.pos =endPos;
+					p3.pos = p4.pos = p7.pos = p8.pos = endPos;
 
-					p1.pos.z -= 20.f / 2.f;
-					p2.pos.z += 20.f / 2.f;
+					p1.pos.z -= hallwayWidth / 2.f;
+					p2.pos.z += hallwayWidth / 2.f;
 
-					p5.pos.z = p4.pos.z = p8.pos.z = p1.pos.z;
+					p5.pos.z = p4.pos.z = p8.pos.z = p1.pos.z; 
 					p6.pos.z = p3.pos.z = p7.pos.z = p2.pos.z;
 
-					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = 15.f; // TODO: CHANGE BACK TO hallwayHeight; AFTER TEST
+					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
 					// NOW WE CAN PUSH THESE POINTS
 					const int currentIndx = hallway->model.vertices.size(); // basically our 0 index
@@ -573,7 +579,96 @@ namespace dxe {
 
 
 				if (hasUp) { // z axis hall
+					glm::vec3 startPos = GetPositionVector(midpoints[row][col]);
+					startPos.z += map[0][row][col].roomSize.y / 2.f;
+					glm::vec3 endPos = GetPositionVector(midpoints[row + 1][col]);
+					endPos.z -= map[0][row + 1][col].roomSize.y / 2.f;
 
+					/*
+					   p2/6   en*  p3/7
+						*           *
+
+					       
+
+					   p1/5  sp*  p4/8
+						*           *
+
+					*/
+					ObjVertex p1;
+					ObjVertex p2;
+					ObjVertex p3;
+					ObjVertex p4;
+
+					ObjVertex p5;
+					ObjVertex p6;
+					ObjVertex p7;
+					ObjVertex p8;
+
+					/*p1.uv = p5.uv = { 0.f, 0.f };
+					p2.uv = p6.uv = { 0.f, 1.f };
+
+					p3.uv = p7.uv = { 1.f, 1.f };
+					p4.uv = p8.uv = { 1.f, 0.f };*/
+
+					p1.pos = p4.pos = p5.pos = p8.pos = startPos;
+					p2.pos = p3.pos = p6.pos = p7.pos = endPos;
+
+					p1.pos.x -= hallwayWidth / 2.f; // TODO: REPLACE FOR ROOM WIDTH
+					p4.pos.x += hallwayWidth / 2.f;
+
+					p5.pos.x = p2.pos.x = p6.pos.x = p1.pos.x;
+					p8.pos.x = p3.pos.x = p7.pos.x = p4.pos.x;
+
+					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
+
+					// NOW WE CAN PUSH THESE POINTS
+					const int currentIndx = hallway->model.vertices.size(); // basically our 0 index
+
+					hallway->model.vertices.push_back(p1);
+					hallway->model.vertices.push_back(p2);
+					hallway->model.vertices.push_back(p3);
+					hallway->model.vertices.push_back(p4);
+					hallway->model.vertices.push_back(p5);
+					hallway->model.vertices.push_back(p6);
+					hallway->model.vertices.push_back(p7);
+					hallway->model.vertices.push_back(p8);
+
+					//floor 
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 1);
+					hallway->model.indices.push_back(currentIndx + 2);
+
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 2);
+					hallway->model.indices.push_back(currentIndx + 3);
+
+					// wall 1
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 5);
+
+					hallway->model.indices.push_back(currentIndx);
+					hallway->model.indices.push_back(currentIndx + 5);
+					hallway->model.indices.push_back(currentIndx + 1);
+
+					// wall 2
+					hallway->model.indices.push_back(currentIndx + 3);
+					hallway->model.indices.push_back(currentIndx + 7);
+					hallway->model.indices.push_back(currentIndx + 6);
+
+					hallway->model.indices.push_back(currentIndx + 3);
+					hallway->model.indices.push_back(currentIndx + 6);
+					hallway->model.indices.push_back(currentIndx + 2);
+
+					// may be removed
+					// ceiling 
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 6);
+					hallway->model.indices.push_back(currentIndx + 5);
+
+					hallway->model.indices.push_back(currentIndx + 4);
+					hallway->model.indices.push_back(currentIndx + 7);
+					hallway->model.indices.push_back(currentIndx + 6);
 				}
 
 
