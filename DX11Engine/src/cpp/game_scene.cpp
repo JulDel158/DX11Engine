@@ -117,7 +117,7 @@ namespace dxe {
 		scb->pointLight[0].pos = { 0.f, 10.f, 0.f };
 		scb->pointLight[0].radius = 100.f;
 
-		scb->spotLight.color = { 0.f, 0.f, 0.f, 1.f };
+		scb->spotLight.color = { 1.f, 1.f, 0.f, 1.f };
 
 		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
 		scb->spotLight.outerRatio = 0.2f;

@@ -8,7 +8,7 @@
 
 namespace dxe {
 	nk_scene::nk_scene(std::shared_ptr<DirectX::AudioEngine> audioEngine) : audioEngine(audioEngine),
-	map(game_map(10, 10, 1, 15, glm::vec2(50.f, 50.f), glm::vec2(50.f, 50.f), 20.f, 15.f, 20.f)){
+	map(game_map(10, 10, 1, 15, glm::vec2(200.f, 200.f), glm::vec2(50.f, 50.f), 20.f, 15.f, 20.f)){
 
 		unsigned int seed = static_cast<unsigned int>(std::time(0));
 		//seed = 12;
@@ -86,8 +86,18 @@ namespace dxe {
 		//========================= lights ============================
 		scb = new Scene_cb;
 		scb->dirLight.color = { 0.1f, 0.1f, 0.f, 0.0f };
-		scb->dirLight.direction = { 1.f, -1.f, -1.f };
+		scb->dirLight.direction = { 1.f, -1.f, 1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
+
+		scb->spotLight.color = { 1.f, 1.f, 0.f, 1.f };
+
+		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
+		scb->spotLight.outerRatio = 0.2f;
+		scb->spotLight.innerRatio = 0.05f;
+		scb->spotLight.falloff = 0.f;
+
+		scb->spotLight.range = 200.f;
+		scb->spotLight.focus = 100.f;
 
 		player = Player(100, 0, 15.f, 60.f, 10.f, 5.f, 5.5f);
 		player.resizeCollider(glm::vec3(2.5f, 10.0f, 2.5f));
@@ -95,15 +105,17 @@ namespace dxe {
 
 		allocateGameObjs(map.getRequiredMeshCount());
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
-		//map.generateDungeon();
-		map.generateDebugDungeon();
-		map.printMapData();
+		map.generateDungeon();
+		//map.generateDebugDungeon();
+		//map.printMapData();
 
 		player.setPosition(map.getRandomActiveRoomPos());
 		/*MakePlane(gameObjects[0].model, 10.f, 10.f);
 		gameObjects[0].isActive = true;
 		gameObjects[0].resourceId = 1;
 		gameObjects[0].setPosition(glm::vec3(0.f, 15.f, 0.f));*/
+
+		
 	}
 
 	nk_scene::~nk_scene(){
@@ -145,6 +157,12 @@ namespace dxe {
 #ifdef _DEBUG
 		debug_lines::addAabb(player.getBox(), { 1.f, 1.f, 0.f, 1.f });
 #endif // _DEBUG
+
+		glm::vec3 campos = camera->view[3];
+		glm::vec3 camforw = camera->view[2];
+
+		scb->spotLight.direction = camforw;
+		scb->spotLight.pos = campos;
 	}
 
 	void nk_scene::inputUpdate(const float dt){

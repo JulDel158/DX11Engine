@@ -52,6 +52,8 @@ namespace dxe {
 
 		createSResourceView(L"assets\\images\\ground1.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::GROUND1));
 
+		createSResourceView(L"assets\\images\\tiled_floor_001_diffuse.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::TILE_FLOOR1));
+
 		createDebugTexture();
 
 		createBlendStates();

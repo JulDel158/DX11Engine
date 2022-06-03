@@ -456,7 +456,7 @@ namespace dxe {
 		hallwayObj->model.vertices.clear();
 		hallwayObj->model.indices.clear();
 		hallwayObj->isActive = true;
-		hallwayObj->resourceId = 4;
+		hallwayObj->resourceId = 8;
 
 		// we can reserve the vertices and indices to the max possible capacity
 
@@ -511,11 +511,11 @@ namespace dxe {
 					ObjVertex p7;
 					ObjVertex p8;
 
-					/*p1.uv = p5.uv = { 0.f, 0.f };
-					p2.uv = p6.uv = { 0.f, 1.f };
+					p1.uv = { 0.f, 0.f };
+					p2.uv = { 0.f, 1.f };
 
-					p3.uv = p7.uv = { 1.f, 1.f };
-					p4.uv = p8.uv = { 1.f, 0.f };*/
+					p3.uv = { 1.f, 1.f };
+					p4.uv = { 1.f, 0.f };
 
 					p1.pos = p2.pos = p5.pos = p6.pos = startPos;
 					p3.pos = p4.pos = p7.pos = p8.pos = endPos;
@@ -528,54 +528,95 @@ namespace dxe {
 
 					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
+					p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
+
 					// NOW WE CAN PUSH THESE POINTS
-					const int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
+					int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
 
 					hallwayObj->model.vertices.push_back(p1);
 					hallwayObj->model.vertices.push_back(p2);
 					hallwayObj->model.vertices.push_back(p3);
 					hallwayObj->model.vertices.push_back(p4);
+					/*hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p8);*/
+
+					//floor 
+					hallwayObj->model.indices.push_back(currentIndx); // p1
+					hallwayObj->model.indices.push_back(currentIndx + 1); // p2
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p3
+
+					hallwayObj->model.indices.push_back(currentIndx); // p1
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p3
+					hallwayObj->model.indices.push_back(currentIndx + 3); // p4
+
+					currentIndx = hallwayObj->model.vertices.size();
+
+					p1.nrm = p4.nrm = p5.nrm = p8.nrm = { 0.f, 0.f, 1.f };
+					p1.uv = { 0.f, 1.f };
+					p5.uv = { 0.f, 0.f };
+					p4.uv = { 1.f, 1.f };
+					p8.uv = { 1.f, 0.f };
+
+					hallwayObj->model.vertices.push_back(p1);
+					hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p8);
+					hallwayObj->model.vertices.push_back(p4);
+
+					// down wall
+					hallwayObj->model.indices.push_back(currentIndx);  //p1
+					hallwayObj->model.indices.push_back(currentIndx + 1); // p5
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p8
+
+					hallwayObj->model.indices.push_back(currentIndx); // p1
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p8
+					hallwayObj->model.indices.push_back(currentIndx + 3); // p4
+
+
+					currentIndx = hallwayObj->model.vertices.size();
+					p2.nrm = p6.nrm = p7.nrm = p3.nrm = { 0.f, 0.f, -1.f };
+					p2.uv = { 0.f, 1.f };
+					p6.uv = { 0.f, 0.f };
+					p7.uv = { 1.f, 0.f };
+					p3.uv = { 1.f, 1.f };
+
+					hallwayObj->model.vertices.push_back(p2);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p3);
+
+					// up wall
+					hallwayObj->model.indices.push_back(currentIndx); // p2
+					hallwayObj->model.indices.push_back(currentIndx + 1); // p6
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p7
+
+					hallwayObj->model.indices.push_back(currentIndx); // p2
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p7
+					hallwayObj->model.indices.push_back(currentIndx + 3); // p3
+
+
+					currentIndx = hallwayObj->model.vertices.size();
+					p5.nrm = p7.nrm = p6.nrm = p8.nrm = { 0.f, -1.f, 0.f };
+					p5.uv = { 0.f, 0.f };
+					p6.uv = { 0.f, 1.f };
+					p7.uv = { 1.f, 1.f };
+					p8.uv = { 1.f, 0.f };
+
 					hallwayObj->model.vertices.push_back(p5);
 					hallwayObj->model.vertices.push_back(p6);
 					hallwayObj->model.vertices.push_back(p7);
 					hallwayObj->model.vertices.push_back(p8);
 
-					//floor 
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 1);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-					hallwayObj->model.indices.push_back(currentIndx + 3);
-
-					// wall 1
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 7);
-
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 7);
-					hallwayObj->model.indices.push_back(currentIndx + 3);
-
-					// wall 2
-					hallwayObj->model.indices.push_back(currentIndx + 1);
-					hallwayObj->model.indices.push_back(currentIndx + 5);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-
-					hallwayObj->model.indices.push_back(currentIndx + 1);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-
 					// may be removed
 					// ceiling 
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-					hallwayObj->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx); // p5
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p7
+					hallwayObj->model.indices.push_back(currentIndx + 1); // p6
 
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 7);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx); // p5
+					hallwayObj->model.indices.push_back(currentIndx + 3); // p8
+					hallwayObj->model.indices.push_back(currentIndx + 2); // p7
 				}
 
 
@@ -623,53 +664,95 @@ namespace dxe {
 					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
 					// NOW WE CAN PUSH THESE POINTS
-					const int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
+					int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
+					p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
+					p1.uv = { 0.f, 0.f };
+					p2.uv = { 0.f, 1.f };
+					p3.uv = { 1.f, 1.f };
+					p4.uv = { 1.f, 0.f };
+					
 
 					hallwayObj->model.vertices.push_back(p1);
 					hallwayObj->model.vertices.push_back(p2);
 					hallwayObj->model.vertices.push_back(p3);
 					hallwayObj->model.vertices.push_back(p4);
+					/*hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p8);*/
+
+					//floor 
+					hallwayObj->model.indices.push_back(currentIndx); //p1
+					hallwayObj->model.indices.push_back(currentIndx + 1); //p2
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p3
+
+					hallwayObj->model.indices.push_back(currentIndx); //p1
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p3
+					hallwayObj->model.indices.push_back(currentIndx + 3); //p4
+
+					currentIndx = hallwayObj->model.vertices.size();
+					p1.nrm = p5.nrm = p6.nrm = p2.nrm = { 1.f, 0.f, 0.f };
+					p1.uv = { 0.f, 1.f };
+					p5.uv = { 0.f, 0.f };
+					p6.uv = { 1.f, 0.f };
+					p2.uv = { 1.f, 1.f };
+
+					hallwayObj->model.vertices.push_back(p1);
+					hallwayObj->model.vertices.push_back(p5);
+					hallwayObj->model.vertices.push_back(p6);
+					hallwayObj->model.vertices.push_back(p2);
+
+					// left wall
+					hallwayObj->model.indices.push_back(currentIndx); //p1
+					hallwayObj->model.indices.push_back(currentIndx + 1); //p5
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p6
+
+					hallwayObj->model.indices.push_back(currentIndx); //p1
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p6
+					hallwayObj->model.indices.push_back(currentIndx + 3); //p2
+
+					currentIndx = hallwayObj->model.vertices.size();
+					p4.nrm = p8.nrm = p7.nrm = p3.nrm = { -1.f, 0.f, 0.f };
+					p4.uv = { 0.f, 1.f };
+					p8.uv = { 0.f, 0.f };
+					p7.uv = { 1.f, 0.f };
+					p3.uv = { 1.f, 1.f };
+
+					hallwayObj->model.vertices.push_back(p4);
+					hallwayObj->model.vertices.push_back(p8);
+					hallwayObj->model.vertices.push_back(p7);
+					hallwayObj->model.vertices.push_back(p3);
+
+					// right wall
+					hallwayObj->model.indices.push_back(currentIndx); //p4
+					hallwayObj->model.indices.push_back(currentIndx + 1); //p8
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p7
+
+					hallwayObj->model.indices.push_back(currentIndx); //p4
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p7
+					hallwayObj->model.indices.push_back(currentIndx + 3); //p3
+
+					currentIndx = hallwayObj->model.vertices.size();
+					p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, -1.f, 0.f };
+					p5.uv = { 0.f, 0.f };
+					p6.uv = { 0.f, 1.f };
+					p7.uv = { 1.f, 1.f };
+					p8.uv = { 1.f, 0.f };
+
 					hallwayObj->model.vertices.push_back(p5);
 					hallwayObj->model.vertices.push_back(p6);
 					hallwayObj->model.vertices.push_back(p7);
 					hallwayObj->model.vertices.push_back(p8);
 
-					//floor 
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 1);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-					hallwayObj->model.indices.push_back(currentIndx + 3);
-
-					// wall 1
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 5);
-
-					hallwayObj->model.indices.push_back(currentIndx);
-					hallwayObj->model.indices.push_back(currentIndx + 5);
-					hallwayObj->model.indices.push_back(currentIndx + 1);
-
-					// wall 2
-					hallwayObj->model.indices.push_back(currentIndx + 3);
-					hallwayObj->model.indices.push_back(currentIndx + 7);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-
-					hallwayObj->model.indices.push_back(currentIndx + 3);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-					hallwayObj->model.indices.push_back(currentIndx + 2);
-
 					// may be removed
 					// ceiling 
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
-					hallwayObj->model.indices.push_back(currentIndx + 5);
+					hallwayObj->model.indices.push_back(currentIndx); //p5
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p7
+					hallwayObj->model.indices.push_back(currentIndx + 1); //p6
 
-					hallwayObj->model.indices.push_back(currentIndx + 4);
-					hallwayObj->model.indices.push_back(currentIndx + 7);
-					hallwayObj->model.indices.push_back(currentIndx + 6);
+					hallwayObj->model.indices.push_back(currentIndx); //p5
+					hallwayObj->model.indices.push_back(currentIndx + 3); //p8
+					hallwayObj->model.indices.push_back(currentIndx + 2); //p7
 				}
 
 
@@ -684,7 +767,7 @@ namespace dxe {
 		roomObj->model.vertices.clear();
 		roomObj->model.indices.clear();
 		roomObj->isActive = true;
-		roomObj->resourceId = 7;
+		roomObj->resourceId = 8;
 
 		int row = 0, col = 0;
 		bool hasLeft = false, hasRight = false, hasUp = false, hasDown = false; // theses will be used to determine wheter a door or a wall should be placed
