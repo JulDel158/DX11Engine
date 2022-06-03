@@ -31,7 +31,7 @@ namespace dxe {
 	class GameScene : public scene {
 
 	public:
-		GameScene();
+		GameScene(std::shared_ptr<DirectX::AudioEngine> audioEngine);
 		~GameScene();
 
 		void update(const float dt);
@@ -47,12 +47,13 @@ namespace dxe {
 		uint32_t score{ 0 };
 		
 		// we will put the sound engine here for now
-		std::unique_ptr<DirectX::AudioEngine> audioEngine;
+		std::shared_ptr<DirectX::AudioEngine> audioEngine;
 		std::unique_ptr<DirectX::SoundEffect> soundData;
 		std::unique_ptr<DirectX::SoundEffect> songData;
 		std::unique_ptr<DirectX::SoundEffect> songData2;
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance;
 		std::unique_ptr<DirectX::SoundEffectInstance> soundInstance2;
+		
 
 		aabb_t player_collider;
 	};

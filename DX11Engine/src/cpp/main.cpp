@@ -85,7 +85,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	}
 	default:
 	{
-		std::cout << "default\n";
 		//if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) { // mouse message
 		//	dxe::input::Listen(message, lParam, hWnd);
 		//}

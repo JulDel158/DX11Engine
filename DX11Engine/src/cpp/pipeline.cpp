@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
+#include <imconfig.h>
+#include <imgui_internal.h>
 
 // std
 #include <cassert>
@@ -50,6 +52,8 @@ namespace dxe {
 
 		createSResourceView(L"assets\\images\\ground1.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::GROUND1));
 
+		createSResourceView(L"assets\\images\\tiled_floor_001_diffuse.dds", static_cast<uint32_t>(SUBRESOURCE_VIEW::TILE_FLOOR1));
+
 		createDebugTexture();
 
 		createBlendStates();
@@ -64,13 +68,13 @@ namespace dxe {
 
 		// initializing Imgui
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		ImGui_ImplDX11_Init(device, context);
-		ImGui_ImplWin32_Init(&windowHandle);
-		ImGui::GetIO().ImeWindowHandle = &windowHandle;
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
+		io.IniFilename = NULL;
+		ImGui_ImplWin32_Init(windowHandle);
+		ImGui::GetIO().ImeWindowHandle = windowHandle;
 
-		
 	}
 
 	pipeline::~pipeline() {
@@ -312,7 +316,7 @@ namespace dxe {
 		context->ClearDepthStencilView(depthStencilView[DEPTH_STENCIL_VIEW::DEFAULT], D3D11_CLEAR_DEPTH, 1.f, 0);
 	}
 
-	void pipeline::drawGameObjects(const GameObject* gameObjects, uint32_t size) {
+	void pipeline::drawGameObjects(const GameObject* gameObjects, uint64_t size) {
 		UINT stride = sizeof(ObjVertex);
 		UINT offset = 0;
 
@@ -341,6 +345,7 @@ namespace dxe {
 
 			//vBuffer = gameObjects[i].model.vertices;
 			//ZeroMemory(vBuffer, vBufferSize * sizeof(ObjVertex));
+			//vBuffer[0] = *gameObjects[i].model.vertices.data();
 			memcpy(vBuffer, gameObjects[i].model.vertices.data(), gameObjects[i].model.vertices.size() * sizeof(ObjVertex));
 			context->UpdateSubresource(vertexBuffer[VERTEX_BUFFER::OBJ_40000], 0, NULL, vBuffer, 0, 0);
 
@@ -356,13 +361,15 @@ namespace dxe {
 			context->PSSetShaderResources(0, 1, &sResourceView[inx]);
 
 			context->DrawIndexed(static_cast<UINT>(gameObjects[i].model.indices.size()), 0, 0);
+			
 		}
 	}
 
-	void pipeline::drawText(const Textwrap* set, const uint32_t size) {
+	void pipeline::drawText(const Textwrap* set, const uint64_t size) {
 		spriteBatch->Begin();
 
 		for (uint32_t i = 0; i < size; ++i) {
+			if (!set[i].active) { continue; }
 			spriteFont->DrawString(spriteBatch.get(),
 				set[i].text.c_str(), // wide string text to draw
 				DirectX::XMFLOAT2{ set[i].position.x, set[i].position.y }, // position
@@ -873,6 +880,21 @@ namespace dxe {
 		context->RSSetState(rasterState[RASTER_STATE::DEFAULT]);
 		context->RSSetViewports(1, &viewPort[VIEWPORT::DEFAULT]);
 		
+	}
+
+	uint32_t pipeline::loadTextures(std::vector<std::wstring> filePaths, ID3D11ShaderResourceView**& SRVs)
+	{
+		const uint32_t size = filePaths.size();
+		SRVs = new ID3D11ShaderResourceView*[size];
+		HRESULT hr;
+		for (size_t i = 0; i < size; ++i) {
+			hr = DirectX::CreateDDSTextureFromFile(device, filePaths[i].data(), nullptr, &SRVs[i]);
+			if (FAILED(hr)) {
+				throw std::runtime_error("could not load texture file!");
+			}
+		}
+
+		return size;
 	}
 
 	void pipeline::createSResourceView(const wchar_t* filename, const uint32_t index) {

@@ -2,6 +2,7 @@
 
 #include "../hpp/file_reader.hpp"
 #include "../hpp/debug_lines.hpp"
+#include "../hpp/game_map.hpp"
 
 // std
 #include <Windows.h>
@@ -14,12 +15,12 @@
 #include <glm/gtc/random.hpp>
 
 namespace dxe {
-
-	GameScene::GameScene() {
-		std::srand(static_cast<unsigned int>(std::time(0)));
+	// REMINDED, WE ARE NOT CURRENTLY WORKING INSIDE THIS FILE
+	GameScene::GameScene(std::shared_ptr<DirectX::AudioEngine> _audioEngine) {
+		
 
 		// camera initialization
-		camera = std::make_unique<View_t>();
+		camera = new View_t();
 		camera->position = glm::vec3(0.f, 0.f, 0.f);
 		camera->updateView();
 
@@ -36,6 +37,7 @@ namespace dxe {
 		textui[0].position = glm::vec2(0.f, 0.f);
 		textui[0].rotation = 0.f;
 		textui[0].scale = glm::vec2(1.f, 1.f);
+		textui[0].active = true;
 		textui[0].text = std::wstring(L"MOUSE DELTA: " + std::to_wstring(score));
 
 		// temp crosshair ui
@@ -45,6 +47,7 @@ namespace dxe {
 		textui[1].position = glm::vec2(610, 300);
 		textui[1].rotation = 0.f;
 		textui[1].scale = glm::vec2(2.5f, 2.5f);
+		textui[1].active = true;
 		textui[1].text = std::wstring(L"+");
 
 
@@ -110,11 +113,11 @@ namespace dxe {
 		scb->dirLight.direction = { 1.f, -1.f, -1.f };
 		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
 
-		scb->pointLight.color = { 1.f, 0.40f, 0.f, 1.f };
-		scb->pointLight.pos = { 0.f, 0.f, 12.f };
-		scb->pointLight.radius = 40.f;
+		scb->pointLight[0].color = { 1.f, 0.40f, 0.f, 1.f };
+		scb->pointLight[0].pos = { 0.f, 10.f, 0.f };
+		scb->pointLight[0].radius = 100.f;
 
-		scb->spotLight.color = { 0.f, 0.f, 0.f, 1.f };
+		scb->spotLight.color = { 1.f, 1.f, 0.f, 1.f };
 
 		// THE HIGHER THESE VALUES ARE, THE MORE DIM THE LIGHT WILL BE
 		scb->spotLight.outerRatio = 0.2f;
@@ -125,13 +128,7 @@ namespace dxe {
 		scb->spotLight.focus = 100.f;
 
 		// sound stuff
-		DirectX::AUDIO_ENGINE_FLAGS eflags = DirectX::AudioEngine_Default;
-
-	#ifdef _DEBUG
-		eflags = eflags | DirectX::AudioEngine_Debug;
-	#endif // _DEBUG
-
-		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
+		audioEngine = _audioEngine;
 
 		soundData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\8bit_gunloop_explosion.wav");
 		songData = std::make_unique<DirectX::SoundEffect>(audioEngine.get(), L"assets\\audio\\mc_theme.wav");
@@ -162,15 +159,6 @@ namespace dxe {
 
 	void GameScene::update(const float dt) {
 		inputUpdate(dt);
-		
-		if (!audioEngine->Update())
-		{
-			// No audio device is active
-			if (audioEngine->IsCriticalError())
-			{
-				// x-x
-			}
-		}
 
 		// updating the text ui
 		

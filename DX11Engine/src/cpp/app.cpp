@@ -3,15 +3,21 @@
 #include "../hpp/dx_window.hpp"
 #include "../hpp/debug_lines.hpp"
 #include "../hpp/input.hpp"
+#include "../hpp/game_scene.hpp"
+#include "../hpp/nk_scene.hpp"
 
+// lib
 #define GLM_FORCE_RADIANS
 #include <glm/gtc/constants.hpp>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 // std
 #ifdef _DEBUG
 #include <iostream>
 #endif
 #include <utility>
+#include <string>
 
 namespace dxe {
 	app::app(HINSTANCE& hInstance, WNDPROC winProc, int nCmdShow, MSG& msg) : 
@@ -30,14 +36,18 @@ namespace dxe {
 		eflags = eflags | DirectX::AudioEngine_Debug;
 #endif // _DEBUG
 
-		audioEngine = std::make_unique<DirectX::AudioEngine>(eflags);
+		audioEngine = std::make_shared<DirectX::AudioEngine>(eflags);
 
 		input::SetWindowHandle(dxWindow.mainHWND);
-		input::ToggleCursor(false);
+		//input::ToggleCursor(false);
+
+		gameScene = new nk_scene(audioEngine);
+		//gameScene = new GameScene(audioEngine);
 	}
 
 	app::~app() {
 		input::ToggleCursor(true);
+		delete gameScene;
 	}
 
 	MSG app::run() {
@@ -59,14 +69,23 @@ namespace dxe {
 			else { // do updates and render down here
 				timer.Signal();
 				input::Update(); // updating global input
+
+				ImGui_ImplWin32_NewFrame();
+				ImGui_ImplDX11_NewFrame();
+				ImGui::NewFrame();
+				
+				if (!audioEngine->Update()) {
+					if (audioEngine->IsCriticalError()) { // No audio device is active
+						// x-x
+					}
+				}
 				const float dt = static_cast<float>(timer.Delta());
-				scene1.update(dt);
+				gameScene->update(dt);
+
+				bool tempbool = true;
+				//ImGui::ShowDemoWindow(&tempbool);
 
 #ifdef _DEBUG
-				/*if (input.KeyPressed((int)'A')) { std::cout << "A key was pressed!\n"; }
-				if (input.KeyDown((int)'A')) { std::cout << "A key is down!\n"; }
-				if (input.KeyUp((int)'A')) { std::cout << "A key was released!\n"; }*/
-
 				/*std::cout << "---------------------TIME DATA----------------------\n";
 				std::cout << "Timer total: " << timer.TotalTime() << "\n";
 				std::cout << "Timer total exact: " << timer.TotalTimeExact() << "\n";
@@ -79,7 +98,9 @@ namespace dxe {
 				// debug_lines::rainbowUpdate(dt);
 #endif // _DEBUG
 
-				dxRenderer.draw(&scene1, dt);
+				ImGui::EndFrame();
+				dxRenderer.draw(gameScene, dt);
+				
 			}
 		}
 

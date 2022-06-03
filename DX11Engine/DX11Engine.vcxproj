@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Julio\Documents\Visual Studio 2019\Libraries\glm;$(ProjectDir)libraries\Imgui_lib\Imgui;$(ProjectDir)libraries\Imgui_lib\Imgui\backends;$(ProjectDir)libraries\tiny_obj_loader;$(ProjectDir)libraries\;%(AdditionalIncludeDirectories);$(ProjectDir)libraries\Imgui_lib\Imgui</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -179,9 +179,11 @@
     <ClCompile Include="src\cpp\debug_lines.cpp" />
     <ClCompile Include="src\cpp\dx_window.cpp" />
     <ClCompile Include="src\cpp\file_reader.cpp" />
+    <ClCompile Include="src\cpp\game_map.cpp" />
     <ClCompile Include="src\cpp\game_scene.cpp" />
     <ClCompile Include="src\cpp\input.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\nk_scene.cpp" />
     <ClCompile Include="src\cpp\object_data.cpp" />
     <ClCompile Include="src\cpp\pipeline.cpp" />
     <ClCompile Include="src\cpp\renderer.cpp" />
@@ -194,12 +196,17 @@
     <ClInclude Include="src\hpp\collision.hpp" />
     <ClInclude Include="src\hpp\debug_lines.hpp" />
     <ClInclude Include="src\hpp\dx_window.hpp" />
+    <ClInclude Include="src\hpp\entity.hpp" />
     <ClInclude Include="src\hpp\file_reader.hpp" />
+    <ClInclude Include="src\hpp\game_map.hpp" />
     <ClInclude Include="src\hpp\game_scene.hpp" />
     <ClInclude Include="src\hpp\input.hpp" />
+    <ClInclude Include="src\hpp\mesh_data.hpp" />
+    <ClInclude Include="src\hpp\nk_scene.hpp" />
     <ClInclude Include="src\hpp\object_data.hpp" />
     <ClInclude Include="src\hpp\pipeline.hpp" />
     <ClInclude Include="src\hpp\pipeline_properties.hpp" />
+    <ClInclude Include="src\hpp\player.hpp" />
     <ClInclude Include="src\hpp\renderer.hpp" />
     <ClInclude Include="src\hpp\scene.hpp" />
     <ClInclude Include="src\hpp\XTime.hpp" />

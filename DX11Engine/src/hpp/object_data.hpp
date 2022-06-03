@@ -32,13 +32,13 @@ namespace dxe {
 		std::vector<ObjVertex> vertices;
 		std::vector<uint32_t> indices;
 
-		void loadObject(const char* filepath, bool invertY = false);
-
-		void dMakeCube(float offset);
-
-		void dMakePlane();
-
 		~Objectdata() { vertices.clear(); indices.clear(); }
+
+		void loadObject(const char* filepath, bool invertY = false);
+		void dMakeCube(float offset);
+		void dMakePlane();
+		void MakeFloorPlane(float width, float lenght);
+
 	};
 
 	struct GameObject {
@@ -70,7 +70,7 @@ namespace dxe {
 
 		void setPosition(glm::vec3 pos);
 
-		void setRotation();
+		//void setRotation();
 
 		glm::vec3 getFoward()const;
 
@@ -124,10 +124,23 @@ namespace dxe {
 	};
 
 	struct alignas(16)Scene_cb{
-		PointLight pointLight;		// 32 BYTES
+		PointLight pointLight[10];  // 32 * 10 BYTES
 		DirLight dirLight;			// 32 BYTES
 		SpotLight spotLight;		// 64 BYTES
-		glm::vec4 ambient{ 0.f };	// 16 BYTES TOTAL: 144 BYTES X-X
+		glm::vec4 ambient{ 0.f };	// 16 BYTES
+	};
+
+	struct alignas(16)PointLights_cb { // TODO SET UP CONTANT BUFFER IN PIPELINE
+		PointLight pointLights[20];
+	};
+
+	struct alignas(16)SpotLights_cb { // TODO SET UP CONTANT BUFFER IN PIPELINE
+		SpotLight spotLight[5];
+	};
+
+	struct alignas(16)GScene_cb		{ // TODO SET UP CONTANT BUFFER IN PIPELINE
+		DirLight directionalLight[5];
+		glm::vec4 ambient{ 0.f };
 	};
 
 	struct Textwrap {
@@ -137,6 +150,7 @@ namespace dxe {
 		glm::vec2 scale{0.f};
 		float rotation{0.f};
 		float layer{0.f};			// 16
+		bool active{ false };
 		std::wstring text;
 		// TODO: ADD FONT TYPE ONCE WE ADD MORE FONTS INTO THE PROJECT
 	};
@@ -161,7 +175,8 @@ namespace dxe {
 
 	struct Emitter {
 		glm::vec3 pos{ 0.f };
-		bool updated{ false };
+		bool updated{ false }; // if false, gpu will handle particle updates
+		bool active{ false };
 		ParticleFlyWeight flyweigth;
 		std::vector<Particle> particles;
 	};
@@ -198,6 +213,8 @@ namespace dxe {
 		void loadTerrain(const char* filepath, const bool invertY = true, const bool minMaxFormat = false);
 
 		void resizeBVH(const glm::mat4& transform);
+		void expandBVHRootSize(glm::vec3 size);
+		void generateWalkPlane();
 
 		template<typename f>
 		void traverseTree(const aabb_t& box, f&& lamda) {
@@ -233,5 +250,9 @@ namespace dxe {
 		}
 
 	};
+
+	inline glm::vec3 GetPositionVector(glm::mat4 transform) {
+		return glm::vec3(transform[3][0], transform[3][1], transform[3][2]);
+	}
 
 } // namespace dxe

@@ -47,9 +47,7 @@ namespace dxe {
 		
 		const glm::vec4 moveDir = rotationMat * translation;
 
-		position.x += moveDir.x;
-		position.y += moveDir.y;
-		position.z += moveDir.z;
+		position += glm::vec3(moveDir);
 
 		view = rotationMat;
 
@@ -68,14 +66,14 @@ namespace dxe {
 		view[3][2] = position.z;
 	}
 
-	void View_t::setRotation() {
+	/*void View_t::setRotation() {
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
 		rotationMat = glm::rotate(rotationMat, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
 		view = rotationMat;
 		
 		rotation = glm::vec3{ 0.f };
-	}
+	}*/
 
 	glm::vec3 View_t::getFoward() const {
 		return glm::normalize(glm::vec3{view[2].x, view[2].y, view[2].z});
@@ -223,6 +221,9 @@ namespace dxe {
 				indices.push_back(uniqueVertices[vertex]);
 			}
 		} // end for loops
+
+		vertices.shrink_to_fit();
+		indices.shrink_to_fit();
 	}
 
 	void Objectdata::dMakeCube(float offset) {
@@ -302,6 +303,9 @@ namespace dxe {
 		p3.uv = {0.f, 0.f};
 		p4.uv = {1.f, 0.f};
 
+		vertices.reserve(4);
+		indices.reserve(6);
+
 		vertices.push_back(p1);
 		vertices.push_back(p2);
 		vertices.push_back(p3);
@@ -317,6 +321,49 @@ namespace dxe {
 		indices.push_back(1);
 	}
 
+	void Objectdata::MakeFloorPlane(float width, float lenght) {
+		vertices.clear();
+		indices.clear();
+
+		// width determines the size in the x axis, and lenght in the z axis
+		ObjVertex p1;
+		ObjVertex p2;
+		ObjVertex p3;
+		ObjVertex p4;
+
+		// dividing by 2 using bitshift
+		width /= 2;
+		lenght /= 2;
+
+		p1.pos = { -width, 0.f,  lenght }; // - X + Z TOP LEFT
+		p2.pos = {  width, 0.f,  lenght }; // + X + Z TOP RIGHT
+		p3.pos = { -width, 0.f, -lenght }; // - X - Z BOTTOM LEFT
+		p4.pos = {  width, 0.f, -lenght }; // + X - Z BOTTOM RIGHT
+
+		p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
+
+		p1.uv = { 0.f, 0.f };
+		p2.uv = { 1.f, 0.f };
+		p3.uv = { 0.f, 1.f };
+		p4.uv = { 1.f, 1.f };
+
+		vertices.reserve(4); // 4 indices
+		indices.reserve(6); // 2 triangles(3 each)
+
+		vertices.push_back(p1);
+		vertices.push_back(p2);
+		vertices.push_back(p3);
+		vertices.push_back(p4);
+
+		indices.push_back(0);
+		indices.push_back(1);
+		indices.push_back(2);
+
+		indices.push_back(2);
+		indices.push_back(1);
+		indices.push_back(3);
+	}
+
 	void Terrain::loadTerrain(const char* filepath, const bool invertY, const bool minMaxFormat) {
 		// 1. Load Mesh data
 		// 2. Generate Triangle data
@@ -324,7 +371,11 @@ namespace dxe {
 
 
 		// getting the object model for terrain
-		object.model.loadObject(filepath, invertY);
+		if (filepath) {
+			object.model.vertices.clear();
+			object.model.indices.clear();
+			object.model.loadObject(filepath, invertY);
+		}
 
 		std::vector<int> tInds; // this will be shuffled when generating the tree to have some balance
 		const int triangleCount = static_cast<int>(object.model.indices.size()) / 3;
@@ -364,9 +415,9 @@ namespace dxe {
 		} // for each triangle
 
 		// shuffling all triangles to prepare for tree generation
-		//std::random_device randDevice; // used to seed engine
-		//std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
-		//std::shuffle(tInds.begin(), tInds.end(), randEngine);
+		std::random_device randDevice; // used to seed engine
+		std::mt19937 randEngine(randDevice()); // pseudo random number generator engine
+		std::shuffle(tInds.begin(), tInds.end(), randEngine);
 
 		// ===================== generating bvh tree =====================
 		bvh_node root = bvh_node(triangles[tInds[0]].box, tInds[0]);
@@ -433,6 +484,32 @@ namespace dxe {
 		}
 
 
+	}
+
+	void Terrain::expandBVHRootSize(glm::vec3 size) {
+		if (tree.empty()) { return; }
+		auto& root = tree[0];
+		const bool mm = root.aabb().isMinMax;
+
+		if (!mm) { swapFormat(root.aabb()); }
+
+		root.aabb().min -= size / 2.f;
+		root.aabb().max += size / 2.f;
+
+		if (!mm) { swapFormat(root.aabb()); }
+	}
+
+	void Terrain::generateWalkPlane() {
+		object.model.MakeFloorPlane(100000000.f, 100000000.f);
+
+		loadTerrain(nullptr, false, false);
+
+		for (auto& node : tree) {
+			node.aabb().extent.y = std::numeric_limits<float>::max() - 1.f;
+		}
+
+		object.resourceId = 0;
+		object.isActive = false;
 	}
 
 	//template<typename f>

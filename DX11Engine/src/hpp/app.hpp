@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dx_window.hpp"
-#include "game_scene.hpp"
+#include "scene.hpp"
 #include "input.hpp"
 #include "object_data.hpp"
 #include "renderer.hpp"
@@ -41,9 +41,9 @@ namespace dxe {
 
 		XTime timer;
 
-		std::unique_ptr<DirectX::AudioEngine> audioEngine;
+		std::shared_ptr<DirectX::AudioEngine> audioEngine;
 
-		GameScene scene1;
+		scene* gameScene{ nullptr };
 	};
 
 } // namespace dxe

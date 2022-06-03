@@ -9,6 +9,8 @@
 
 // std
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "debug_lines.hpp"
 #include "pipeline_properties.hpp"
@@ -46,9 +48,9 @@ namespace dxe {
 
 		void drawSkybox(const GameObject* skybox);
 
-		void drawGameObjects(const GameObject* gameObjects, uint32_t size);
+		void drawGameObjects(const GameObject* gameObjects, uint64_t size);
 
-		void drawText(const Textwrap* set, const uint32_t size);
+		void drawText(const Textwrap* set, const uint64_t size);
 
 		void drawParticle(const Emitter* particleEmitter);
 
@@ -57,6 +59,8 @@ namespace dxe {
 		void UpdateParticles(Emitter* const emitter, const float dt);
 
 		void setRenderTargetView();
+
+		uint32_t loadTextures(std::vector<std::wstring> filePaths, ID3D11ShaderResourceView**& SRVs);
 
 	private:
 		HWND hwnd;

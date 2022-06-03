@@ -2,6 +2,9 @@
 
 #include "../hpp/debug_lines.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+
 namespace dxe {
 
 	renderer::renderer(HWND windowHandle, Window_cb& wcb) : 
@@ -21,7 +24,7 @@ namespace dxe {
 
 	void renderer::update(const View_t& camera) {
 #ifdef _DEBUG
-		/*debug_lines::addGrid();
+		debug_lines::addGrid();
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f }, 1.f, glm::vec4{1.f, 1.f, 1.f, 1.f});
 
@@ -29,7 +32,7 @@ namespace dxe {
 
 		debug_lines::addDebugCube(glm::vec3{ 0.f, 5.f, 0.f }, 0.5f, glm::vec4{ 0.f, 1.f, 0.f, 1.f });
 
-		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });*/
+		debug_lines::addDebugCube(glm::vec3{ 0.f, 0.f, 5.f }, 0.5f, glm::vec4{ 0.f, 0.f, 1.f, 1.f });
 
 #endif // DEBUG
 		frameCbuffer.view = camera.view;
@@ -114,6 +117,10 @@ namespace dxe {
 		if (scene->GetTextUITotal() > 0) { // Must be drawn last
 			implementation.drawText(scene->GetTextUI(), scene->GetTextUITotal());
 		}
+
+		// ImGui Draw calls
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 		implementation.present(0);
 	}
