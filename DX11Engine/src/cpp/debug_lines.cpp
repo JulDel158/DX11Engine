@@ -125,7 +125,7 @@ namespace dxe::debug_lines {
         addLine(p8, p7, color);
     }
 
-    void addAabb(const aabb_t& box, glm::vec4 color) {
+    void addAabb(aabb_t box, glm::vec4 color) {
         const glm::vec3 min = (box.isMinMax) ? box.min : box.center - box.extent;
         const glm::vec3 max = (box.isMinMax) ? box.max : box.center + box.extent;
 

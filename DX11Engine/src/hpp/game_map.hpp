@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "object_data.hpp"
+#include "collision.hpp"
 
 namespace dxe {
 
@@ -24,7 +25,9 @@ namespace dxe {
 		glm::vec2 roomSize{ 0.f }; // may be changed to a vec 3 later to handle the celing 
 		static constexpr int MAX_NEIGHBOR_COUNT = 4;
 		NEIGHBOR neightbors[MAX_NEIGHBOR_COUNT] = { NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE, NEIGHBOR::NONE }; 
-		std::vector<GameObject*> roomObjs;
+		std::vector<int> hallsId;
+		aabb_t box;
+		//std::vector<GameObject*> roomObjs;
 
 		void clear();
 		void addNeighbor(NEIGHBOR n);
@@ -46,6 +49,7 @@ namespace dxe {
 		void generateDungeon();
 		void generateDebugDungeon();
 		glm::vec3 getRandomActiveRoomPos();
+		void drawColliders();
 
 	private:
 		void randomWalkGeneration(map_room**& floor);
@@ -53,6 +57,7 @@ namespace dxe {
 		void generateHallwayMeshes(); // DEPRECATED
 		void generateHallwayMesh();
 		void generateRoomMesh();
+		void generateHallColliders();
 
 		static constexpr uint64_t MESH_PER_ROOM_COUNT = 1;
 		uint64_t gridWidth{ 0 };
@@ -73,6 +78,8 @@ namespace dxe {
 		GameObject* hallwayObj{ nullptr };
 		GameObject* roomObj{ nullptr };
 		glm::mat4** midpoints{ nullptr };
+		std::vector<aabb_t> hallwayColliders;
+		
 	};
 
 } // namespace dxe

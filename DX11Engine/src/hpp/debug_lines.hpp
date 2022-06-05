@@ -25,7 +25,7 @@ namespace dxe::debug_lines {
 
 		void addDebugCube(glm::vec3 pos = glm::vec3{ 0.f, 0.f, 0.f }, float offset = 0.5f, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
 
-		void addAabb(const aabb_t& box, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
+		void addAabb(aabb_t box, glm::vec4 color = glm::vec4{1.f, 0.f, 0.f, 1.f});
 
 		void rainbowUpdate(const float dt);
 	

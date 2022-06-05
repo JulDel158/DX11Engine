@@ -6,6 +6,8 @@
 
 #include <glm/gtc/random.hpp>
 
+#include "../hpp/debug_lines.hpp"
+
 namespace dxe {
 
 	game_map::game_map(uint64_t width, uint64_t height, uint64_t maxFloorCount, uint64_t startingMinimunRoomCount, glm::vec2 maxCellDimension, glm::vec2 minCellDimension, float offset, float hallWidth, float hallHeight) :
@@ -227,6 +229,7 @@ namespace dxe {
 
 		generateRoomMesh();
 		generateHallwayMesh();
+		generateHallColliders();
 	}
 
 	void game_map::generateDebugDungeon() {
@@ -255,6 +258,7 @@ namespace dxe {
 
 		generateRoomMesh();
 		generateHallwayMesh();
+		generateHallColliders();
 	}
 
 	glm::vec3 game_map::getRandomActiveRoomPos()
@@ -273,6 +277,11 @@ namespace dxe {
 		}
 
 		return glm::vec3(0.f);
+	}
+
+	void game_map::drawColliders() {
+		for (auto& c : hallwayColliders)
+			debug_lines::addAabb(c);
 	}
 
 	void game_map::randomWalkGeneration(map_room**& floor) {
@@ -903,12 +912,19 @@ namespace dxe {
 				p3.uv = { 1.f, 1.f };
 				p4.uv = { 1.f, 0.f };
 
-				p5.uv = { 0.4f, 0.f };
+				/*p5.uv = { 0.4f, 0.f };
 				p6.uv = { 0.4f, 0.6f };
 				p7.uv = { 0.6f, 0.6f };
-				p8.uv = { 0.6f, 0.0f };
+				p8.uv = { 0.6f, 0.0f };*/
+
+
 
 				currentIndx = roomObj->model.vertices.size();
+
+				p5.uv = { 0.35f, 0.f };
+				p6.uv = { 0.35f, 0.65f };
+				p7.uv = { 0.65f, 0.65f };
+				p8.uv = { 0.65f, 0.0f };
 				if (hasLeft) {
 					roomObj->model.vertices.push_back(p1);
 					roomObj->model.vertices.push_back(p2);
@@ -971,6 +987,10 @@ namespace dxe {
 				p1.pos.x = p2.pos.x = p3.pos.x = p4.pos.x = p5.pos.x = p6.pos.x = p7.pos.x = p8.pos.x = center.x + map[0][row][col].roomSize.x / 2.f;
 				// adjusting normals
 				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { -1.f, 0.f, 0.f };
+				p5.uv = { 0.35f, 0.f };
+				p6.uv = { 0.35f, 0.65f };
+				p7.uv = { 0.65f, 0.65f };
+				p8.uv = { 0.65f, 0.0f };
 				currentIndx = roomObj->model.vertices.size();
 				if (hasRight) {
 					roomObj->model.vertices.push_back(p1);
@@ -1059,10 +1079,10 @@ namespace dxe {
 				p3.uv = { 1.f, 1.f };
 				p4.uv = { 1.f, 0.f };
 
-				p5.uv = { 0.4f, 0.f };
-				p6.uv = { 0.4f, 0.6f };
-				p7.uv = { 0.6f, 0.6f };
-				p8.uv = { 0.6f, 0.0f };
+				p5.uv = { 0.35f, 0.f };
+				p6.uv = { 0.35f, 0.65f };
+				p7.uv = { 0.65f, 0.65f };
+				p8.uv = { 0.65f, 0.0f };
 				currentIndx = roomObj->model.vertices.size();
 				if (hasUp) {
 					roomObj->model.vertices.push_back(p1);
@@ -1127,6 +1147,10 @@ namespace dxe {
 				// adjusting normals
 				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, 0.f, 1.f };
 				currentIndx = roomObj->model.vertices.size();
+				p5.uv = { 0.35f, 0.f };
+				p6.uv = { 0.35f, 0.65f };
+				p7.uv = { 0.65f, 0.65f };
+				p8.uv = { 0.65f, 0.0f };
 
 				if (hasDown) {
 					roomObj->model.vertices.push_back(p1);
@@ -1190,20 +1214,76 @@ namespace dxe {
 
 	}
 
+	void game_map::generateHallColliders() {
+		int row, col, i;
+		bool hasRight = false;
+		bool hasUp = false;
+		for (row = 0; row < gridHeight; ++row) {
+			for (col = 0; col < gridWidth; ++col) {
+				
+				// for every room we will check if they have a up or right neightbor and then we will generate the collisions for those halls and add them to both rooms
+				if (!map[currentFloor][row][col].active) { continue; }
+				hasRight = false;
+				hasUp = false;
+
+				for (i = 0; i < map_room::MAX_NEIGHBOR_COUNT; ++i) {
+					if (map[currentFloor][row][col].neightbors[i] == NEIGHBOR::RIGHT) {
+						hasRight = true;
+					}
+					else if (map[currentFloor][row][col].neightbors[i] == NEIGHBOR::UP) {
+						hasUp = true;
+					}
+				}
+
+				if (hasRight) {
+					aabb_t hall;
+					hall.isMinMax = false;
+					hall.center = (GetPositionVector(midpoints[row][col]) + GetPositionVector(midpoints[row][col + 1])) / 2.f;
+					hall.extent.y = hallwayHeight;
+					hall.extent.z = hallwayWidth / 2.f;
+					hall.extent.x = GetPositionVector(midpoints[row][col + 1]).x - hall.center.x + hallwayWidth / 2.f;
+
+					int index = hallwayColliders.size();
+					hallwayColliders.push_back(hall);
+
+					map[currentFloor][row][col].hallsId.push_back(index);
+					map[currentFloor][row][col + 1].hallsId.push_back(index);
+				}
+
+				if (hasUp) {
+					aabb_t hall;
+					hall.isMinMax = false;
+					hall.center = (GetPositionVector(midpoints[row][col]) + GetPositionVector(midpoints[row + 1][col])) / 2.f;
+					hall.extent.y = hallwayHeight;
+					hall.extent.x = hallwayWidth / 2.f;
+					hall.extent.z = GetPositionVector(midpoints[row + 1][col]).z - hall.center.z + hallwayWidth / 2.f;
+
+					int index = hallwayColliders.size();
+					hallwayColliders.push_back(hall);
+
+					map[currentFloor][row][col].hallsId.push_back(index);
+					map[currentFloor][row + 1][col].hallsId.push_back(index);
+				}
+			}
+		}
+	}
+
 	void map_room::clear() {
 		active = false; 
 		type = ROOM_TYPE::DEBUG;
 
-		for (auto& n : neightbors) {
-			n = NEIGHBOR::NONE;
+		for (int i = 0; i < MAX_NEIGHBOR_COUNT; ++i) {
+			neightbors[i] = NEIGHBOR::NONE;
+			//hallsId[i] = -1;
 		}
 
-		if (roomObjs.empty() || !roomObjs.front()) {
+		/*if (roomObjs.empty() || !roomObjs.front()) {
 			return;
-		}
+		}*/
 
-		auto& ptr = roomObjs.front();
-		ptr->isActive = false;
+		/*auto& ptr = roomObjs.front();
+		ptr->isActive = false;*/
+		hallsId.clear();
 	}
 
 	void map_room::addNeighbor(NEIGHBOR n) {
@@ -1219,6 +1299,11 @@ namespace dxe {
 		active = true;
 		roomSize = glm::linearRand(minSize, maxSize);
 
+		box.center = position;
+		box.extent.x = roomSize.x;
+		box.extent.y = 100000.f;
+		box.extent.z = roomSize.y;
+
 		/*if (roomObjs.empty() || !roomObjs.front()) {
 			return;
 		}
@@ -1227,5 +1312,6 @@ namespace dxe {
 		ptr->setPosition(position);
 		ptr->resourceId = 7;
 		ptr->isActive = true;*/
+		hallsId.reserve(4);
 	}
 }

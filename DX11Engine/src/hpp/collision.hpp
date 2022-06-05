@@ -56,6 +56,18 @@ namespace dxe {
 		return true;
 	}
 
+	inline const bool PointToAabbCollision(aabb_t box, glm::vec3 pos) {
+		if (!box.isMinMax) {
+			swapFormat(box);
+		}
+
+		if (pos.x < box.min.x || pos.x > box.max.x) { return false; }
+		if (pos.y < box.min.y || pos.y > box.max.y) { return false; }
+		if (pos.z < box.min.z || pos.z > box.max.z) { return false; }
+
+		return true;
+	}
+
 	inline const bool AabbToAabbCollision(const aabb_t& ls, const aabb_t& rs) {
 		if (ls.isMinMax != rs.isMinMax) { // error, boxes in different formats
 			return false;

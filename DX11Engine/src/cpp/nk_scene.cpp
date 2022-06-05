@@ -87,7 +87,7 @@ namespace dxe {
 		scb = new Scene_cb;
 		scb->dirLight.color = { 0.1f, 0.1f, 0.f, 0.0f };
 		scb->dirLight.direction = { 1.f, -1.f, 1.f };
-		scb->ambient = { 1.f, 1.f, 1.f, 0.2f };
+		scb->ambient = { 1.f, 1.f, 1.f, 0.4f };
 
 		scb->spotLight.color = { 1.f, 1.f, 0.f, 1.f };
 
@@ -105,8 +105,8 @@ namespace dxe {
 
 		allocateGameObjs(map.getRequiredMeshCount());
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
-		map.generateDungeon();
-		//map.generateDebugDungeon();
+		//map.generateDungeon();
+		map.generateDebugDungeon();
 		//map.printMapData();
 
 		player.setPosition(map.getRandomActiveRoomPos());
@@ -163,6 +163,8 @@ namespace dxe {
 
 		scb->spotLight.direction = camforw;
 		scb->spotLight.pos = campos;
+
+		map.drawColliders();
 	}
 
 	void nk_scene::inputUpdate(const float dt){
