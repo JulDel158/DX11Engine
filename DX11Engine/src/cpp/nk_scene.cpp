@@ -105,8 +105,8 @@ namespace dxe {
 
 		allocateGameObjs(map.getRequiredMeshCount());
 		map.generateRoomMeshes(gameObjects, 0, gObjSize);
-		//map.generateDungeon();
-		map.generateDebugDungeon();
+		map.generateDungeon();
+		//map.generateDebugDungeon();
 		//map.printMapData();
 
 		player.setPosition(map.getRandomActiveRoomPos());
@@ -150,6 +150,8 @@ namespace dxe {
 		//player.addGravityConstantForce(-gravity, dt);
 		player.update(dt);
 		terrain->traverseTree(player.getBox(), groundClamp);
+
+		player.setPosition(map.playerClampedPositions(player.getPosition()));
 		camera->setPosition(player.getPosition() + glm::vec3(0.f, player.currentOffset, 0.f));
 
 		skybox->transform[3] = glm::vec4(camera->position, 1.f); // positioning skybox at camera location

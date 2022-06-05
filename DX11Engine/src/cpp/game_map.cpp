@@ -271,6 +271,9 @@ namespace dxe {
 		for (row = 0; row < gridHeight; ++row) {
 			for (col = 0; col < gridWidth; ++col) {
 				if (map[0][row][col].active) {
+					// IN THE FUTURE WE MIGHT WANT TO SET THESE COORDINATES SOMEWHERE ELSE
+					playerCoordinates.row = row;
+					playerCoordinates.col = col;
 					return glm::vec3(midpoints[row][col][3][0], midpoints[row][col][3][1], midpoints[row][col][3][2]);
 				}
 			}
@@ -282,6 +285,14 @@ namespace dxe {
 	void game_map::drawColliders() {
 		for (auto& c : hallwayColliders)
 			debug_lines::addAabb(c);
+
+		for (int row = 0; row < gridHeight; ++row) {
+			for (int col = 0; col < gridWidth; ++col) {
+				if (map[currentFloor][row][col].active) {
+					debug_lines::addAabb(map[currentFloor][row][col].box, glm::vec4(0.f, 1.f, 0.f, 1.f ));
+				}
+			}
+		}
 	}
 
 	void game_map::randomWalkGeneration(map_room**& floor) {
@@ -540,7 +551,7 @@ namespace dxe {
 					p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
 
 					// NOW WE CAN PUSH THESE POINTS
-					int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
+					int currentIndx = static_cast<int>(hallwayObj->model.vertices.size()); // basically our 0 index
 
 					hallwayObj->model.vertices.push_back(p1);
 					hallwayObj->model.vertices.push_back(p2);
@@ -560,7 +571,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 2); //p3
 					hallwayObj->model.indices.push_back(currentIndx + 3); // p4
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 
 					p1.nrm = p4.nrm = p5.nrm = p8.nrm = { 0.f, 0.f, 1.f };
 					p1.uv = { 0.f, 1.f };
@@ -583,7 +594,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 3); // p4
 
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 					p2.nrm = p6.nrm = p7.nrm = p3.nrm = { 0.f, 0.f, -1.f };
 					p2.uv = { 0.f, 1.f };
 					p6.uv = { 0.f, 0.f };
@@ -605,7 +616,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 3); // p3
 
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 					p5.nrm = p7.nrm = p6.nrm = p8.nrm = { 0.f, -1.f, 0.f };
 					p5.uv = { 0.f, 0.f };
 					p6.uv = { 0.f, 1.f };
@@ -673,7 +684,7 @@ namespace dxe {
 					p5.pos.y = p6.pos.y = p7.pos.y = p8.pos.y = hallwayHeight;
 
 					// NOW WE CAN PUSH THESE POINTS
-					int currentIndx = hallwayObj->model.vertices.size(); // basically our 0 index
+					int currentIndx = static_cast<int>(hallwayObj->model.vertices.size()); // basically our 0 index
 					p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, 1.f, 0.f };
 					p1.uv = { 0.f, 0.f };
 					p2.uv = { 0.f, 1.f };
@@ -699,7 +710,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 2); //p3
 					hallwayObj->model.indices.push_back(currentIndx + 3); //p4
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 					p1.nrm = p5.nrm = p6.nrm = p2.nrm = { 1.f, 0.f, 0.f };
 					p1.uv = { 0.f, 1.f };
 					p5.uv = { 0.f, 0.f };
@@ -720,7 +731,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 2); //p6
 					hallwayObj->model.indices.push_back(currentIndx + 3); //p2
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 					p4.nrm = p8.nrm = p7.nrm = p3.nrm = { -1.f, 0.f, 0.f };
 					p4.uv = { 0.f, 1.f };
 					p8.uv = { 0.f, 0.f };
@@ -741,7 +752,7 @@ namespace dxe {
 					hallwayObj->model.indices.push_back(currentIndx + 2); //p7
 					hallwayObj->model.indices.push_back(currentIndx + 3); //p3
 
-					currentIndx = hallwayObj->model.vertices.size();
+					currentIndx = static_cast<int>(hallwayObj->model.vertices.size());
 					p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, -1.f, 0.f };
 					p5.uv = { 0.f, 0.f };
 					p6.uv = { 0.f, 1.f };
@@ -811,7 +822,7 @@ namespace dxe {
 				// we will need the main 8 vertices
 				// and the we will need 4 more vertices that will be used for doors
 
-				int currentIndx = roomObj->model.vertices.size();
+				int currentIndx = static_cast<int>(roomObj->model.vertices.size());
 				// Floor
 				ObjVertex p1;
 				ObjVertex p2;
@@ -861,7 +872,7 @@ namespace dxe {
 				p1.pos.y = p2.pos.y = p3.pos.y = p4.pos.y = hallwayHeight * 1.5f;
 				p1.nrm = p2.nrm = p3.nrm = p4.nrm = { 0.f, -1.f, 0.f };
 				// TODO: CHANGE UVS HERE 
-				currentIndx = roomObj->model.vertices.size();
+				currentIndx = static_cast<int>(roomObj->model.vertices.size());
 
 				roomObj->model.vertices.push_back(p1);
 				roomObj->model.vertices.push_back(p2);
@@ -919,7 +930,7 @@ namespace dxe {
 
 
 
-				currentIndx = roomObj->model.vertices.size();
+				currentIndx = static_cast<int>(roomObj->model.vertices.size());
 
 				p5.uv = { 0.35f, 0.f };
 				p6.uv = { 0.35f, 0.65f };
@@ -991,7 +1002,7 @@ namespace dxe {
 				p6.uv = { 0.35f, 0.65f };
 				p7.uv = { 0.65f, 0.65f };
 				p8.uv = { 0.65f, 0.0f };
-				currentIndx = roomObj->model.vertices.size();
+				currentIndx = static_cast<int>(roomObj->model.vertices.size());
 				if (hasRight) {
 					roomObj->model.vertices.push_back(p1);
 					roomObj->model.vertices.push_back(p2);
@@ -1083,7 +1094,7 @@ namespace dxe {
 				p6.uv = { 0.35f, 0.65f };
 				p7.uv = { 0.65f, 0.65f };
 				p8.uv = { 0.65f, 0.0f };
-				currentIndx = roomObj->model.vertices.size();
+				currentIndx = static_cast<int>(roomObj->model.vertices.size());
 				if (hasUp) {
 					roomObj->model.vertices.push_back(p1);
 					roomObj->model.vertices.push_back(p2);
@@ -1146,7 +1157,7 @@ namespace dxe {
 				p1.pos.z = p2.pos.z = p3.pos.z = p4.pos.z = p5.pos.z = p6.pos.z = p7.pos.z = p8.pos.z = center.z - map[0][row][col].roomSize.y / 2.f;
 				// adjusting normals
 				p1.nrm = p2.nrm = p3.nrm = p4.nrm = p5.nrm = p6.nrm = p7.nrm = p8.nrm = { 0.f, 0.f, 1.f };
-				currentIndx = roomObj->model.vertices.size();
+				currentIndx = static_cast<int>(roomObj->model.vertices.size());
 				p5.uv = { 0.35f, 0.f };
 				p6.uv = { 0.35f, 0.65f };
 				p7.uv = { 0.65f, 0.65f };
@@ -1214,6 +1225,90 @@ namespace dxe {
 
 	}
 
+	glm::vec3 game_map::playerClampedPositions(glm::vec3 playerPosition)
+	{
+		auto& currentRoom = map[currentFloor][playerCoordinates.row][playerCoordinates.col];
+		bool collidedWithRoom = PointToAabbCollision(currentRoom.box, playerPosition);
+		std::vector<int> hallCollisions;
+
+		for (auto i : currentRoom.hallsId) {
+			if (PointToAabbCollision(hallwayColliders[i], playerPosition)) {
+				hallCollisions.push_back(i);
+			}
+		}
+
+		if (!collidedWithRoom  && hallCollisions.empty()) {
+			int debug = 0;
+		}
+
+		// if we are colliding with the current room and not any halls, then we clamp the position to this room
+		if (collidedWithRoom && hallCollisions.empty()) {
+			glm::vec3 min = GetPositionVector(midpoints[playerCoordinates.row][playerCoordinates.col]);
+			glm::vec3 max = min;
+			min.x -= currentRoom.roomSize.x / 2.f - 0.25f;
+			min.z -= currentRoom.roomSize.y / 2.f - 0.25f;
+
+			max.x += currentRoom.roomSize.x / 2.f - 0.25f;
+			max.z += currentRoom.roomSize.y / 2.f - 0.25f;
+
+			return glm::clamp(playerPosition, min, max);
+		}
+
+		// we will now check if we are colliding with any neightbors and if such, then we must update the player coordinates
+		// each room has possibly 4 neightbors
+		bool collidedWithNeighbor = false;
+		for (int i = 0; i < map_room::MAX_NEIGHBOR_COUNT; ++i) {
+			if (currentRoom.neightbors[i] == NEIGHBOR::UP) {
+				if (PointToAabbCollision(map[currentFloor][playerCoordinates.row + 1][playerCoordinates.col].box, playerPosition)) {
+					++playerCoordinates.row;
+					collidedWithNeighbor = true;
+					break;
+				}
+			}
+			else if (currentRoom.neightbors[i] == NEIGHBOR::DOWN) {
+				if (PointToAabbCollision(map[currentFloor][playerCoordinates.row - 1][playerCoordinates.col].box, playerPosition)) {
+					--playerCoordinates.row;
+					collidedWithNeighbor = true;
+					break;
+				}
+			}
+			else if (currentRoom.neightbors[i] == NEIGHBOR::LEFT) {
+				if (PointToAabbCollision(map[currentFloor][playerCoordinates.row][playerCoordinates.col - 1].box, playerPosition)) {
+					--playerCoordinates.col;
+					collidedWithNeighbor = true;
+					break;
+				}
+			}
+			else if (currentRoom.neightbors[i] == NEIGHBOR::RIGHT) {
+				if (PointToAabbCollision(map[currentFloor][playerCoordinates.row][playerCoordinates.col + 1].box, playerPosition)) {
+					++playerCoordinates.col;
+					collidedWithNeighbor = true;
+					break;
+				}
+			}
+		}
+
+		if (collidedWithNeighbor == false && !hallCollisions.empty() && !collidedWithRoom) {
+			// we should be colliding with a hallway
+
+			auto box = hallwayColliders[hallCollisions.back()];
+
+			glm::vec3 min = box.center - box.extent;
+			min.x += 0.25f;
+			min.z += 0.25f;
+			glm::vec3 max = box.center + box.extent;
+			max.x -= 0.25f;
+			max.z -= 0.25f;
+
+			return glm::clamp(playerPosition, min, max);
+		}
+
+		
+
+
+		return playerPosition;
+	}
+
 	void game_map::generateHallColliders() {
 		int row, col, i;
 		bool hasRight = false;
@@ -1243,7 +1338,7 @@ namespace dxe {
 					hall.extent.z = hallwayWidth / 2.f;
 					hall.extent.x = GetPositionVector(midpoints[row][col + 1]).x - hall.center.x + hallwayWidth / 2.f;
 
-					int index = hallwayColliders.size();
+					int index = static_cast<int>(hallwayColliders.size());
 					hallwayColliders.push_back(hall);
 
 					map[currentFloor][row][col].hallsId.push_back(index);
@@ -1258,7 +1353,7 @@ namespace dxe {
 					hall.extent.x = hallwayWidth / 2.f;
 					hall.extent.z = GetPositionVector(midpoints[row + 1][col]).z - hall.center.z + hallwayWidth / 2.f;
 
-					int index = hallwayColliders.size();
+					int index = static_cast<int>(hallwayColliders.size());
 					hallwayColliders.push_back(hall);
 
 					map[currentFloor][row][col].hallsId.push_back(index);
@@ -1300,9 +1395,9 @@ namespace dxe {
 		roomSize = glm::linearRand(minSize, maxSize);
 
 		box.center = position;
-		box.extent.x = roomSize.x;
-		box.extent.y = 100000.f;
-		box.extent.z = roomSize.y;
+		box.extent.x = roomSize.x / 2.f;
+		box.extent.y = 100.f;
+		box.extent.z = roomSize.y / 2.f;
 
 		/*if (roomObjs.empty() || !roomObjs.front()) {
 			return;

@@ -19,6 +19,11 @@ namespace dxe {
 		NONE = 0, UP, DOWN, LEFT, RIGHT
 	};
 
+	struct roomCoordinates {
+		int row{ 0 };
+		int col{ 0 };
+	};
+
 	struct map_room {
 		bool active{ false };
 		ROOM_TYPE type{ ROOM_TYPE::DEBUG };
@@ -50,6 +55,7 @@ namespace dxe {
 		void generateDebugDungeon();
 		glm::vec3 getRandomActiveRoomPos();
 		void drawColliders();
+		glm::vec3 playerClampedPositions(glm::vec3 playerPosition);
 
 	private:
 		void randomWalkGeneration(map_room**& floor);
@@ -79,7 +85,7 @@ namespace dxe {
 		GameObject* roomObj{ nullptr };
 		glm::mat4** midpoints{ nullptr };
 		std::vector<aabb_t> hallwayColliders;
-		
+		roomCoordinates playerCoordinates;
 	};
 
 } // namespace dxe
